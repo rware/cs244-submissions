@@ -190,7 +190,7 @@ CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
-CXX11_FLAGS = -std=c++11 -pthread
+CXX11_FLAGS = -std=c++11 -pthread -lboost_system
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
