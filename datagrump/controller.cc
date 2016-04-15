@@ -18,7 +18,7 @@ unsigned int Controller::window_size( void )
 {
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
-	 << " window size is " << the_window_size << endl;
+	 << " window size is " << win_size_ << endl;
   }
 
   return (win_size_);
@@ -61,7 +61,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 
 /* A timeout was received */
-void timeout_received( void )
+void Controller::timeout_received( void )
 {
   win_size_ = (win_size_ + 1) / 2;
   return;

@@ -98,11 +98,7 @@ controller.o: controller.cc /usr/include/stdc-predef.h \
  /usr/include/c++/5.3.1/bits/basic_ios.tcc \
  /usr/include/c++/5.3.1/bits/ostream.tcc /usr/include/c++/5.3.1/istream \
  /usr/include/c++/5.3.1/bits/istream.tcc controller.hh \
- /usr/include/c++/5.3.1/set /usr/include/c++/5.3.1/bits/stl_tree.h \
- /usr/include/c++/5.3.1/ext/aligned_buffer.h \
- /usr/include/c++/5.3.1/bits/stl_set.h \
- /usr/include/c++/5.3.1/bits/stl_multiset.h ../src/timestamp.hh \
- /usr/include/c++/5.3.1/ctime
+ ../src/timestamp.hh /usr/include/c++/5.3.1/ctime
 
 /usr/include/stdc-predef.h:
 
@@ -375,16 +371,6 @@ controller.o: controller.cc /usr/include/stdc-predef.h \
 /usr/include/c++/5.3.1/bits/istream.tcc:
 
 controller.hh:
-
-/usr/include/c++/5.3.1/set:
-
-/usr/include/c++/5.3.1/bits/stl_tree.h:
-
-/usr/include/c++/5.3.1/ext/aligned_buffer.h:
-
-/usr/include/c++/5.3.1/bits/stl_set.h:
-
-/usr/include/c++/5.3.1/bits/stl_multiset.h:
 
 ../src/timestamp.hh:
 

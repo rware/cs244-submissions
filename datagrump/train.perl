@@ -13,15 +13,29 @@ sub filter_candidates() {
     @candidates = (sort { $a->{'power'} <=> $b->{'power'} } @candidates)[0..10];
 }
 
+
+sub gen_base_candidate() {
+    # Start with unknown power, delay, throughput
+    my $candidate = {'power' => 0,
+                     'signal_delay' => 0,
+                     'throughput' => 0 };
+}
+
+sub gen_random_candidate() {
+    my $candidate = gen_base_candidate();    
+
+    # TODO add params 
+    $candidate->{'param1'} = int(rand(100));
+
+    return $candidate;
+}
+
 # "Mate" two candidates together,
 # by averaging their parameter values
 # and adding some amount of random variation
 sub mate_candidates($$) {
-
-}
-
-sub gen_random_candidate() {
-    
+    my $(c1, c2) = @_;
+    my $c2 = 
 }
 
 # Create a bunch of random candidates
