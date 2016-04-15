@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+enum Controller_State { SS, CA };
 /* Congestion controller interface */
 
 class Controller
@@ -11,6 +12,9 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
+  unsigned int win_size_;
+  unsigned int ssthresh_;
+  Controller_State state_;
 
 public:
   /* Public interface for the congestion controller */
@@ -32,6 +36,9 @@ public:
 		     const uint64_t send_timestamp_acked,
 		     const uint64_t recv_timestamp_acked,
 		     const uint64_t timestamp_ack_received );
+
+  /* A timeout was received */
+  void timeout_received( void );
 
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */
