@@ -4,6 +4,7 @@
 #include <cstdint>
 
 enum Controller_State { SS, CA };
+enum Controller_Mode { NA, AIMD, SIMPLE_DELAY };
 /* Congestion controller interface */
 
 class Controller
@@ -13,8 +14,9 @@ private:
 
   /* Add member variables here */
   unsigned int win_size_;
-  unsigned int ssthresh_;
+  unsigned int max_rtt_thresh_;
   Controller_State state_;
+  Controller_Mode mode_;
 
 public:
   /* Public interface for the congestion controller */

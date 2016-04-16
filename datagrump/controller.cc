@@ -3,13 +3,15 @@
 #include "controller.hh"
 #include "timestamp.hh"
 
+#define WINDOW_SIZE_FIXED 50
 using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    ssthresh_( 100 ),
+    max_rtt_thresh_( 100 ),
+    mode_( SIMPLE_DELAY ),
     state_( SS )
 {}
 
@@ -21,7 +23,11 @@ unsigned int Controller::window_size( void )
 	 << " window size is " << win_size_ << endl;
   }
 
-  return (win_size_);
+  if (mode_ == NA) {
+    return (WINDOW_SIZE_FIXED);
+  } else {
+    return (win_size_);
+  }
 }
 
 /* A datagram was sent */
@@ -48,7 +54,19 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  win_size_++;
+  unsigned int rtt;
+  if (mode_ == AIMD) {
+    win_size_++;
+  } else if (mode_ == SIMPLE_DELAY) {
+    rtt = timestamp_ack_received - send_timestamp_acked;
+    if (rtt < max_rtt_thresh_) {
+      win_size_++;
+    } else {
+      win_size_ = win_size_ * max_rtt_thresh_ / rtt;
+      if (win_size_ == 0)
+        win_size_ = 1;
+    }
+  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -63,7 +81,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  win_size_ = (win_size_ + 1) / 2;
+  if (mode_ == AIMD) {
+    win_size_ = (win_size_ + 1) / 2;
+  }
   return;
 }
 
