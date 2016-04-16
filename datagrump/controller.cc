@@ -10,9 +10,10 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    max_rtt_thresh_( 100 ),
-    mode_( SIMPLE_DELAY ),
-    state_( SS )
+    timeout_( 60 ),
+    max_rtt_thresh_( 70 ),
+    state_( SS ),
+    mode_( SIMPLE_DELAY )
 {}
 
 /* Get current window size, in datagrams */
@@ -55,10 +56,18 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   unsigned int rtt;
-  if (mode_ == AIMD) {
-    win_size_++;
+  rtt = timestamp_ack_received - send_timestamp_acked;
+  bool timeout = false;
+  if ((mode_ == AIMD) && (rtt >  timeout_)) {
+    timeout = true;
+  }
+  if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
+    if (timeout) {
+      timeout_received();
+    } else {
+      win_size_++;
+    }
   } else if (mode_ == SIMPLE_DELAY) {
-    rtt = timestamp_ack_received - send_timestamp_acked;
     if (rtt < max_rtt_thresh_) {
       win_size_++;
     } else {
@@ -81,7 +90,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  if (mode_ == AIMD) {
+  if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
     win_size_ = (win_size_ + 1) / 2;
   }
   return;
@@ -91,5 +100,5 @@ void Controller::timeout_received( void )
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 1000; /* timeout of one second */
+  return (timeout_); /* timeout of one second */
 }
