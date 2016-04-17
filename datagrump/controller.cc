@@ -41,8 +41,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 /* An ack was received */
 void Controller::ack_received( const uint64_t sequence_number_acked,
              /* what sequence number was acknowledged */
-             const uint64_t send_timestamp,
-             /* when the datagram was sent */
              const uint64_t send_timestamp_acked,
              /* when the acknowledged datagram was sent (sender's clock) */
              const uint64_t recv_timestamp_acked,
@@ -50,13 +48,15 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
              const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  if (timestamp_ack_received - send_timestamp >= timeout_ms()) {
+  if (timestamp_ack_received - send_timestamp_acked >= timeout_ms()) {
     if (!in_timeout_batch) {
       in_timeout_batch = true;
       // Multiplicative decrease
       window_size_double *= 0.5;
       window_size_int = static_cast<unsigned int>(window_size_double);
-      if (window_size_int == 0) window_size_int = 1;
+      if (window_size_int == 0) {
+        window_size_int = 1;
+      }
       if (debug_) {
         cerr << "timeout: window size is now " << window_size_int << endl;
       }

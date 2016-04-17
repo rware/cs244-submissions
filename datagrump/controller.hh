@@ -32,7 +32,6 @@ public:
 
   /* An ack was received */
   void ack_received( const uint64_t sequence_number_acked,
-         const uint64_t send_timestamp,
          const uint64_t send_timestamp_acked,
          const uint64_t recv_timestamp_acked,
          const uint64_t timestamp_ack_received );
