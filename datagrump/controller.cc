@@ -57,7 +57,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       window_size_double *= 0.5;
       window_size_int = static_cast<unsigned int>(window_size_double);
       if (window_size_int == 0) window_size_int = 1;
-      cerr << "timeout: window size is now " << window_size_int << endl;
+      if (debug_) {
+        cerr << "timeout: window size is now " << window_size_int << endl;
+      }
     }
   } else {
     in_timeout_batch = false;
@@ -65,7 +67,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     window_size_double += 1 / static_cast<double>(window_size_int);
     if (static_cast<unsigned int>(window_size_double) > window_size_int) {
       window_size_int = static_cast<unsigned int>(window_size_double);
-      cerr << "window size increased to " << window_size_int << endl;
+      if (debug_) {
+        cerr << "window size increased to " << window_size_int << endl;
+      }
     }
   }
 
