@@ -6,8 +6,8 @@
 
 using namespace std;
 
-static const uint64_t INCREASE_THRESHOLD = 90;
-static const uint64_t DECREASE_THRESHOLD = 150;
+static const uint64_t INCREASE_THRESHOLD = 70;
+static const uint64_t DECREASE_THRESHOLD = 120;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
