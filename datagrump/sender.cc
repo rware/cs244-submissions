@@ -90,6 +90,7 @@ void DatagrumpSender::got_ack( const uint64_t timestamp,
 
   /* Inform congestion controller */
   controller_.ack_received( ack.header.ack_sequence_number,
+          ack.header.send_timestamp,
 			    ack.header.ack_send_timestamp,
 			    ack.header.ack_recv_timestamp,
 			    timestamp );
