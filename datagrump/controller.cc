@@ -57,13 +57,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
         cerr << "RTT " << timestamp_ack_received - send_timestamp_acked << ", decreasing window size " << window_size_double << endl;
     }
     if (window_size_double >= 1) {
-        window_size_double -= 1;
+        window_size_double -= 1 / sqrt(window_size_double);
     }
   } else if (timestamp_ack_received - send_timestamp_acked <= INCREASE_THRESHOLD) {
     if (debug_) {
         cerr << "RTT " << timestamp_ack_received - send_timestamp_acked << ", increasing window size " << window_size_double << endl;
     }
-    window_size_double += 1;
+    window_size_double += 1 / window_size_double;
   } else {
     if (debug_) {
         cerr << "RTT " << timestamp_ack_received - send_timestamp_acked << ", doing nothing" << endl;
