@@ -10,7 +10,6 @@ Controller::Controller( const bool debug )
   : debug_( debug )
   , window_size_int(10)
   , window_size_double(window_size_int)
-  , expected_ack(0)
   , in_timeout_batch(false)
 {}
 
@@ -68,7 +67,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       window_size_int = static_cast<unsigned int>(window_size_double);
       cerr << "window size increased to " << window_size_int << endl;
     }
-    expected_ack = sequence_number_acked + 1;
   }
 
   if ( debug_ ) {

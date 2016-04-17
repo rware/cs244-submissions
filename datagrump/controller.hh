@@ -13,7 +13,6 @@ private:
   /* Add member variables here */
   unsigned int window_size_int;
   double window_size_double;
-  uint64_t expected_ack;
   bool in_timeout_batch;
 
 public:
