@@ -1,20 +1,30 @@
 #include <iostream>
+#include <math.h>
 
 #include "controller.hh"
 #include "timestamp.hh"
 
 using namespace std;
 
+/* AIMD Scheme : initial window size. */
+#define AIMD_MIN 1.0
+/* AIMD Scheme : additive constant (> 0). */
+#define AIMD_ADD 1.0
+/* AIMD Scheme : multiplicative constant (< 1). */
+#define AIMD_MULT 0.5
+
+
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug )
-{}
+  , cur_window_size( AIMD_MIN )
+{ }
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  unsigned int the_window_size = 50;
+  unsigned int the_window_size = static_cast<int>(cur_window_size);
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
@@ -48,7 +58,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  /* Default: take no action */
+  /* AIMD scheme : increase the congestion window size. */
+  cur_window_size += AIMD_ADD / floor( cur_window_size );
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -59,9 +70,25 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 }
 
+/* What happens when a timeout is experienced. */
+void Controller::timeout_experienced( void )
+{
+  /* AIMD Scheme : divide the window size. */
+  double res = cur_window_size * AIMD_MULT;
+  if ( res <= AIMD_MIN )
+    cur_window_size = AIMD_MIN;
+  else
+    cur_window_size = res;
+
+  int w_s = window_size (); //useful for debugging
+
+  if ( debug_ )
+    cerr << "Timeout experienced ! New size : " << w_s << endl;
+}
+
 /* How long to wait (in milliseconds) if there are no acks
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 1000; /* timeout of one second */
+  return 200; /* timeout of 200ms */
 }

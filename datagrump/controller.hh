@@ -11,6 +11,7 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
+  double cur_window_size; //need a double for additive increase
 
 public:
   /* Public interface for the congestion controller */
@@ -32,6 +33,9 @@ public:
 		     const uint64_t send_timestamp_acked,
 		     const uint64_t recv_timestamp_acked,
 		     const uint64_t timestamp_ack_received );
+
+  /* A timeout was experienced. */
+  void timeout_experienced ( void );
 
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */
