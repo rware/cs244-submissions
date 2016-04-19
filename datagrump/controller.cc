@@ -1,7 +1,11 @@
 #include <iostream>
+#include <cmath>
 
 #include "controller.hh"
 #include "timestamp.hh"
+
+#define ALPHA 1.0/(double)8
+#define BETA 1.0/(double)4
 
 using namespace std;
 
@@ -12,10 +16,13 @@ Controller::Controller( const bool debug) :
   debug_( debug ),
   windowSize( 1 ),
   ssthresh(1 << 15),
-  outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
-  receivedAckno(0),
-  ackCount(0),
-  timeout ( 150 ) {}
+  srtt ( 0 ),
+  rttvar ( 0 ),
+  timeout ( 250 ),
+  outgoingPackets(deque<pair<uint64_t, uint64_t>>())
+  {}
+
+
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
@@ -49,20 +56,27 @@ void Controller::datagram_was_sent( const uint64_t sequence_number, /* of the se
   }
 }
 
+/* EMWA of RTT samples is calculated accoring to RFC 2988 */
+void Controller::update_rtt(int64_t diff ) {
+  if (srtt == 0) {
+    srtt = diff;
+    rttvar = diff / 2;
+    timeout = 3 * srtt;
+  } else {
+    rttvar = (1.0 - BETA)*rttvar + BETA * abs(srtt - diff);
+    srtt = (1.0 - ALPHA)*srtt + ALPHA * diff;
+    timeout = 4*srtt + 4 * rttvar;
+  }
+}
+
 /* An ack was received */
 void Controller::ack_received( const uint64_t sequence_number_acked, /* what sequence number was acknowledged */
                               const uint64_t send_timestamp_acked, /* when the acknowledged datagram was sent (sender's clock) */
                               const uint64_t recv_timestamp_acked, /* when the acknowledged datagram was received (receiver's clock)*/
                               const uint64_t timestamp_ack_received ) /* when the ack was received (by sender) */
 {
-  /* Default: take no action */
-  //  if (receivedAckno == sequence_number_acked) {
-  //    if (++ackCount == 3)
-  //      windowSize = windowSize / 2 == 0 ? 1 : windowSize / 2;
-  //  } else {
-  receivedAckno = sequence_number_acked;
-  ackCount = 1;
   bool acked = false;
+  update_rtt(timestamp_ack_received - send_timestamp_acked);
   for (size_t i = 0; i < outgoingPackets.size(); i++) {
     auto sent_seqno = outgoingPackets.front();
     if (sent_seqno.first > sequence_number_acked)

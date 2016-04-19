@@ -14,10 +14,11 @@ private:
 	bool debug_; /* Enables debugging output */
   double windowSize;
   unsigned int ssthresh;
+  int64_t srtt;
+  int64_t rttvar;
+  uint64_t timeout;
+  
   deque<pair<uint64_t, uint64_t> > outgoingPackets;
-  uint64_t receivedAckno;
-  unsigned int ackCount;
-  unsigned int timeout;
   /* Add member variables here */
 	
 public:
@@ -31,6 +32,7 @@ public:
 	/* Get current window size, in datagrams */
 	unsigned int window_size( void );
 	
+  void update_rtt( int64_t diff );
 	/* A datagram was sent */
 	void datagram_was_sent( const uint64_t sequence_number,
 						   const uint64_t send_timestamp );
