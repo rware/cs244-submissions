@@ -1,0 +1,364 @@
+
+Now running window size 20
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.17 Mbits/s (62.9% utilization)
+95th percentile per-packet queueing delay: 97 ms
+95th percentile signal delay: 280 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1847667 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461031961-xishithi
+
+Now running window size 40
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 4.42 Mbits/s (87.7% utilization)
+95th percentile per-packet queueing delay: 190 ms
+95th percentile signal delay: 503 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (2290360 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461032105-ithohshi
+
+Now running window size 60
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 5.04 Mbits/s
+Average throughput: 4.74 Mbits/s (94.0% utilization)
+95th percentile per-packet queueing delay: 295 ms
+95th percentile signal delay: 700 ms
+
+Uploading data to server... done.
+
+Upload successful (2417581 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461032250-bavohpin
+
+Now running window size 80
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 5.04 Mbits/s
+Average throughput: 4.65 Mbits/s (92.2% utilization)
+95th percentile per-packet queueing delay: 411 ms
+95th percentile signal delay: 894 ms
+
+Uploading data to server... done.
+
+Upload successful (2392302 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461032397-ahtashah
+
+Now running window size 100
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 5.04 Mbits/s
+Average throughput: 4.72 Mbits/s (93.7% utilization)
+95th percentile per-packet queueing delay: 515 ms
+95th percentile signal delay: 1043 ms
+
+Uploading data to server... done.
+
+Upload successful (2428133 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461032542-laukoshi
+
+Now running window size 120
+Listening on :::9090
+Sending to 100.64.0.1:9090
+Now running window size 1
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 0.21 Mbits/s (4.1% utilization)
+95th percentile per-packet queueing delay: 19 ms
+95th percentile signal delay: 194 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (845521 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461032782-laiveete
+
+Now running window size 3
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 0.61 Mbits/s (12.2% utilization)
+95th percentile per-packet queueing delay: 25 ms
+95th percentile signal delay: 123 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (981448 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461032925-thacoosh
+
+Now running window size 5
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 5.04 Mbits/s
+Average throughput: 0.93 Mbits/s (18.5% utilization)
+95th percentile per-packet queueing delay: 33 ms
+95th percentile signal delay: 154 ms
+
+Uploading data to server... done.
+
+Upload successful (1087273 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033068-iequeiso
+
+Now running window size 7
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 1.26 Mbits/s (24.9% utilization)
+95th percentile per-packet queueing delay: 43 ms
+95th percentile signal delay: 152 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1197023 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033213-iweshahs
+
+Now running window size 9
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 1.62 Mbits/s (32.1% utilization)
+95th percentile per-packet queueing delay: 51 ms
+95th percentile signal delay: 166 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1318619 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033360-jechaish
+
+Now running window size 11
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 1.92 Mbits/s (38.1% utilization)
+95th percentile per-packet queueing delay: 59 ms
+95th percentile signal delay: 177 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1420861 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033507-quoophee
+
+Now running window size 13
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 2.25 Mbits/s (44.6% utilization)
+95th percentile per-packet queueing delay: 70 ms
+95th percentile signal delay: 195 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1531017 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033651-wifaegei
+
+Now running window size 15
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 5.04 Mbits/s
+Average throughput: 2.56 Mbits/s (50.9% utilization)
+95th percentile per-packet queueing delay: 74 ms
+95th percentile signal delay: 215 ms
+
+Uploading data to server... done.
+
+Upload successful (1637884 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033801-feizeequ
+
+Now running window size 17
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 2.79 Mbits/s (55.4% utilization)
+95th percentile per-packet queueing delay: 81 ms
+95th percentile signal delay: 234 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1716473 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461033948-aghaayie
+
+Now running window size 19
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.02 Mbits/s (59.9% utilization)
+95th percentile per-packet queueing delay: 92 ms
+95th percentile signal delay: 258 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1793447 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461034094-ciephooc
+
+Now running window size 21
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.31 Mbits/s (65.7% utilization)
+95th percentile per-packet queueing delay: 101 ms
+95th percentile signal delay: 290 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1895312 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461034239-aemaquoh
+
+Now running window size 23
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.44 Mbits/s (68.3% utilization)
+95th percentile per-packet queueing delay: 111 ms
+95th percentile signal delay: 319 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (1940850 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461034383-agheecah
+
+Now running window size 25
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 2.11 Mbits/s
+Average throughput: 0.54 Mbits/s (25.4% utilization)
+95th percentile per-packet queueing delay: 98 ms
+95th percentile signal delay: 284 ms
+
+Uploading data to server... done.
+
+Upload successful (1197388 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461034722-yiecheew
+
+Now running window size 27
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.70 Mbits/s (73.5% utilization)
+95th percentile per-packet queueing delay: 128 ms
+95th percentile signal delay: 364 ms
+
+Uploading data to server... done.
+
+Upload successful (2033800 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461034867-keenoona
+
+Now running window size 29
+Listening on :::9090
+Sending to 100.64.0.1:9090
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.85 Mbits/s (76.5% utilization)
+95th percentile per-packet queueing delay: 138 ms
+95th percentile signal delay: 383 ms
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Uploading data to server... done.
+
+Upload successful (2085980 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?test22-1461035011-teijajol
+
