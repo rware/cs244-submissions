@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cmath>
+#include <algorithm>
 
 #include "controller.hh"
 #include "timestamp.hh"
@@ -61,12 +61,11 @@ void Controller::update_rtt(int64_t diff ) {
   if (srtt == 0) {
     srtt = diff;
     rttvar = diff / 2;
-    timeout = 3 * srtt;
   } else {
     rttvar = (1.0 - BETA)*rttvar + BETA * abs(srtt - diff);
     srtt = (1.0 - ALPHA)*srtt + ALPHA * diff;
-    timeout = 4*srtt + 4 * rttvar;
   }
+  timeout = 300 < srtt + 4 * rttvar ? srtt + 4 * rttvar : 300;
 }
 
 /* An ack was received */
@@ -105,5 +104,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked, /* what seq
  before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return this->timeout; /* timeout of one second */
+  return timeout; /* timeout of one second */
 }
