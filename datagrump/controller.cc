@@ -5,10 +5,12 @@
 
 using namespace std;
 
+
+
 /* Default constructor */
 Controller::Controller( const bool debug)
-  : debug_( debug ), windowSize( 20 ),  outgoingPackets(deque<uint64_t>()),
-    receivedAckno(0), ackCount(0), timeout ( 1000 ) {}
+  : debug_( debug ), windowSize( 20 ),  outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
+    receivedAckno(0), ackCount(0), timeout ( 75 ) {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
@@ -29,7 +31,12 @@ void Controller::datagram_was_sent( const uint64_t sequence_number, /* of the se
 				    const uint64_t send_timestamp ) /* in milliseconds */
 {
   /* Default: take no action */
-  outgoingPackets.push_back(sequence_number);
+  outgoingPackets.push_back(make_pair(sequence_number, send_timestamp));
+  auto oldest_packet = outgoingPackets.front();
+  
+  if (oldest_packet.second + timeout < send_timestamp)
+    windowSize = windowSize / 2 == 0 ? 1 : windowSize / 2;
+  
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
 	 << " sent datagram " << sequence_number << endl;
@@ -43,22 +50,22 @@ void Controller::ack_received( const uint64_t sequence_number_acked, /* what seq
 			       const uint64_t timestamp_ack_received ) /* when the ack was received (by sender) */
 {
   /* Default: take no action */
-  if (receivedAckno == sequence_number_acked) {
-    if (ackCount++ == 3)
-      windowSize = windowSize / 2 == 0 ? 1 : windowSize / 2;
-  } else {
+//  if (receivedAckno == sequence_number_acked) {
+//    if (++ackCount == 3)
+//      windowSize = windowSize / 2 == 0 ? 1 : windowSize / 2;
+//  } else {
     receivedAckno = sequence_number_acked;
     ackCount = 1;
     
     for (size_t i = 0; i < outgoingPackets.size(); i++) {
-      uint64_t sent_seqno = outgoingPackets.front();
-      if (sent_seqno > sequence_number_acked)
+      auto sent_seqno = outgoingPackets.front();
+      if (sent_seqno.first > sequence_number_acked)
         break;
       
       outgoingPackets.pop_front();
       this->windowSize++;
     }
-  }
+//  }
   
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
