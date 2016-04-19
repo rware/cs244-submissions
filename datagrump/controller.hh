@@ -12,7 +12,7 @@ class Controller
 {
 private:
 	bool debug_; /* Enables debugging output */
-  unsigned int windowSize;
+  double windowSize;
   unsigned int ssthresh;
   deque<pair<uint64_t, uint64_t> > outgoingPackets;
   uint64_t receivedAckno;

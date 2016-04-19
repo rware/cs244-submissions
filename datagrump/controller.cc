@@ -8,15 +8,20 @@ using namespace std;
 
 
 /* Default constructor */
-Controller::Controller( const bool debug)
-: debug_( debug ), windowSize( 15 ), ssthresh(1 << 15), outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
-receivedAckno(0), ackCount(0), timeout ( 50 ) {}
+Controller::Controller( const bool debug) :
+  debug_( debug ),
+  windowSize( 5 ),
+  ssthresh(1 << 15),
+  outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
+  receivedAckno(0),
+  ackCount(0),
+  timeout ( 50 ) {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  unsigned int the_window_size = this->windowSize;
+  unsigned int the_window_size = (unsigned int) this->windowSize;
   
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
@@ -70,7 +75,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked, /* what seq
     }
   }
   if (windowSize >= ssthresh && acked)
-    windowSize += ssthresh + ssthresh/windowSize;
+    windowSize += 1 / windowSize;
   
   
     if ( debug_ ) {
