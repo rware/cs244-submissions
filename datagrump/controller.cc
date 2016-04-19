@@ -7,8 +7,8 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug)
-  : debug_( debug ), windowSize( 20 ), timeout ( 1000 )
-{}
+  : debug_( debug ), windowSize( 20 ), timeout ( 1000 ),
+    receivedAckno(0), ackCount(0) {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
@@ -29,7 +29,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number, /* of the se
 				    const uint64_t send_timestamp ) /* in milliseconds */
 {
   /* Default: take no action */
-
+  outgoingPackets.push_back(sequence_number);
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
 	 << " sent datagram " << sequence_number << endl;
@@ -43,13 +43,23 @@ void Controller::ack_received( const uint64_t sequence_number_acked, /* what seq
 			       const uint64_t timestamp_ack_received ) /* when the ack was received (by sender) */
 {
   /* Default: take no action */
-
-  if (packetSuccessfullyAcked) {
-    this->windowSize++;
-  } else if (timeoutComputed > this.timeout_ms()) {
-    this->windowSize = this->windowSize / 2;
+  if (receivedAckno == sequence_number_acked) {
+    if (ackCount++ == 3)
+      windowSize = windowSize / 2 == 0 ? 1 : windowSize / 2;
+  } else {
+    receivedAckno = sequence_number_acked;
+    ackCount = 1;
+    
+    for (int i = 0; i < outgoingPackets.size(); i++) {
+      uint64_t sent_seqno = outgoingPackets.front();
+      if (sent_seqno > sequence_number_acked)
+        break;
+      
+      outgoingPackets.pop_front();
+      this->windowSize++;
+    }
   }
-
+  
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
 	 << " received ack for datagram " << sequence_number_acked
