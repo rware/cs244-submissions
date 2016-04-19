@@ -7,8 +7,8 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug)
-  : debug_( debug ), windowSize( 20 ), timeout ( 1000 ),
-    receivedAckno(0), ackCount(0) {}
+  : debug_( debug ), windowSize( 20 ),  outgoingPackets(deque<uint64_t>()),
+    receivedAckno(0), ackCount(0), timeout ( 1000 ) {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
@@ -50,7 +50,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked, /* what seq
     receivedAckno = sequence_number_acked;
     ackCount = 1;
     
-    for (int i = 0; i < outgoingPackets.size(); i++) {
+    for (size_t i = 0; i < outgoingPackets.size(); i++) {
       uint64_t sent_seqno = outgoingPackets.front();
       if (sent_seqno > sequence_number_acked)
         break;
