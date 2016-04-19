@@ -10,12 +10,12 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug) :
   debug_( debug ),
-  windowSize( 5 ),
+  windowSize( 1 ),
   ssthresh(1 << 15),
   outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
   receivedAckno(0),
   ackCount(0),
-  timeout ( 50 ) {}
+  timeout ( 150 ) {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
