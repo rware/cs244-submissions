@@ -8,18 +8,12 @@
 /* Congestion controller interface */
 using namespace std;
 
-class SentPacket {
-public:
-  uint64_t seqno;
-  uint64_t timestamp;
-  SentPacket(uint64_t sequence_no, uint64_t tstamp ) : seqno(sequence_no), timestamp(tstamp) {};
-};
-
 class Controller
 {
 private:
 	bool debug_; /* Enables debugging output */
   unsigned int windowSize;
+  unsigned int ssthresh;
   deque<pair<uint64_t, uint64_t> > outgoingPackets;
   uint64_t receivedAckno;
   unsigned int ackCount;
