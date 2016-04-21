@@ -9,6 +9,7 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
+  float cwnd_;
 
   /* Add member variables here */
 
@@ -18,7 +19,7 @@ public:
      the call site as well (in sender.cc) */
 
   /* Default constructor */
-  Controller( const bool debug );
+  Controller( const bool debug, float cwnd_sz);
 
   /* Get current window size, in datagrams */
   unsigned int window_size( void );
@@ -26,6 +27,8 @@ public:
   /* A datagram was sent */
   void datagram_was_sent( const uint64_t sequence_number,
 			  const uint64_t send_timestamp );
+
+  void timeout_occured( void );
 
   /* An ack was received */
   void ack_received( const uint64_t sequence_number_acked,
