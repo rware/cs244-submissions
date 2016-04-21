@@ -63,7 +63,10 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 void Controller::timeout_occured( void ) {
   /* Simple AIMD, decrement by 1/2 */
-  cwnd_ = cwnd_ / 2;
+  cwnd_ = cwnd_ / cwnd_;
+
+  cerr << "Timeout occured!" << endl
+       << " cwnd = " << cwnd_ << endl;
 
 } 
 
