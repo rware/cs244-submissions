@@ -6,7 +6,8 @@
 
 #define INITIAL_WINDOW_SIZE 1
 #define MULTIPLICATIVE_DECREASE_FACTOR 2
-#define TIMEOUT_VAL 50
+#define TIMEOUT_VAL 200
+#define RTT_THRESH 100
 
 using namespace std;
 
@@ -54,7 +55,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   /* Default: take no action */
-  this->curr_window_size += 1.0 / this->window_size();
+  uint64_t rtt = timestamp_ack_received - send_timestamp_acked;
+  if (rtt > RTT_THRESH) {
+    this->_multiplicativeDecrease();
+  } else {
+    this->_additiveIncrease();
+  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -65,10 +71,22 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 }
 
-void Controller::timeout_occured( void)
+void Controller::_multiplicativeDecrease( void )
 {
-  cout << "Timeout occured with window size " << this->curr_window_size << endl;
   this->curr_window_size /= MULTIPLICATIVE_DECREASE_FACTOR;
+}
+
+void Controller::_additiveIncrease( void )
+{
+  this->curr_window_size += 2.0 / this->window_size();
+}
+
+void Controller::timeout_occured( void )
+{
+  if (debug_) {
+    cout << "Timeout occured with window size " << this->curr_window_size << endl;
+  }
+  this->_multiplicativeDecrease();
 }
 
 /* How long to wait (in milliseconds) if there are no acks

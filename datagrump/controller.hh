@@ -10,6 +10,8 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   double curr_window_size;
+  void _additiveIncrease( void );
+  void _multiplicativeDecrease( void);
 
   /* Add member variables here */
 
