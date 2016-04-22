@@ -2,10 +2,19 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#include <set>
 
 enum Controller_State { SS, CA };
 enum Controller_Mode { NA, AIMD, AIMD_INF, SIMPLE_DELAY };
 /* Congestion controller interface */
+
+struct SentPacket {
+  uint64_t sequence_number;
+  uint64_t sent_time;
+  bool operator<(const SentPacket& rhs) const {
+    return rhs.sequence_number < this->sequence_number;
+  }
+};
 
 class Controller
 {
@@ -18,6 +27,10 @@ private:
   unsigned int max_rtt_thresh_;
   Controller_State state_;
   Controller_Mode mode_;
+  std::set<SentPacket> outstanding_packets_;
+  uint64_t last_timeout_;
+
+  bool is_timeout(uint64_t current_time);
 
 public:
   /* Public interface for the congestion controller */

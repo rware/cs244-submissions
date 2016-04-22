@@ -110,7 +110,11 @@ sender.o: sender.cc /usr/include/stdc-predef.h \
  /usr/include/netdb.h /usr/include/rpc/netdb.h \
  /usr/include/bits/siginfo.h /usr/include/bits/netdb.h \
  ../src/file_descriptor.hh contest_message.hh controller.hh \
- ../src/poller.hh /usr/include/c++/5.3.1/vector \
+ /usr/include/c++/5.3.1/set /usr/include/c++/5.3.1/bits/stl_tree.h \
+ /usr/include/c++/5.3.1/ext/aligned_buffer.h \
+ /usr/include/c++/5.3.1/bits/stl_set.h \
+ /usr/include/c++/5.3.1/bits/stl_multiset.h ../src/poller.hh \
+ /usr/include/c++/5.3.1/vector \
  /usr/include/c++/5.3.1/bits/stl_construct.h \
  /usr/include/c++/5.3.1/bits/stl_uninitialized.h \
  /usr/include/c++/5.3.1/bits/stl_vector.h \
@@ -443,6 +447,16 @@ sender.o: sender.cc /usr/include/stdc-predef.h \
 contest_message.hh:
 
 controller.hh:
+
+/usr/include/c++/5.3.1/set:
+
+/usr/include/c++/5.3.1/bits/stl_tree.h:
+
+/usr/include/c++/5.3.1/ext/aligned_buffer.h:
+
+/usr/include/c++/5.3.1/bits/stl_set.h:
+
+/usr/include/c++/5.3.1/bits/stl_multiset.h:
 
 ../src/poller.hh:
 
