@@ -5,10 +5,18 @@
 
 using namespace std;
 
-#define USING_AIMD true
-#define DEFAULT_CWIND 40
+//AIMD values
+#define USING_AIMD false
 #define ADDITIVE_INCREASE 1
 #define DECREASE_FACTOR .75
+
+//Delay triggered values
+#define DELAY_TRIGGER true
+#define MAX_DELAY_THRESHOLD 125
+#define MIN_DELAY_THRESHOLD 50
+
+
+#define DEFAULT_CWIND 40
 #define DEFAULT_TIMEOUT 45
 
 /* Default constructor */
@@ -54,6 +62,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 {
   if (USING_AIMD){
     cwind += ADDITIVE_INCREASE / cwind;
+  }
+
+  if (DELAY_TRIGGER){
+    float delay = timestamp_ack_received - send_timestamp_acked;
+    if (delay < MIN_DELAY_THRESHOLD){
+      cwind += ADDITIVE_INCREASE / cwind;
+    }
+    else if (delay > MAX_DELAY_THRESHOLD && cwind > 1){
+      cwind *= DECREASE_FACTOR;
+    }
   }
   /* Default: take no action */
 
