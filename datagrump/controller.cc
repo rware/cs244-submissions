@@ -5,6 +5,9 @@
 #include <cmath>
 
 #define WINDOW_SIZE_FIXED 50
+#define MAX_WIN_SIZE 1000
+#define RTT_ADJUST_INTERVAL 1
+
 using namespace std;
 
 #define TIMEOUT_RESET 100
@@ -13,10 +16,12 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    timeout_( 100 ),
+    timeout_( 60 ),
+    min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
+    last_rtt_timestamp_(0),
     state_( SS ),
-    mode_( AIMD ),
+    mode_( DOUBLE_THRESH )
     outstanding_packets_( ),
     last_timeout_( 0 )
 {}
@@ -100,16 +105,31 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
       win_size_++;
   } else if (mode_ == SIMPLE_DELAY) {
-    //if (rtt < max_rtt_thresh_) {
-      //win_size_++;
-    //} else {
-      cout << "Window Size " << win_size_ << endl;
-      cout << "Ratio: " << (1.0*max_rtt_thresh_) / rtt << endl;
-      win_size_ += max(win_size_ * (1.0*max_rtt_thresh_ / rtt), win_size_ + 1.0);
+    if (rtt < max_rtt_thresh_) {
+      win_size_++;
+    } else {
+      win_size_ = win_size_ * max_rtt_thresh_ / rtt;
       if (win_size_ == 0)
         win_size_ = 1;
-    //}
+    }
+  } else if (mode_ == DOUBLE_THRESH) {
+    if (timestamp_ack_received - last_rtt_timestamp_ > RTT_ADJUST_INTERVAL) {
+      last_rtt_timestamp_ = timestamp_ack_received;
+      if (rtt < min_rtt_thresh_) {
+        win_size_ = win_size_ * min_rtt_thresh_ / rtt + 1;
+      }
+      else if (rtt < max_rtt_thresh_) {
+        win_size_++;
+      } else {
+        win_size_ = win_size_ * max_rtt_thresh_ / rtt;
+      }
+      if (win_size_ == 0)
+        win_size_ = 1;
+      if (win_size_ > MAX_WIN_SIZE)
+        win_size_ = MAX_WIN_SIZE;
+    }
   }
+  cout << "winsize: " << win_size_ << "rtt: " << rtt << endl;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -124,8 +144,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  cerr << "timeout!" << endl;
-  if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == SIMPLE_DELAY)) {
+  if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
     win_size_ = (win_size_ + 1) / 2;
   }
   return;

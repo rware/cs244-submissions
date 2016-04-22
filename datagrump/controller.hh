@@ -5,7 +5,7 @@
 #include <set>
 
 enum Controller_State { SS, CA };
-enum Controller_Mode { NA, AIMD, AIMD_INF, SIMPLE_DELAY };
+enum Controller_Mode { NA, AIMD, AIMD_INF, SIMPLE_DELAY, DOUBLE_THRESH };
 /* Congestion controller interface */
 
 struct SentPacket {
@@ -24,7 +24,9 @@ private:
   /* Add member variables here */
   unsigned int win_size_;
   unsigned int timeout_;
+  unsigned int min_rtt_thresh_;
   unsigned int max_rtt_thresh_;
+  uint64_t last_rtt_timestamp_;
   Controller_State state_;
   Controller_Mode mode_;
   std::set<SentPacket> outstanding_packets_;
