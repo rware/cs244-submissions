@@ -51,6 +51,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   /* Simple AIMD, when ACK received, increment cwnd_ by 1 / cwnd_ */
   cwnd_ += 1 / cwnd_;
+  if (cwnd_ > 50) {
+    timeout_occured();
+  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -63,7 +66,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 void Controller::timeout_occured( void ) {
   /* Simple AIMD, decrement by 1/2 */
-  cwnd_ = cwnd_ / cwnd_;
+  cwnd_ = cwnd_ / 2;
 
   cerr << "Timeout occured!" << endl
        << " cwnd = " << cwnd_ << endl;
