@@ -9,6 +9,8 @@ using namespace std;
 Controller::Controller( const bool debug, float cwnd_sz)
   : debug_( debug )
   , cwnd_ (cwnd_sz)
+  , avg_rtt_ (0.0)
+  , rtt_samples_ (0)
 {}
 
 /* Get current window size, in datagrams */
@@ -48,15 +50,19 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-
+  uint64_t rtt = (timestamp_ack_received - send_timestamp_acked);
+  avg_rtt_ = (avg_rtt_ * rtt_samples_ + rtt)/(rtt_samples_ + 1);
+  rtt_samples_ += 1;
   /* Simple AIMD, when ACK received, increment cwnd_ by 1 / cwnd_ */
-  cwnd_ += 1 / cwnd_;
 
-  ///* Simple AIMD, when ACK received, increment cwnd_ by 1 / cwnd_, bound to 50 */
-  //if (cwnd_ < 50) {
-  //  cwnd_ += 1 / cwnd_;
-  //} 
-
+  if (rtt <= avg_rtt_) {
+    cwnd_ += 1 / cwnd_;
+  } else {
+    cwnd_ -= 1 / cwnd_;
+  }
+  cerr << "avg_rtt = " << avg_rtt_ << endl
+       << " cwnd = " << cwnd_ << endl;
+  
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
 	 << " received ack for datagram " << sequence_number_acked
@@ -68,9 +74,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 void Controller::timeout_occured( void ) {
   /* Simple AIMD, decrement by 1/2 */
-  cwnd_ = 1;
-
   cerr << "Timeout occured!" << endl
+       << "avg_rtt = " << avg_rtt_ << endl
        << " cwnd = " << cwnd_ << endl;
 
 } 
