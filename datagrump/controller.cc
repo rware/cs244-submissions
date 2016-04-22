@@ -21,7 +21,7 @@ Controller::Controller( const bool debug )
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
     state_( SS ),
-    mode_( DOUBLE_THRESH )
+    mode_( DOUBLE_THRESH ),
     outstanding_packets_( ),
     last_timeout_( 0 )
 {}
@@ -103,7 +103,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   unsigned int rtt;
   rtt = timestamp_ack_received - send_timestamp_acked;
   if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
-      win_size_++;
+      /* Don't want to increase window size too quickly
+       * when there's no timeouts for a while - indicative of
+       * overshooting the network capacity */
+     uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
+     if((uint64_t)(rand() % 150) > time_since_timeout) {
+        cout << "Window++" << endl;
+        win_size_++;
+     } else {
+        cout << "Window Throttled" << endl;
+     }
   } else if (mode_ == SIMPLE_DELAY) {
     if (rtt < max_rtt_thresh_) {
       win_size_++;
@@ -149,6 +158,7 @@ void Controller::timeout_received( void )
   }
   return;
 }
+
 
 /* How long to wait (in milliseconds) if there are no acks
    before sending one more datagram */
