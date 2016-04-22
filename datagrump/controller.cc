@@ -108,7 +108,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
        * when there's no timeouts for a while - indicative of
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % (90*90)) > time_since_timeout*time_since_timeout) {
+     if((uint64_t)(rand() % (90)) > time_since_timeout) {
         cout << "Window++" << endl;
         win_size_++;
      } else {
