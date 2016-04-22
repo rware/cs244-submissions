@@ -10,18 +10,18 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 50
+#define TIMEOUT_RESET 40
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    timeout_( 60 ),
+    timeout_( 50 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
     state_( SS ),
-    mode_( AIMD ),
+    mode_( AIMD_PROBABALISTIC ),
     outstanding_packets_( ),
     last_timeout_( 0 )
 {}
@@ -51,7 +51,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
   /* Keep track of sent packets and their times,
    * for our own implementation of timeouts */
-  if (mode_ == SIMPLE_DELAY || mode_ == AIMD) {
+  if (mode_ == SIMPLE_DELAY || mode_ == AIMD || mode_ == AIMD_PROBABALISTIC) {
     struct SentPacket sent = {sequence_number, send_timestamp};
     outstanding_packets_.insert(sent);
 
@@ -102,11 +102,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   unsigned int rtt;
   rtt = timestamp_ack_received - send_timestamp_acked;
   if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
+      win_size_++;
+  } else if (mode_ == AIMD_PROBABALISTIC) {
       /* Don't want to increase window size too quickly
        * when there's no timeouts for a while - indicative of
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % 100) > time_since_timeout) {
+     if((uint64_t)(rand() % (90*90)) > time_since_timeout*time_since_timeout) {
         cout << "Window++" << endl;
         win_size_++;
      } else {
@@ -153,7 +155,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
+  if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
     win_size_ = (win_size_ + 1) / 2;
   }
   return;
