@@ -9,6 +9,7 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
+  float cwind;
 
   /* Add member variables here */
 
@@ -36,6 +37,8 @@ public:
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */
   unsigned int timeout_ms( void );
+
+  void timeout();
 };
 
 #endif
