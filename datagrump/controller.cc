@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 100
+#define TIMEOUT_RESET 50
 
 /* Default constructor */
 Controller::Controller( const bool debug )
@@ -21,7 +21,7 @@ Controller::Controller( const bool debug )
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
     state_( SS ),
-    mode_( DOUBLE_THRESH ),
+    mode_( AIMD ),
     outstanding_packets_( ),
     last_timeout_( 0 )
 {}
@@ -78,8 +78,7 @@ bool Controller::is_timeout(uint64_t current_time) {
     while (it != outstanding_packets_.end())
     {
        if(current_time - (*it).sent_time > timeout_  ||
-             current_time - (*it).sent_time > timeout_ ) {
-         cout << current_time << "| Packet " << (*it).sequence_number << " has timed out (send time " << (*it).sent_time << endl;
+          current_time - (*it).sent_time > timeout_ ) {
          it = outstanding_packets_.erase(it);
          timeout = 1;
        } else {
@@ -107,7 +106,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
        * when there's no timeouts for a while - indicative of
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % 150) > time_since_timeout) {
+     if((uint64_t)(rand() % 100) > time_since_timeout) {
         cout << "Window++" << endl;
         win_size_++;
      } else {
@@ -138,7 +137,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
         win_size_ = MAX_WIN_SIZE;
     }
   }
-  cout << "winsize: " << win_size_ << "rtt: " << rtt << endl;
+
+  // cout << "winsize: " << win_size_ << "rtt: " << rtt << endl;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
