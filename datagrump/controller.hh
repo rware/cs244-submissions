@@ -10,8 +10,12 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   double curr_window_size;
+  uint64_t prev_rtt;
+  double rtt_diff;
+  uint64_t min_rtt;
+  int increase_counter;
   void _additiveIncrease( void );
-  void _multiplicativeDecrease( void);
+  void _multiplicativeDecrease( double gradient );
 
   /* Add member variables here */
 
