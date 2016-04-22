@@ -68,9 +68,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       win_size_++;
     }
   } else if (mode_ == SIMPLE_DELAY) {
-    if (rtt < max_rtt_thresh_) {
-      win_size_++;
-    } else {
+    //if (rtt < max_rtt_thresh_) {
+      //win_size_++;
+    //} else {
       win_size_ = win_size_ * max_rtt_thresh_ / rtt;
       if (win_size_ == 0)
         win_size_ = 1;
@@ -90,6 +90,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
+  cerr << "timeout!" << endl;
   if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
     win_size_ = (win_size_ + 1) / 2;
   }
