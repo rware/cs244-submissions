@@ -2,6 +2,7 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#include <map>
 
 /* Congestion controller interface */
 
@@ -9,11 +10,18 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
-  double curr_window_size;
-  void _additiveIncrease( void );
-  void _multiplicativeDecrease( void);
+  unsigned int rtt_estimate;
+  unsigned int the_window_size;
+  uint64_t num_packets_received;
+  uint64_t rtt_total;
 
   /* Add member variables here */
+  void delay_aiad_unsmoothedRTT( const uint64_t sequence_number_acked,
+             const uint64_t send_timestamp_acked,
+             const uint64_t timestamp_ack_received );
+  void delay_aimd_smoothedRTT( const uint64_t sequence_number_acked,
+             const uint64_t send_timestamp_acked,
+             const uint64_t timestamp_ack_received );
 
 public:
   /* Public interface for the congestion controller */
@@ -29,9 +37,6 @@ public:
   /* A datagram was sent */
   void datagram_was_sent( const uint64_t sequence_number,
 			  const uint64_t send_timestamp );
-
-  /* A timeout occured since the last ack */
-  void timeout_occured( void );
 
   /* An ack was received */
   void ack_received( const uint64_t sequence_number_acked,
