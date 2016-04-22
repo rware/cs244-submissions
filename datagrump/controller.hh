@@ -19,9 +19,6 @@ private:
   void delay_aiad_unsmoothedRTT( const uint64_t sequence_number_acked,
              const uint64_t send_timestamp_acked,
              const uint64_t timestamp_ack_received );
-  void delay_aimd_smoothedRTT( const uint64_t sequence_number_acked,
-             const uint64_t send_timestamp_acked,
-             const uint64_t timestamp_ack_received );
 
 public:
   /* Public interface for the congestion controller */
