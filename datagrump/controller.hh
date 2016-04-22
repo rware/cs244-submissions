@@ -10,6 +10,8 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   float cwnd_;
+  float avg_rtt_;
+  int rtt_samples_;
 
   /* Add member variables here */
 
