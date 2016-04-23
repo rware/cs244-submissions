@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 
 #include "controller.hh"
 #include "timestamp.hh"
@@ -7,7 +8,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_(debug), rtt_estimate(200), the_window_size(14), num_packets_received(0), rtt_total(0)
+  : debug_(debug), rtt_estimate(100), the_window_size(1.0), num_packets_received(0), first_of_burst(0), curr_interarrival(0), burst_count(0), burst_timer(0)
 {
   debug_ = false;
 }
@@ -23,7 +24,7 @@ unsigned int Controller::window_size( void )
 	 << " window size is " << the_window_size << endl;
   }
 
-  return the_window_size;
+  return max((int)the_window_size, 1);
 }
 
 /* A datagram was sent */
@@ -39,29 +40,66 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   }
 }
 
-void Controller::delay_aiad_unsmoothedRTT( const uint64_t sequence_number_acked,
+uint64_t abs_(uint64_t first, uint64_t second) 
+{
+  if (first > second) {
+    return first - second;
+  } else {
+    return second - first;
+  }
+}
+
+uint64_t max_(uint64_t first, uint64_t second) 
+{
+  return first > second ? first : second;
+}
+
+uint64_t min_(uint64_t first, uint64_t second) 
+{
+  return first > second ? second : first;
+}
+
+void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
              const uint64_t send_timestamp_acked,
+             const uint64_t recv_timestamp_acked,
              const uint64_t timestamp_ack_received )
 {
   uint64_t newRoundTripTime = timestamp_ack_received - send_timestamp_acked;
   num_packets_received++;
-  rtt_total += newRoundTripTime;
-  bool firstPacket = num_packets_received == 1;
-  if (firstPacket) {
-    rtt_estimate = newRoundTripTime;
+  if (num_packets_received <= 1) {
+    rtt_estimate = rtt_estimate == 0 ? newRoundTripTime : (0.8 * rtt_estimate + 0.2 * newRoundTripTime);
+    first_of_burst = recv_timestamp_acked;
+    burst_timer = rtt_estimate;
+    burst_count++;
+    if (newRoundTripTime > 95) {
+      the_window_size /= 2;
+    } else {
+      the_window_size += 2.0/window_size();
+    }
   } else {
- 	  bool shouldChangeWindow = num_packets_received % (the_window_size < 16 ? 1 : the_window_size/16) == 0;
- 	  if (shouldChangeWindow) {
-      if (newRoundTripTime > rtt_estimate) {
-    		the_window_size = the_window_size <= 1 ? 1 : the_window_size - 1;
+    if (true) {
+      if (newRoundTripTime > 95) {
+        the_window_size /= 2;
       } else {
-      	the_window_size++;
+        the_window_size += 2.0/window_size();
       }
- 	  }
-  	rtt_estimate = rtt_total / (float)num_packets_received;	
+    }
+    // rtt_estimate = rtt_estimate == 0 ? newRoundTripTime : (0.8 * rtt_estimate + 0.2 * newRoundTripTime);
+    if (recv_timestamp_acked <= first_of_burst + 95) {
+      burst_count++;
+    } else {
+      // cerr << burst_count << " packets with recv_timestamp_acked of " << recv_timestamp_acked << " with estimated rtt of " << rtt_estimate << endl;
+      the_window_size = 0.8 * burst_count;
+      // cerr << burst_count << " " << the_window_size << " " << rtt_estimate << endl;
+      burst_count = 1;
+      burst_timer = rtt_estimate;
+      first_of_burst = recv_timestamp_acked;
+    }
   }
-  if ( debug_ ) {
-    cerr << endl << "The estimated rtt for datagram " << sequence_number_acked << " is " << newRoundTripTime << ". " << endl << "The new rtt estimate is " << rtt_estimate << "." << endl << endl;
+
+
+  if (debug_) {
+    cerr << sequence_number_acked << endl;
   }
 }
 
@@ -76,7 +114,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   /* Default: take no action */
-  delay_aiad_unsmoothedRTT(sequence_number_acked, send_timestamp_acked, timestamp_ack_received);
+  delay_aiad_unsmoothedRTT(sequence_number_acked, send_timestamp_acked, recv_timestamp_acked, timestamp_ack_received);
   
 
   if ( debug_ ) {
@@ -92,5 +130,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return rtt_estimate; /* timeout of one second */
+  return 2 * rtt_estimate; /* timeout of one second */
 }

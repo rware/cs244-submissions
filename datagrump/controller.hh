@@ -11,13 +11,17 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   unsigned int rtt_estimate;
-  unsigned int the_window_size;
+  double the_window_size;
   uint64_t num_packets_received;
-  uint64_t rtt_total;
+  uint64_t first_of_burst;
+  uint64_t curr_interarrival;
+  uint64_t burst_count;
+  uint64_t burst_timer;
 
   /* Add member variables here */
-  void delay_aiad_unsmoothedRTT( const uint64_t sequence_number_acked,
+  void delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
              const uint64_t send_timestamp_acked,
+             const uint64_t recv_timestamp_acked,
              const uint64_t timestamp_ack_received );
 
 public:
