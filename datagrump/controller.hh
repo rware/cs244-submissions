@@ -17,6 +17,9 @@ private:
   uint64_t curr_interarrival;
   uint64_t burst_count;
   uint64_t burst_timer;
+  bool slow_start;
+  double capacity_estimate;
+  std::map<uint64_t, uint64_t> send_map;
 
   /* Add member variables here */
   void delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
@@ -48,6 +51,7 @@ public:
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */
   unsigned int timeout_ms( void );
+  void timeout_( void );
 };
 
 #endif

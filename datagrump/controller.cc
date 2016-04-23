@@ -8,7 +8,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_(debug), rtt_estimate(100), the_window_size(1.0), num_packets_received(0), first_of_burst(0), curr_interarrival(0), burst_count(0), burst_timer(0)
+  : debug_(debug), rtt_estimate(0), the_window_size(1.0), num_packets_received(0), first_of_burst(0), curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map()
 {
   debug_ = false;
 }
@@ -34,6 +34,9 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
                                     /* in milliseconds */
 {
   /* Default: take no action */
+  if (slow_start && send_map.find(sequence_number) == send_map.end()) {
+    send_map.insert(pair<uint64_t, uint64_t>(sequence_number, 0));
+  }
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
 	 << " sent datagram " << sequence_number << endl;
@@ -66,38 +69,39 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
 {
   uint64_t newRoundTripTime = timestamp_ack_received - send_timestamp_acked;
   num_packets_received++;
-  if (num_packets_received <= 1) {
-    rtt_estimate = rtt_estimate == 0 ? newRoundTripTime : (0.8 * rtt_estimate + 0.2 * newRoundTripTime);
+  // cerr << sequence_number_acked << " " << rtt_estimate << " " << window_size() << endl;
+  if (num_packets_received == 1) {
     first_of_burst = recv_timestamp_acked;
     burst_timer = rtt_estimate;
-    burst_count++;
-    if (newRoundTripTime > 95) {
-      the_window_size /= 2;
+    if (newRoundTripTime > 80) {
+      the_window_size -= 1.5/window_size();
     } else {
-      the_window_size += 2.0/window_size();
+      the_window_size += 1.5/window_size();  
     }
+    rtt_estimate = newRoundTripTime;
   } else {
-    if (true) {
-      if (newRoundTripTime > 95) {
-        the_window_size /= 2;
-      } else {
-        the_window_size += 2.0/window_size();
-      }
+    if (newRoundTripTime > 80) {
+      the_window_size -= 1.5/window_size();
+    // cerr << newRoundTripTime << " " << rtt_estimate << " decrease" << endl;
+    } else {
+      // cerr << newRoundTripTime << " " << rtt_estimate << " increase" << endl;
+      the_window_size += 1.5/window_size();
     }
-    // rtt_estimate = rtt_estimate == 0 ? newRoundTripTime : (0.8 * rtt_estimate + 0.2 * newRoundTripTime);
-    if (recv_timestamp_acked <= first_of_burst + 95) {
+    // if (send_map.find(sequence_number_acked) == send_map.end()) {
+      rtt_estimate = rtt_estimate == 0 ? newRoundTripTime : (0.8 * rtt_estimate + 0.2 * newRoundTripTime);  
+    // }
+    if (recv_timestamp_acked <= first_of_burst + 80) {
       burst_count++;
     } else {
       // cerr << burst_count << " packets with recv_timestamp_acked of " << recv_timestamp_acked << " with estimated rtt of " << rtt_estimate << endl;
-      the_window_size = 0.8 * burst_count;
+      // cerr << sequence_number_acked << ": " << (burst_count * 1424 * 8)/ (130 * 1000) << endl;
+      the_window_size = 0.5 * the_window_size + 0.4 * burst_count;
       // cerr << burst_count << " " << the_window_size << " " << rtt_estimate << endl;
       burst_count = 1;
       burst_timer = rtt_estimate;
       first_of_burst = recv_timestamp_acked;
     }
   }
-
-
   if (debug_) {
     cerr << sequence_number_acked << endl;
   }
@@ -121,13 +125,17 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << " received ack for datagram " << sequence_number_acked
 	 << " (send @ time " << send_timestamp_acked
 	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
-   << "gradient value is " << normalized_gradient
 	 << endl;
   }
+}
+
+void Controller::timeout_( void )
+{
+  the_window_size -= 1.5/window_size();
 }
 /* How long to wait (in milliseconds) if there are no acks
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 2 * rtt_estimate; /* timeout of one second */
+  return 150; /* timeout of one second */
 }
