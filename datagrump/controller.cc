@@ -10,13 +10,13 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 50
+#define TIMEOUT_RESET 46
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    timeout_( 50 ),
+    timeout_( 42 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
@@ -108,11 +108,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
        * when there's no timeouts for a while - indicative of
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % (70)) > time_since_timeout) {
-        cout << "Window++" << endl;
+     if((uint64_t)(rand() % (73)) > time_since_timeout) {
         win_size_++;
-     } else {
-        cout << "Window Throttled" << endl;
      }
   } else if (mode_ == SIMPLE_DELAY) {
     if (rtt < max_rtt_thresh_) {
