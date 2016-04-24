@@ -10,8 +10,6 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 50
-
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
@@ -23,8 +21,24 @@ Controller::Controller( const bool debug )
     state_( SS ),
     mode_( AIMD_PROBABALISTIC ),
     outstanding_packets_( ),
-    last_timeout_( 0 )
+    last_timeout_( 0 ),
+    timeout_reset_( 50 ),
+    rand_linear( 70 )
 {}
+
+void set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear) {
+    if(rtt_timeout != 0) {
+        rtt_timeout_ = rtt_timeout;
+    }
+
+    if(timeout_reset != 0) {
+        timeout_reset_ = timeout_reset;
+    }
+
+    if(rand_linear != 0) {
+        rand_linear = rand_linear_;
+    }
+}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
@@ -56,7 +70,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     outstanding_packets_.insert(sent);
 
     /* Check if a timeout should have triggered */
-    if(is_timeout(send_timestamp) && send_timestamp - last_timeout_ > TIMEOUT_RESET) {
+    if(is_timeout(send_timestamp) && send_timestamp - last_timeout_ > timeout_reset_) {
         timeout_received();
         last_timeout_ = send_timestamp;
     }
@@ -108,7 +122,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
        * when there's no timeouts for a while - indicative of
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % (70)) > time_since_timeout) {
+     if((uint64_t)(rand() % (rand_linear_)) > time_since_timeout) {
         cout << "Window++" << endl;
         win_size_++;
      } else {

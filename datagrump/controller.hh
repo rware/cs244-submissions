@@ -30,7 +30,12 @@ private:
   Controller_State state_;
   Controller_Mode mode_;
   std::set<SentPacket> outstanding_packets_;
+   
+  /* For Probabalistic AIMD, these
+   * are the three tunable paramaters */
   uint64_t last_timeout_;
+  uint64_t timeout_reset_;
+  uint64_t rand_linear_;
 
   bool is_timeout(uint64_t current_time);
 
@@ -57,6 +62,8 @@ public:
 
   /* A timeout was received */
   void timeout_received( void );
+
+  void set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear);
 
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */
