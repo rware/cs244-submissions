@@ -87,10 +87,55 @@ sub mate_candidates() {
 # Create a bunch of random candidates
 # to begin with
 sub seed_candidates() {
-    for(my $i = 0; $i < 30; $i++) {
-        my $c = gen_random_candidate();
-        push(@candidates, $c);
-    }
+    # for(my $i = 0; $i < 30; $i++) {
+    #     my $c = gen_random_candidate();
+    #     push(@candidates, $c);
+    # }
+
+    my $c = gen_base_candidate();
+    $c->{'param1'} = 46;
+    $c->{'param2'} = 56;
+    $c->{'param3'} = 58;
+    $c->{'throughput'} = 3.12;
+    $c->{'signal_delay'} = 83;
+    $c->{'power'} = 37.5;
+    push(@candidates, $c);
+
+    $c = gen_base_candidate();
+    $c->{'param1'} = 55;
+    $c->{'param2'} = 26;
+    $c->{'param3'} = 82;
+    $c->{'throughput'} = 2.92;
+    $c->{'signal_delay'} = 84;
+    $c->{'power'} = 34.7;
+    push(@candidates, $c);
+
+    $c = gen_base_candidate();
+    $c->{'param1'} = 49;
+    $c->{'param2'} = 76;
+    $c->{'param3'} = 66;
+    $c->{'throughput'} = 4.20;
+    $c->{'signal_delay'} = 121;
+    $c->{'power'} = 34.7;
+    push(@candidates, $c);
+
+    $c = gen_base_candidate();
+    $c->{'param1'} = 94;
+    $c->{'param2'} = 134;
+    $c->{'param3'} = 65;
+    $c->{'throughput'} = 3.65;
+    $c->{'signal_delay'} = 110;
+    $c->{'power'} = 33.1818;
+    push(@candidates, $c);
+
+    $c = gen_base_candidate();
+    $c->{'param1'} = 143;
+    $c->{'param2'} = 57;
+    $c->{'param3'} = 66;
+    $c->{'throughput'} = 3.89;
+    $c->{'signal_delay'} = 119;
+    $c->{'power'} = 32.68;
+    push(@candidates, $c);
 }
 
 # Given a candidate, run the 
@@ -155,7 +200,5 @@ while(1) {
 
     mate_candidates();
 
-    filter_candidates();
-    
     $iter++;
 }
