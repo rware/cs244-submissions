@@ -12,7 +12,7 @@ private:
 
   /* Add member variables here */
   // unsigned int window_size_int;
-  double window_size_double;
+  double rate_double;
   bool in_timeout_batch;
   uint64_t prev_rtt;
   double rtt_diff;
@@ -26,8 +26,7 @@ public:
   /* Default constructor */
   Controller( const bool debug );
 
-  /* Get current window size, in datagrams */
-  unsigned int window_size( void );
+  unsigned int rate( void );
 
   /* A datagram was sent */
   void datagram_was_sent( const uint64_t sequence_number,
