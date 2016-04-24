@@ -15,14 +15,17 @@ my @candidates;
 # only keeping the top 10 results
 sub filter_candidates() {
     for(my $i = 0; $i < scalar(@candidates); $i++) {
-        if(!defined $candidates[$i]) {
+        my $c = $candidates[$i];
+        if(!defined $c || $c->{'power'} == 0) {
             splice @candidates, $i, 1;
             $i--;
             print("Removed candidate\n");
         }
     }
 
-    @candidates = (sort { $b->{'power'} <=> $a->{'power'} } @candidates)[0..10];
+    # Only keep top 4 candiates,
+    # because after mating this will be 5 + 4! = 29 candidates
+    @candidates = (sort { $b->{'power'} <=> $a->{'power'} } @candidates)[0..4];
 }
 
 sub gen_base_candidate() {
@@ -69,19 +72,15 @@ sub mate_candidates() {
 
             my $c = gen_base_candidate();
 
-            print Dumper($c1);
-            print Dumper($c2);
-
             $c->{'param1'} = ceil( (($c1->{'param1'} + $c2->{'param1'}) / 2.0) * ((90 + rand(20)) / 100.0) );
             $c->{'param2'} = ceil( (($c1->{'param2'} + $c2->{'param2'}) / 2.0) * ((90 + rand(20)) / 100.0) );
             $c->{'param3'} = ceil( (($c1->{'param3'} + $c2->{'param3'}) / 2.0) * ((90 + rand(20)) / 100.0) );
 
-            print Dumper($c);
             push(@candidates, $c);
-
-            print "\n\n";
         }
     }
+
+    print "After mating, " . scalar(@candidates) . " candidates\n\n";
 }
 
 # Create a bunch of random candidates
