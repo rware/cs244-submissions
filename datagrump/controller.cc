@@ -8,11 +8,11 @@ using namespace std;
 //AIMD values
 #define USING_AIMD false
 #define ADDITIVE_INCREASE 1
-#define DECREASE_FACTOR .75
+#define DECREASE_FACTOR .6
 
 //Delay triggered values
 #define DELAY_TRIGGER true
-#define MAX_DELAY_THRESHOLD 125
+#define MAX_DELAY_THRESHOLD 120
 #define MIN_DELAY_THRESHOLD 60
 
 #define DELTA_DELAY false
@@ -66,10 +66,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     cwind += ADDITIVE_INCREASE / cwind;
   }
 
+  float increaseFactor = ADDITIVE_INCREASE;
+
   float delay = timestamp_ack_received - send_timestamp_acked;
+  float diff = delay - lastDelay;
+  float prediction = delay + 2 * diff;
+
+  //if (diff > 0){
+    increaseFactor *= lastDelay / delay;
+  //}
+
+  lastDelay = delay;
 
   if (DELAY_TRIGGER){
-    if (delay < MIN_DELAY_THRESHOLD){
+    if (delay < MIN_DELAY_THRESHOLD && prediction < MAX_DELAY_THRESHOLD){
       cwind += (MIN_DELAY_THRESHOLD / delay) * ADDITIVE_INCREASE / cwind;
     }
     else if (delay > MAX_DELAY_THRESHOLD && cwind > MIN_CWIND){
@@ -78,7 +88,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   if (DELTA_DELAY && lastDelay > 0){
-    float diff = delay - lastDelay;
+    
     if (diff > 0){
       cwind *= (diff / lastDelay);
     }
