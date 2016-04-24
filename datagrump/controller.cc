@@ -7,7 +7,7 @@ using namespace std;
 
 //AIMD values
 #define USING_AIMD false
-#define ADDITIVE_INCREASE 1
+#define ADDITIVE_INCREASE 1.2
 #define DECREASE_FACTOR .6
 
 //Delay triggered values
@@ -17,9 +17,11 @@ using namespace std;
 
 #define DELTA_DELAY false
 
-#define DEFAULT_CWIND 40
+#define DEFAULT_CWIND 80
 #define DEFAULT_TIMEOUT 45
-#define MIN_CWIND 10
+#define MIN_CWIND 6
+
+#define EPSILON 3
 
 /* Default constructor */
 Controller::Controller( const bool debug )
@@ -72,15 +74,17 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   float diff = delay - lastDelay;
   float prediction = delay + 2 * diff;
 
-  //if (diff > 0){
-    increaseFactor *= lastDelay / delay;
-  //}
+  if (diff > EPSILON){
+    increaseFactor *= lastDelay / delay * .5;
+  }
+
+  cerr << "Diff: " << diff << endl;
 
   lastDelay = delay;
 
   if (DELAY_TRIGGER){
     if (delay < MIN_DELAY_THRESHOLD && prediction < MAX_DELAY_THRESHOLD){
-      cwind += (MIN_DELAY_THRESHOLD / delay) * ADDITIVE_INCREASE / cwind;
+      cwind += (MIN_DELAY_THRESHOLD / delay) * increaseFactor / cwind;
     }
     else if (delay > MAX_DELAY_THRESHOLD && cwind > MIN_CWIND){
       cwind *= DECREASE_FACTOR * (MAX_DELAY_THRESHOLD / delay);
@@ -100,6 +104,11 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   else if (lastDelay <= 0) {
     lastDelay = delay;
   }
+
+  if (cwind < MIN_CWIND){
+    cwind = MIN_CWIND;
+  }
+
   /* Default: take no action */
 
   if ( debug_ ) {
@@ -113,7 +122,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
 void Controller::timeout() {
   if (cwind > MIN_CWIND){
-    cwind *= DECREASE_FACTOR;
+    //cwind *= DECREASE_FACTOR;
   }
 }
 
