@@ -72,9 +72,10 @@ sub mate_candidates() {
 
             my $c = gen_base_candidate();
 
-            $c->{'param1'} = ceil( (($c1->{'param1'} + $c2->{'param1'}) / 2.0) * ((90 + rand(20)) / 100.0) );
-            $c->{'param2'} = ceil( (($c1->{'param2'} + $c2->{'param2'}) / 2.0) * ((90 + rand(20)) / 100.0) );
-            $c->{'param3'} = ceil( (($c1->{'param3'} + $c2->{'param3'}) / 2.0) * ((90 + rand(20)) / 100.0) );
+            # Mate parameters by averaging them +- 20%
+            $c->{'param1'} = ceil( (($c1->{'param1'} + $c2->{'param1'}) / 2.0) * ((80 + rand(40)) / 100.0) );
+            $c->{'param2'} = ceil( (($c1->{'param2'} + $c2->{'param2'}) / 2.0) * ((80 + rand(40)) / 100.0) );
+            $c->{'param3'} = ceil( (($c1->{'param3'} + $c2->{'param3'}) / 2.0) * ((80 + rand(40)) / 100.0) );
 
             push(@candidates, $c);
         }
