@@ -11,9 +11,12 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
-  unsigned int window_size_int;
+  // unsigned int window_size_int;
   double window_size_double;
   bool in_timeout_batch;
+  uint64_t prev_rtt;
+  double rtt_diff;
+  int hai_count;
 
 public:
   /* Public interface for the congestion controller */
