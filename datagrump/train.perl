@@ -44,9 +44,9 @@ sub gen_random_candidate() {
     my $candidate = gen_base_candidate();    
 
     # TODO add params 
-    $candidate->{'param1'} = int(rand(200));
-    $candidate->{'param2'} = int(rand(200));
-    $candidate->{'param3'} = int(rand(200));
+    $candidate->{'param1'} = int(20 + rand(130));
+    $candidate->{'param2'} = int(20 + rand(130));
+    $candidate->{'param3'} = int(20 + rand(130));
 
     return $candidate;
 }
