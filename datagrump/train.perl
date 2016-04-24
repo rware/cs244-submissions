@@ -84,13 +84,17 @@ sub run_candidate($) {
 
     my $output = `$command`;
 
-    $output =~ m/throughput: ([\d\.]+) Mbit.*signal delay: (\d+) ms/;
+    $output =~ m/throughput: ([\d\.]+) Mbit/;
     $c->{'throughput'} = $1;
-    $c->{'signal_delay'} = $2;
-    $c->{'power'} = $1/($2/1000);
 
-    print "Throughput $1\n";
-    print "Signal Delay$2\n\n";
+    $output =~ m/signal delay: (\d+) ms/;
+    $c->{'signal_delay'} = $1;
+
+    $c->{'power'} = $c->{'throughput'} / ($c->{'signal_delay'} / 1000.0);
+
+    print "Throughput: $c->{'throughput'}\n";
+    print "Signal Delay: $c->{'signal_delay'}\n";
+    print "Power: $c->{'power'}\n\n";
 }
 
 
