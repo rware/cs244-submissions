@@ -30,9 +30,9 @@ sub gen_random_candidate() {
     my $candidate = gen_base_candidate();    
 
     # TODO add params 
-    $candidate->{'param1'} = int(rand(150));
-    $candidate->{'param2'} = int(rand(150));
-    $candidate->{'param3'} = int(rand(150));
+    $candidate->{'param1'} = int(rand(200));
+    $candidate->{'param2'} = int(rand(200));
+    $candidate->{'param3'} = int(rand(200));
 
     return $candidate;
 }
@@ -62,7 +62,8 @@ sub mate_candidates() {
 # to begin with
 sub seed_candidates() {
     for(my $i = 0; $i < 20; $i++) {
-        gen_random_candidate();
+        my $c = gen_random_candidate();
+        push(@candidates, $c);
     }
 }
 
@@ -105,10 +106,7 @@ my $i;
 my $c;
 
 # Generate some random candidates
-for($i = 0; $i < 2; $i++) {
-    $c = gen_random_candidate();
-    push(@candidates, $c);
-}
+seed_candidates();
 
 # Main loop:
 # run candidates that haven't been run,
