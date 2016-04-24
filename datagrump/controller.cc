@@ -8,7 +8,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_(debug), rtt_estimate(0), the_window_size(1.0), num_packets_received(0), first_of_burst(0), curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map()
+  : debug_(debug), rtt_estimate(0), the_window_size(1.0), num_packets_received(0), first_of_burst(0), curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map(), rtt_total(0)
 {
   debug_ = false;
 }
@@ -69,36 +69,40 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
 {
   uint64_t newRoundTripTime = timestamp_ack_received - send_timestamp_acked;
   num_packets_received++;
+  rtt_total += newRoundTripTime;
+  // unsigned int window_int = 70;
   // cerr << sequence_number_acked << " " << rtt_estimate << " " << window_size() << endl;
   if (num_packets_received == 1) {
     first_of_burst = recv_timestamp_acked;
-    burst_timer = rtt_estimate;
-    if (newRoundTripTime > 80) {
-      the_window_size -= 1.5/window_size();
+    burst_timer = min_(rtt_estimate, 200);
+    if (newRoundTripTime > 200) {
+      the_window_size -= 2.0/window_size();
     } else {
-      the_window_size += 1.5/window_size();  
+      the_window_size += 2.0/window_size();  
     }
     rtt_estimate = newRoundTripTime;
   } else {
-    if (newRoundTripTime > 80) {
-      the_window_size -= 1.5/window_size();
+    if (newRoundTripTime > 70) {
+      the_window_size -= 2.0/window_size();
     // cerr << newRoundTripTime << " " << rtt_estimate << " decrease" << endl;
     } else {
       // cerr << newRoundTripTime << " " << rtt_estimate << " increase" << endl;
-      the_window_size += 1.5/window_size();
+      the_window_size += 2.0/window_size();
     }
     // if (send_map.find(sequence_number_acked) == send_map.end()) {
-      rtt_estimate = rtt_estimate == 0 ? newRoundTripTime : (0.8 * rtt_estimate + 0.2 * newRoundTripTime);  
+      rtt_estimate = 0.7 * rtt_estimate + 0.3 * newRoundTripTime;
+      // rtt_estimate = rtt_total / (float)(num_packets_received); 
     // }
-    if (recv_timestamp_acked <= first_of_burst + 80) {
+    if (recv_timestamp_acked <= first_of_burst + 70) {
       burst_count++;
     } else {
       // cerr << burst_count << " packets with recv_timestamp_acked of " << recv_timestamp_acked << " with estimated rtt of " << rtt_estimate << endl;
       // cerr << sequence_number_acked << ": " << (burst_count * 1424 * 8)/ (130 * 1000) << endl;
-      the_window_size = 0.5 * the_window_size + 0.4 * burst_count;
+      
+      the_window_size = 0.4 * the_window_size + 0.5 * burst_count;
+      // cerr << burst_count << " " << window_size() << endl;
       // cerr << burst_count << " " << the_window_size << " " << rtt_estimate << endl;
       burst_count = 1;
-      burst_timer = rtt_estimate;
       first_of_burst = recv_timestamp_acked;
     }
   }

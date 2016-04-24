@@ -20,6 +20,7 @@ private:
   bool slow_start;
   double capacity_estimate;
   std::map<uint64_t, uint64_t> send_map;
+  uint64_t rtt_total;
 
   /* Add member variables here */
   void delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
