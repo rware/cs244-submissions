@@ -14,6 +14,14 @@ my @candidates;
 # Sorts candidates by power, 
 # only keeping the top 10 results
 sub filter_candidates() {
+    for(my $i = 0; $i < scalar(@candidates); $i++) {
+        if(!defined $candidates[$i]) {
+            splice @candidates, $i, 1;
+            $i--;
+            print("Removed candidate\n");
+        }
+    }
+
     @candidates = (sort { $b->{'power'} <=> $a->{'power'} } @candidates)[0..10];
 }
 
@@ -21,7 +29,10 @@ sub gen_base_candidate() {
     # Start with unknown power, delay, throughput
     my $candidate = {'power' => 0,
                      'signal_delay' => 0,
-                     'throughput' => 0 };
+                     'throughput' => 0,
+                     'param1' => 0,
+                     'param2' => 0,
+                     'param3' => 0 };
 
     return $candidate;
 }
@@ -49,11 +60,26 @@ sub mate_candidates() {
         for(my $j = $i+1; $j < $bound; $j++) {
             $c1 = $candidates[$i];
             $c2 = $candidates[$j];
+
+            if(!defined $c1 || !defined $c2 || $c1->{'power'} == 0 || $c2->{'power'} == 0) {
+                next;
+            }
+
+            print "Mating $i and $j\n";
+
             my $c = gen_base_candidate();
+
+            print Dumper($c1);
+            print Dumper($c2);
+
             $c->{'param1'} = ceil( (($c1->{'param1'} + $c2->{'param1'}) / 2.0) * ((90 + rand(20)) / 100.0) );
             $c->{'param2'} = ceil( (($c1->{'param2'} + $c2->{'param2'}) / 2.0) * ((90 + rand(20)) / 100.0) );
             $c->{'param3'} = ceil( (($c1->{'param3'} + $c2->{'param3'}) / 2.0) * ((90 + rand(20)) / 100.0) );
+
+            print Dumper($c);
             push(@candidates, $c);
+
+            print "\n\n";
         }
     }
 }
@@ -61,7 +87,7 @@ sub mate_candidates() {
 # Create a bunch of random candidates
 # to begin with
 sub seed_candidates() {
-    for(my $i = 0; $i < 20; $i++) {
+    for(my $i = 0; $i < 30; $i++) {
         my $c = gen_random_candidate();
         push(@candidates, $c);
     }
@@ -115,6 +141,8 @@ my $iter = 0;
 while(1) {
     for($i = 0; $i < scalar(@candidates); $i++) {
         $c = $candidates[$i];
+        print "Running candiate: \n";
+        print Dumper($c);
         if($c->{'power'} == 0) {
             run_candidate($c);
         }
@@ -126,6 +154,8 @@ while(1) {
     Dumper(@candidates);
 
     mate_candidates();
+
+    filter_candidates();
     
     $iter++;
 }
