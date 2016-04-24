@@ -10,6 +10,7 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
   float cwind;
+  float lastDelay;
 
   /* Add member variables here */
 

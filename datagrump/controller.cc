@@ -13,15 +13,17 @@ using namespace std;
 //Delay triggered values
 #define DELAY_TRIGGER true
 #define MAX_DELAY_THRESHOLD 125
-#define MIN_DELAY_THRESHOLD 50
+#define MIN_DELAY_THRESHOLD 60
 
+#define DELTA_DELAY false
 
 #define DEFAULT_CWIND 40
 #define DEFAULT_TIMEOUT 45
+#define MIN_CWIND 10
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), cwind(DEFAULT_CWIND)
+  : debug_( debug ), cwind(DEFAULT_CWIND), lastDelay(-1)
 {}
 
 /* Get current window size, in datagrams */
@@ -64,14 +66,29 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     cwind += ADDITIVE_INCREASE / cwind;
   }
 
+  float delay = timestamp_ack_received - send_timestamp_acked;
+
   if (DELAY_TRIGGER){
-    float delay = timestamp_ack_received - send_timestamp_acked;
     if (delay < MIN_DELAY_THRESHOLD){
-      cwind += ADDITIVE_INCREASE / cwind;
+      cwind += (MIN_DELAY_THRESHOLD / delay) * ADDITIVE_INCREASE / cwind;
     }
-    else if (delay > MAX_DELAY_THRESHOLD && cwind > 1){
-      cwind *= DECREASE_FACTOR;
+    else if (delay > MAX_DELAY_THRESHOLD && cwind > MIN_CWIND){
+      cwind *= DECREASE_FACTOR * (MAX_DELAY_THRESHOLD / delay);
     }
+  }
+
+  if (DELTA_DELAY && lastDelay > 0){
+    float diff = delay - lastDelay;
+    if (diff > 0){
+      cwind *= (diff / lastDelay);
+    }
+    else {
+      cwind += - diff / cwind;
+    }
+    lastDelay = delay;
+  }
+  else if (lastDelay <= 0) {
+    lastDelay = delay;
   }
   /* Default: take no action */
 
@@ -85,7 +102,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 }
 
 void Controller::timeout() {
-  if (USING_AIMD) {
+  if (cwind > MIN_CWIND){
     cwind *= DECREASE_FACTOR;
   }
 }
