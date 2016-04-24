@@ -30,10 +30,10 @@ private:
   Controller_State state_;
   Controller_Mode mode_;
   std::set<SentPacket> outstanding_packets_;
+  uint64_t last_timeout_;
    
   /* For Probabalistic AIMD, these
    * are the three tunable paramaters */
-  uint64_t last_timeout_;
   uint64_t timeout_reset_;
   uint64_t rand_linear_;
 

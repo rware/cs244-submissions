@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <cstdint>
 
 #include "socket.hh"
 #include "contest_message.hh"
@@ -25,10 +26,6 @@ private:
      next expects will be acknowledged by the receiver */
   uint64_t next_ack_expected_;
 
-  uint64_t rtt_timeout = 0
-  uint64_t timeout_reset = 0;
-  uint64_t rand_linear = 0;
-
   void send_datagram( void );
   void got_ack( const uint64_t timestamp, const ContestMessage & msg );
   bool window_is_open( void );
@@ -39,6 +36,9 @@ public:
   int loop( void );
 };
 
+uint64_t rtt_timeout = 0;
+uint64_t timeout_reset = 0;
+uint64_t rand_linear = 0;
 
 int main( int argc, char *argv[] )
 {

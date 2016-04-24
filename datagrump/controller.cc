@@ -23,12 +23,12 @@ Controller::Controller( const bool debug )
     outstanding_packets_( ),
     last_timeout_( 0 ),
     timeout_reset_( 50 ),
-    rand_linear( 70 )
+    rand_linear_( 70 )
 {}
 
-void set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear) {
+void Controller::set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear) {
     if(rtt_timeout != 0) {
-        rtt_timeout_ = rtt_timeout;
+        timeout_ = rtt_timeout;
     }
 
     if(timeout_reset != 0) {
@@ -36,7 +36,7 @@ void set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_line
     }
 
     if(rand_linear != 0) {
-        rand_linear = rand_linear_;
+        rand_linear_ = rand_linear;
     }
 }
 
@@ -123,10 +123,10 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
      if((uint64_t)(rand() % (rand_linear_)) > time_since_timeout) {
-        cout << "Window++" << endl;
+        // cout << "Window++" << endl;
         win_size_++;
      } else {
-        cout << "Window Throttled" << endl;
+        // cout << "Window Throttled" << endl;
      }
   } else if (mode_ == SIMPLE_DELAY) {
     if (rtt < max_rtt_thresh_) {
