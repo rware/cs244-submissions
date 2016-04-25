@@ -7,11 +7,11 @@
 using namespace std;
 
 /* AIMD Scheme : initial window size. */
-#define AIMD_MIN 3.0
+#define AIMD_MIN 1.0
 /* AIMD Scheme : additive constant (> 0). */
 #define AIMD_ADD 1.0
 /* AIMD Scheme : multiplicative constant. */
-#define AIMD_MULT 0.75
+#define AIMD_MULT 0.5
 
 #define TARGET_DELAY 100
 
