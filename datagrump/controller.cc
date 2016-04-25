@@ -65,13 +65,13 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
     if (send_timestamp - timestamp_ms_raw(one_hundred_ms) > min) {
       cerr << "Scaling back! " << outstanding_acks.size() << endl;
-      cwnd_ = cwnd_ / 2 + 1;
+      cwnd_ = cwnd_ * 0.8 + 1;
     } else {
-      cwnd_ += 0.5;
+      cwnd_ += 0.1;
     }
 
   } else {
-    cwnd_ += 1;
+    cwnd_ += 0.2;
   }
 
   outstanding_acks.push_back(send_timestamp);
