@@ -12,6 +12,8 @@ using namespace std;
 #define AIMD_ADD 1.0
 /* AIMD Scheme : multiplicative constant. */
 #define AIMD_MULT 5.0
+/* Halve window size on timeout */
+#define TIMEOUT_MULT 0.5
 
 #define TARGET_DELAY 75
 
@@ -89,7 +91,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 void Controller::timeout_experienced( void )
 {
   /* AIMD Scheme : divide the window size. */
-  double res = cur_window_size * AIMD_MULT;
+  double res = cur_window_size * TIMEOUT_MULT;
   if ( res <= AIMD_MIN )
     cur_window_size = AIMD_MIN;
   else
