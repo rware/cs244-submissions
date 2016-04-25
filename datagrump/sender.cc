@@ -7,7 +7,6 @@
 #include "contest_message.hh"
 #include "controller.hh"
 #include "poller.hh"
-#include "timestamp.hh"
 
 using namespace std;
 using namespace PollerShortNames;
@@ -25,9 +24,8 @@ private:
      this is the sequence number that the sender
      next expects will be acknowledged by the receiver */
   uint64_t next_ack_expected_;
-  uint64_t last_sent_;
 
-  void send_datagrams( void );
+  void send_datagram( void );
   void got_ack( const uint64_t timestamp, const ContestMessage & msg );
   bool window_is_open( void );
 
@@ -95,36 +93,25 @@ void DatagrumpSender::got_ack( const uint64_t timestamp,
 			    ack.header.ack_send_timestamp,
 			    ack.header.ack_recv_timestamp,
 			    timestamp );
-
-  if (timestamp_ms() - last_sent_ > controller_.timeout_ms()) {
-    send_datagrams();
-  }
 }
 
-void DatagrumpSender::send_datagrams( void )
+void DatagrumpSender::send_datagram( void )
 {
-  last_sent_ = timestamp_ms();
+  /* All messages use the same dummy payload */
+  static const string dummy_payload( 1424, 'x' );
 
+  ContestMessage cm( sequence_number_++, dummy_payload );
+  cm.set_send_timestamp();
+  socket_.send( cm.to_string() );
 
-  double rate = controller_.rate();
-  cerr << "Sending " << rate << " datagrams!!" << endl;
-  for (int i = 0; i < rate; i++) {
-    /* All messages use the same dummy payload */
-    static const string dummy_payload( 1424, 'x' );
-
-    ContestMessage cm( sequence_number_++, dummy_payload );
-    cm.set_send_timestamp();
-    socket_.send( cm.to_string() );
-
-    /* Inform congestion controller */
-    controller_.datagram_was_sent( cm.header.sequence_number,
-  				 cm.header.send_timestamp );
-  }
+  /* Inform congestion controller */
+  controller_.datagram_was_sent( cm.header.sequence_number,
+				 cm.header.send_timestamp );
 }
 
 bool DatagrumpSender::window_is_open( void )
 {
-  return false; //sequence_number_ - next_ack_expected_ < controller_.window_size();
+  return sequence_number_ - next_ack_expected_ < controller_.window_size();
 }
 
 int DatagrumpSender::loop( void )
@@ -134,15 +121,15 @@ int DatagrumpSender::loop( void )
 
   /* first rule: if the window is open, close it by
      sending more datagrams */
- //  poller.add_action( Action( socket_, Direction::Out, [&] () {
-	// /* Close the window */
-	// while ( window_is_open() ) {
-	//   send_datagram();
-	// }
-	// return ResultType::Continue;
- //      },
- //      /* We're only interested in this rule when the window is open */
- //      [&] () { return window_is_open(); } ) );
+  poller.add_action( Action( socket_, Direction::Out, [&] () {
+	/* Close the window */
+	while ( window_is_open() ) {
+	  send_datagram();
+	}
+	return ResultType::Continue;
+      },
+      /* We're only interested in this rule when the window is open */
+      [&] () { return window_is_open(); } ) );
 
   /* second rule: if sender receives an ack,
      process it and inform the controller
@@ -160,8 +147,8 @@ int DatagrumpSender::loop( void )
     if ( ret.result == PollResult::Exit ) {
       return ret.exit_status;
     } else if ( ret.result == PollResult::Timeout ) {
-      cerr << "TIMEOUT!!!" << endl;
-      send_datagrams();
+      /* After a timeout, send one datagram to try to get things moving again */
+      send_datagram();
     }
   }
 }
