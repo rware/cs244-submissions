@@ -84,12 +84,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       window_size_double = 1;
     }
     cerr << "above T_HIGH (rtt is " << new_rtt << "), window size decreasing to " << window_size_double << endl;
-  } else if (normalized_gradient <= 0) {
+  } else if (normalized_gradient <= 0 && new_rtt < 100) {
     int n = hai_count >= 3 ? hai_count / 2 : 1;
 
     window_size_double += n * ADDITIVE_INCREMENT / window_size_double;
     // cerr << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
-  } else {
+  } else if (normalized_gradient > 0 && new_rtt > 100) {
     window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient / sqrt(window_size_double));
     if (window_size_double < 1) {
       window_size_double = 1;
