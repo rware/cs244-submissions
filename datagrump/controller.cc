@@ -6,8 +6,10 @@
 
 using namespace std;
 
-/* AIMD Scheme : initial window size. */
-#define AIMD_MIN 1.0
+/* initial window size. */
+#define WINDOW_INIT 20.0
+/* AIMD Scheme : minimum window size. */
+#define AIMD_MIN 2.0
 /* AIMD Scheme : additive constant (> 0). */
 #define AIMD_ADD 1.0
 /* AIMD Scheme : multiplicative constant. */
@@ -22,7 +24,7 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug )
-  , cur_window_size( AIMD_MIN )
+  , cur_window_size( WINDOW_INIT )
   , avg_delay( -1.0 )
 { }
 
