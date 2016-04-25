@@ -13,11 +13,11 @@ private:
   /* Add member variables here */
   // unsigned int window_size_int;
   double window_size_double;
-  bool in_timeout_batch;
   uint64_t prev_rtt;
   double rtt_diff;
   int hai_count;
   uint64_t timestamp_changed;
+  int timeout_batch;
 
 public:
   /* Public interface for the congestion controller */

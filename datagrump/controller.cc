@@ -19,7 +19,7 @@ Controller::Controller( const bool debug )
   : debug_( debug )
   // , window_size_int(10)
   , window_size_double(10)
-  , in_timeout_batch(false)
+  , timeout_batch(0)
   , prev_rtt(100) // TODO: initial value?
   , rtt_diff(10) // TODO: initial value?
   , hai_count(0)
@@ -62,35 +62,45 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   uint64_t now = timestamp_ms();
-  if (now - timestamp_changed < 15) {
+  uint64_t new_rtt = timestamp_ack_received - send_timestamp_acked;
+  if (now - timestamp_changed < 10 && new_rtt <= 1000) {
     return;
   }
   timestamp_changed = now;
 
-  uint64_t new_rtt = timestamp_ack_received - send_timestamp_acked;
   int64_t new_rtt_diff = new_rtt - prev_rtt;
-  cerr << "rtt diff is " << new_rtt_diff << endl;
+  // cerr << "rtt diff is " << new_rtt_diff << endl;
   prev_rtt = new_rtt;
   rtt_diff = (1 - EWMA_WEIGHT)*rtt_diff + EWMA_WEIGHT*new_rtt_diff;
   double normalized_gradient = rtt_diff / MIN_RTT;
   hai_count = normalized_gradient < 0 ? hai_count+1 : 0;
 
+  if (new_rtt <= T_HIGH) timeout_batch = 0;
+
   if (new_rtt < T_LOW) {
     window_size_double += 5 * ADDITIVE_INCREMENT / sqrt(window_size_double);
-    cerr << "below T_LOW, window size increasing to " << window_size_double << endl;
+    // cerr << "below T_LOW, window size increasing to " << window_size_double << endl;
   } else if (new_rtt > T_HIGH) {
-    window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*(1 - T_HIGH/new_rtt));
-    if (window_size_double < 1) {
+    if (new_rtt > 1000) {
+      timeout_batch = 0;
       window_size_double = 1;
+    } else {
+      if (timeout_batch) timeout_batch--;
+      else {
+        timeout_batch = 3;
+        window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*(1 - T_HIGH/new_rtt));
+        if (window_size_double < 1) {
+          window_size_double = 1;
+        }
+      }
     }
     cerr << "above T_HIGH (rtt is " << new_rtt << "), window size decreasing to " << window_size_double << endl;
   } else if (normalized_gradient <= 0 && new_rtt < 100) {
     int n = hai_count >= 3 ? hai_count / 2 : 1;
-
     window_size_double += n * ADDITIVE_INCREMENT / window_size_double;
     // cerr << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
-  } else if (normalized_gradient > 0 && new_rtt > 100) {
-    window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient / sqrt(window_size_double));
+  } else if (normalized_gradient > 0 && new_rtt > 90) {
+    window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient*0.7 / sqrt(window_size_double));
     if (window_size_double < 1) {
       window_size_double = 1;
     }
