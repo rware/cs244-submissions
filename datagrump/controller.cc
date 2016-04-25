@@ -175,7 +175,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 void Controller::timeout_received( void )
 {
   if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
-    win_size_ = std::min(1, (int) (win_size_ * timeout_multiplier_) );
+    win_size_ = std::max(1, (int) (win_size_ * timeout_multiplier_) );
   }
   return;
 }
