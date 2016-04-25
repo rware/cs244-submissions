@@ -15,7 +15,7 @@ using namespace std;
 
 bool comp(const uint64_t& a, const uint64_t& b)
 {
-  return b < a ? true : false;
+  return a < b ? true : false;
 }
 
 /* Default constructor */
