@@ -11,9 +11,9 @@ using namespace std;
 /* AIMD Scheme : additive constant (> 0). */
 #define AIMD_ADD 1.0
 /* AIMD Scheme : multiplicative constant. */
-#define AIMD_MULT 0.5
+#define AIMD_MULT 5.0
 
-#define TARGET_DELAY 100
+#define TARGET_DELAY 75
 
 #define SMOOTHING_FACTOR 0.2
 
@@ -69,7 +69,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     avg_delay = (1.0 - SMOOTHING_FACTOR)*delay + SMOOTHING_FACTOR*avg_delay;
   if ( avg_delay > TARGET_DELAY )
   {
-    cur_window_size -= AIMD_MULT * (avg_delay / TARGET_DELAY);
+    cur_window_size -= AIMD_MULT * (avg_delay / TARGET_DELAY) / floor( cur_window_size );
     if ( cur_window_size < AIMD_MIN )
       cur_window_size = AIMD_MIN;
   }
@@ -105,5 +105,5 @@ void Controller::timeout_experienced( void )
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 100; /* timeout of 200ms */
+  return 75; /* timeout of 200ms */
 }
