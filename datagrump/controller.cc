@@ -7,7 +7,7 @@
 using namespace std;
 
 /* initial window size. */
-#define WINDOW_INIT 20.0
+#define WINDOW_INIT 60.0
 /* AIMD Scheme : minimum window size. */
 #define AIMD_MIN 2.0
 /* AIMD Scheme : additive constant (> 0). */
