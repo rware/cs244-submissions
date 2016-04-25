@@ -17,6 +17,7 @@ private:
   uint64_t prev_rtt;
   double rtt_diff;
   int hai_count;
+  uint64_t timestamp_changed;
 
 public:
   /* Public interface for the congestion controller */

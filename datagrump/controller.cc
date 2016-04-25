@@ -7,7 +7,7 @@
 using namespace std;
 
 // TODO
-static const double EWMA_WEIGHT = 0.8;
+static const double EWMA_WEIGHT = 0.4;
 static const uint64_t T_LOW = 50;
 static const uint64_t T_HIGH = 140;
 static const uint64_t MIN_RTT = 30;
@@ -23,6 +23,7 @@ Controller::Controller( const bool debug )
   , prev_rtt(100) // TODO: initial value?
   , rtt_diff(10) // TODO: initial value?
   , hai_count(0)
+  , timestamp_changed(0)
 {}
 
 /* Get current window size, in datagrams */
@@ -60,6 +61,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
              const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
+  uint64_t now = timestamp_ms();
+  if (now - timestamp_changed < 15) {
+    return;
+  }
+  timestamp_changed = now;
+
   uint64_t new_rtt = timestamp_ack_received - send_timestamp_acked;
   int64_t new_rtt_diff = new_rtt - prev_rtt;
   cerr << "rtt diff is " << new_rtt_diff << endl;
@@ -69,7 +76,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   hai_count = normalized_gradient < 0 ? hai_count+1 : 0;
 
   if (new_rtt < T_LOW) {
-    window_size_double += 5 * ADDITIVE_INCREMENT / window_size_double;
+    window_size_double += 5 * ADDITIVE_INCREMENT / sqrt(window_size_double);
     cerr << "below T_LOW, window size increasing to " << window_size_double << endl;
   } else if (new_rtt > T_HIGH) {
     window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*(1 - T_HIGH/new_rtt));
@@ -78,15 +85,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
     cerr << "above T_HIGH (rtt is " << new_rtt << "), window size decreasing to " << window_size_double << endl;
   } else if (normalized_gradient <= 0) {
-    int n = hai_count >= 5 ? 5 : 1;
-    window_size_double += n * ADDITIVE_INCREMENT / sqrt(window_size_double);
-    cerr << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
+    int n = hai_count >= 3 ? hai_count / 2 : 1;
+
+    window_size_double += n * ADDITIVE_INCREMENT / window_size_double;
+    // cerr << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
   } else {
     window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient / sqrt(window_size_double));
     if (window_size_double < 1) {
       window_size_double = 1;
     }
-    cerr << "gradient is " << normalized_gradient << ", decreasing window size to " << window_size_double << endl;
+    // cerr << "gradient is " << normalized_gradient << ", decreasing window size to " << window_size_double << endl;
   }
   
 
@@ -104,5 +112,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 500;
+  return 100;
 }
