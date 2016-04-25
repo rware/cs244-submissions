@@ -15,7 +15,7 @@ using namespace std;
 
 bool comp(const uint64_t& a, const uint64_t& b)
 {
-  return a < b ? true : false;
+  return b < a ? true : false;
 }
 
 /* Default constructor */
@@ -55,7 +55,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
         << cwnd_ << endl;
 */
 
-
   /* Check if min value of heap is greater than now - 100ms */
   if (!outstanding_acks.empty()) {
     uint64_t min = outstanding_acks.at(0);
@@ -65,29 +64,18 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     one_hundred_ms.tv_nsec = TIMEOUT_IN_MS * 1e6;
 
     if (send_timestamp - timestamp_ms_raw(one_hundred_ms) > min) {
-      
-      cerr << "Send timestamp is " << send_timestamp << endl;
-      cerr << min << " " << endl;
-      for (size_t i = 0; i < outstanding_acks.size(); i++) {
-        if (outstanding_acks[i] < min) {
-          cerr << "bug exists";
-        }
-      }
-      cerr << endl;
-
-
-      cerr << "Scaling back!" << endl;
+      cerr << "Scaling back! " << outstanding_acks.size() << endl;
       cwnd_ = cwnd_ / 2 + 1;
     } else {
-      cwnd_ += 0.2;
+      cwnd_ += 0.5;
     }
 
   } else {
-    cwnd_ += 0.5;
+    cwnd_ += 1;
   }
 
   outstanding_acks.push_back(send_timestamp);
-  push_heap(outstanding_acks.begin(), outstanding_acks.end());
+  push_heap(outstanding_acks.begin(), outstanding_acks.end(), comp);
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -114,7 +102,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   } else {
     //remove the element from the heap and restore the heap properties.
     outstanding_acks.erase(it);
-    make_heap(outstanding_acks.begin(), outstanding_acks.end());
+    make_heap(outstanding_acks.begin(), outstanding_acks.end(), comp);
   }
 
 
