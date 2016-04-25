@@ -7,17 +7,21 @@
 using namespace std;
 
 /* AIMD Scheme : initial window size. */
-#define AIMD_MIN 1.0
+#define AIMD_MIN 3.0
 /* AIMD Scheme : additive constant (> 0). */
 #define AIMD_ADD 1.0
-/* AIMD Scheme : multiplicative constant (< 1). */
-#define AIMD_MULT 0.5
+/* AIMD Scheme : multiplicative constant. */
+#define AIMD_MULT 0.75
 
+#define TARGET_DELAY 100
+
+#define SMOOTHING_FACTOR 0.2
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug )
   , cur_window_size( AIMD_MIN )
+  , avg_delay( -1.0 )
 { }
 
 /* Get current window size, in datagrams */
@@ -58,8 +62,19 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  /* AIMD scheme : increase the congestion window size. */
-  cur_window_size += AIMD_ADD / floor( cur_window_size );
+  int delay = timestamp_ack_received - send_timestamp_acked;
+  if ( avg_delay < 0 )
+    avg_delay = delay;
+  else
+    avg_delay = (1.0 - SMOOTHING_FACTOR)*delay + SMOOTHING_FACTOR*avg_delay;
+  if ( avg_delay > TARGET_DELAY )
+  {
+    cur_window_size -= AIMD_MULT * (avg_delay / TARGET_DELAY);
+    if ( cur_window_size < AIMD_MIN )
+      cur_window_size = AIMD_MIN;
+  }
+  else
+    cur_window_size += (TARGET_DELAY / avg_delay) * AIMD_ADD / floor( cur_window_size );
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -90,5 +105,5 @@ void Controller::timeout_experienced( void )
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 200; /* timeout of 200ms */
+  return 100; /* timeout of 200ms */
 }
