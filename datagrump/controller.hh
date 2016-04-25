@@ -2,6 +2,12 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#include <algorithm>
+#include <vector>
+
+#ifndef TIMEOUT_IN_MS
+#define TIMEOUT_IN_MS 100
+#endif
 
 /* Congestion controller interface */
 
@@ -12,6 +18,7 @@ private:
   float cwnd_;
   float avg_rtt_;
   int rtt_samples_;
+  std::vector<uint64_t> outstanding_acks;
 
   /* Add member variables here */
 
