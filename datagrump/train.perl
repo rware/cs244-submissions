@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use POSIX;
 use Data::Dumper::Simple;
+use Math::Round;
 
 # Array of candidate hashes,
 # Each candidate hash has values for 
@@ -35,7 +36,8 @@ sub gen_base_candidate() {
                      'throughput' => 0,
                      'param1' => 0,
                      'param2' => 0,
-                     'param3' => 0 };
+                     'param3' => 0,
+                     'param4' => 0 };
 
     return $candidate;
 }
@@ -44,9 +46,10 @@ sub gen_random_candidate() {
     my $candidate = gen_base_candidate();    
 
     # TODO add params 
-    $candidate->{'param1'} = int(20 + rand(130));
-    $candidate->{'param2'} = int(20 + rand(130));
-    $candidate->{'param3'} = int(20 + rand(130));
+    $candidate->{'param1'} = int(40 + rand(40));
+    $candidate->{'param2'} = int(40 + rand(40));
+    $candidate->{'param3'} = int(30*30+rand(80*80));
+    $candidate->{'param4'} = nearest(0.01, rand(66)/100.0 + 0.01);
 
     return $candidate;
 }
@@ -76,6 +79,7 @@ sub mate_candidates() {
             $c->{'param1'} = ceil( (($c1->{'param1'} + $c2->{'param1'}) / 2.0) * ((80 + rand(40)) / 100.0) );
             $c->{'param2'} = ceil( (($c1->{'param2'} + $c2->{'param2'}) / 2.0) * ((80 + rand(40)) / 100.0) );
             $c->{'param3'} = ceil( (($c1->{'param3'} + $c2->{'param3'}) / 2.0) * ((80 + rand(40)) / 100.0) );
+            $c->{'param4'} = nearest(0.01, (($c1->{'param4'} + $c2->{'param4'}) / 2.0) * ((80 + rand(40)) / 100.0) );
 
             push(@candidates, $c);
         }
@@ -87,55 +91,19 @@ sub mate_candidates() {
 # Create a bunch of random candidates
 # to begin with
 sub seed_candidates() {
-    # for(my $i = 0; $i < 30; $i++) {
-    #     my $c = gen_random_candidate();
-    #     push(@candidates, $c);
-    # }
+    for(my $i = 0; $i < 30; $i++) {
+        my $c = gen_random_candidate();
+        push(@candidates, $c);
+    }
 
-    my $c = gen_base_candidate();
-    $c->{'param1'} = 46;
-    $c->{'param2'} = 56;
-    $c->{'param3'} = 58;
-    $c->{'throughput'} = 3.12;
-    $c->{'signal_delay'} = 83;
-    $c->{'power'} = 37.5;
-    push(@candidates, $c);
-
-    $c = gen_base_candidate();
-    $c->{'param1'} = 55;
-    $c->{'param2'} = 26;
-    $c->{'param3'} = 82;
-    $c->{'throughput'} = 2.92;
-    $c->{'signal_delay'} = 84;
-    $c->{'power'} = 34.7;
-    push(@candidates, $c);
-
-    $c = gen_base_candidate();
-    $c->{'param1'} = 49;
-    $c->{'param2'} = 76;
-    $c->{'param3'} = 66;
-    $c->{'throughput'} = 4.20;
-    $c->{'signal_delay'} = 121;
-    $c->{'power'} = 34.7;
-    push(@candidates, $c);
-
-    $c = gen_base_candidate();
-    $c->{'param1'} = 94;
-    $c->{'param2'} = 134;
-    $c->{'param3'} = 65;
-    $c->{'throughput'} = 3.65;
-    $c->{'signal_delay'} = 110;
-    $c->{'power'} = 33.1818;
-    push(@candidates, $c);
-
-    $c = gen_base_candidate();
-    $c->{'param1'} = 143;
-    $c->{'param2'} = 57;
-    $c->{'param3'} = 66;
-    $c->{'throughput'} = 3.89;
-    $c->{'signal_delay'} = 119;
-    $c->{'power'} = 32.68;
-    push(@candidates, $c);
+    # my $c = gen_base_candidate();
+    # $c->{'param1'} = 46;
+    # $c->{'param2'} = 56;
+    # $c->{'param3'} = 58;
+    # $c->{'throughput'} = 3.12;
+    # $c->{'signal_delay'} = 83;
+    # $c->{'power'} = 37.5;
+    # push(@candidates, $c);
 }
 
 # Given a candidate, run the 
@@ -150,7 +118,7 @@ sub run_candidate($) {
 
     my $c = $_[0];
 
-    my $command = "./run-train $c->{'param1'} $c->{'param2'} $c->{'param3'} 2>&1";
+    my $command = "./run-train $c->{'param1'} $c->{'param2'} $c->{'param3'} $c->{'param4'} 2>&1";
     
     print "Runing $command...\n";
 

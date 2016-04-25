@@ -39,6 +39,7 @@ public:
 uint64_t rtt_timeout = 0;
 uint64_t timeout_reset = 0;
 uint64_t rand_linear = 0;
+float timeout_multiplier = 0;
 
 int main( int argc, char *argv[] )
 {
@@ -53,11 +54,12 @@ int main( int argc, char *argv[] )
     debug = true;
   } else if ( argc == 3 ) {
     /* do nothing */
-  } else if (argc == 6) {
+  } else if (argc == 7) {
       cout << "Got train args" << endl;
       rtt_timeout = atoi(argv[3]);
       timeout_reset = atoi(argv[4]);
       rand_linear = atoi(argv[5]);
+      timeout_multiplier = atof(argv[6]);
   } else {
     cerr << "Usage: " << argv[ 0 ] << " HOST PORT [debug]" << endl;
     return EXIT_FAILURE;
@@ -77,7 +79,7 @@ DatagrumpSender::DatagrumpSender( const char * const host,
     sequence_number_( 0 ),
     next_ack_expected_( 0 )
 {
-  controller_.set_params(rtt_timeout, timeout_reset, rand_linear);
+  controller_.set_params(rtt_timeout, timeout_reset, rand_linear, timeout_multiplier);
 
   /* turn on timestamps when socket receives a datagram */
   socket_.set_timestamps();
