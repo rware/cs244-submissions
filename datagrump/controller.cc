@@ -19,7 +19,8 @@ using namespace std;
 
 #define TARGET_DELAY 70
 
-#define GAIN 0.2
+#define AVG_GAIN 0.2
+#define VAR_GAIN 0.4
 #define VAR_MULT 2.0
 
 /* Default constructor */
@@ -74,8 +75,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     var_delay = 0;
   }
   else {
-      avg_delay = GAIN * avg_delay + (1 - GAIN) * delay;
-      var_delay = GAIN * var_delay + (1 - GAIN) * (delay - avg_delay - var_delay);
+      avg_delay = AVG_GAIN * avg_delay + (1 - AVG_GAIN) * delay;
+      var_delay = VAR_GAIN * var_delay + (1 - VAR_GAIN) * fabs(delay - avg_delay);
   }
 
   if ( avg_delay + VAR_MULT * var_delay > TARGET_DELAY )
