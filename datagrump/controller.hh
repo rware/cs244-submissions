@@ -12,9 +12,8 @@ private:
 
   /* Add member variables here */
   double cur_window_size; //need a double for additive increase
-
-  /* Average delay. */
   double avg_delay;
+  double var_delay;
 
 public:
   /* Public interface for the congestion controller */

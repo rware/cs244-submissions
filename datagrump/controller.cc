@@ -19,13 +19,15 @@ using namespace std;
 
 #define TARGET_DELAY 70
 
-#define SMOOTHING_FACTOR 0.2
+#define GAIN 0.2
+#define VAR_MULT 2.0
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug )
   , cur_window_size( WINDOW_INIT )
   , avg_delay( -1.0 )
+  , var_delay( -1.0 )
 { }
 
 /* Get current window size, in datagrams */
@@ -67,11 +69,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   int delay = timestamp_ack_received - send_timestamp_acked;
-  if ( avg_delay < 0 )
+  if ( avg_delay < 0 ) {
     avg_delay = delay;
-  else
-    avg_delay = (1.0 - SMOOTHING_FACTOR)*delay + SMOOTHING_FACTOR*avg_delay;
-  if ( avg_delay > TARGET_DELAY )
+    var_delay = 0;
+  }
+  else {
+      avg_delay = GAIN * avg_delay + (1 - GAIN) * delay;
+      var_delay = GAIN * var_delay + (1 - GAIN) * (delay - avg_delay - var_delay);
+  }
+
+  if ( avg_delay + VAR_MULT * var_delay > TARGET_DELAY )
   {
     cur_window_size -= AIMD_MULT * (avg_delay / TARGET_DELAY) / floor( cur_window_size );
     if ( cur_window_size < AIMD_MIN )
