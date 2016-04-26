@@ -13,11 +13,11 @@ using namespace std;
 /* AIMD Scheme : additive constant (> 0). */
 #define AIMD_ADD 1.0
 /* AIMD Scheme : multiplicative constant. */
-#define AIMD_MULT 5.0
+#define AIMD_MULT 3.0
 /* Halve window size on timeout */
 #define TIMEOUT_MULT 0.8
 
-#define TARGET_DELAY 70
+#define TARGET_DELAY 65
 
 #define AVG_GAIN 0.2
 #define VAR_GAIN 0.4
@@ -81,7 +81,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   if ( avg_delay + VAR_MULT * var_delay > TARGET_DELAY )
   {
-    cur_window_size -= AIMD_MULT * (avg_delay / TARGET_DELAY) / floor( cur_window_size );
+    cur_window_size -= AIMD_MULT * ((avg_delay + var_delay) / TARGET_DELAY) / floor( cur_window_size );
     if ( cur_window_size < AIMD_MIN )
       cur_window_size = AIMD_MIN;
   }
