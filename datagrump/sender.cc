@@ -11,6 +11,7 @@
 using namespace std;
 using namespace PollerShortNames;
 
+
 /* simple sender class to handle the accounting */
 class DatagrumpSender
 {
@@ -31,9 +32,12 @@ private:
 
 public:
   DatagrumpSender( const char * const host, const char * const port,
-		   const bool debug );
+       const bool debug );
   int loop( void );
 };
+
+
+unsigned int delay_threshold;
 
 int main( int argc, char *argv[] )
 {
@@ -41,28 +45,33 @@ int main( int argc, char *argv[] )
   if ( argc < 1 ) { /* for sticklers */
     abort();
   }
-
+  printf("%i\n", argc);
+  printf("%s %s\n", argv[1], argv[2]);
+  printf("%s \n", argv[3]);
   bool debug = false;
-  if ( argc == 4 and string( argv[ 3 ] ) == "debug" ) {
+  if ( argc == 5 and string( argv[ 4 ] ) == "debug" ) {
     debug = true;
-  } else if ( argc == 3 ) {
+  } else if ( argc == 4 ) {
     /* do nothing */
   } else {
     cerr << "Usage: " << argv[ 0 ] << " HOST PORT [debug]" << endl;
     return EXIT_FAILURE;
   }
 
+  sscanf(argv[3], "%u",&delay_threshold);
+  printf("delay_threshold %u\n", delay_threshold);
+
   /* create sender object to handle the accounting */
   /* all the interesting work is done by the Controller */
-  DatagrumpSender sender( argv[ 1 ], argv[ 2 ], debug );
+  DatagrumpSender sender( argv[ 1 ], argv[ 2 ], debug);
   return sender.loop();
 }
 
 DatagrumpSender::DatagrumpSender( const char * const host,
-				  const char * const port,
-				  const bool debug )
+          const char * const port,
+          const bool debug )
   : socket_(),
-    controller_( debug ),
+    controller_( debug, delay_threshold),
     sequence_number_( 0 ),
     next_ack_expected_( 0 )
 {
@@ -78,7 +87,7 @@ DatagrumpSender::DatagrumpSender( const char * const host,
 }
 
 void DatagrumpSender::got_ack( const uint64_t timestamp,
-			       const ContestMessage & ack )
+             const ContestMessage & ack )
 {
   if ( not ack.is_ack() ) {
     throw runtime_error( "sender got something other than an ack from the receiver" );
@@ -86,13 +95,13 @@ void DatagrumpSender::got_ack( const uint64_t timestamp,
 
   /* Update sender's counter */
   next_ack_expected_ = max( next_ack_expected_,
-			    ack.header.ack_sequence_number + 1 );
+          ack.header.ack_sequence_number + 1 );
 
   /* Inform congestion controller */
   controller_.ack_received( ack.header.ack_sequence_number,
-			    ack.header.ack_send_timestamp,
-			    ack.header.ack_recv_timestamp,
-			    timestamp );
+          ack.header.ack_send_timestamp,
+          ack.header.ack_recv_timestamp,
+          timestamp );
 }
 
 void DatagrumpSender::send_datagram( void )
@@ -106,9 +115,8 @@ void DatagrumpSender::send_datagram( void )
 
   /* Inform congestion controller */
   controller_.datagram_was_sent( cm.header.sequence_number,
-				 cm.header.send_timestamp );
+         cm.header.send_timestamp );
 }
-
 bool DatagrumpSender::window_is_open( void )
 {
   return sequence_number_ - next_ack_expected_ < controller_.window_size();
@@ -122,11 +130,11 @@ int DatagrumpSender::loop( void )
   /* first rule: if the window is open, close it by
      sending more datagrams */
   poller.add_action( Action( socket_, Direction::Out, [&] () {
-	/* Close the window */
-	while ( window_is_open() ) {
-	  send_datagram();
-	}
-	return ResultType::Continue;
+  /* Close the window */
+  while ( window_is_open() ) {
+    send_datagram();
+  }
+  return ResultType::Continue;
       },
       /* We're only interested in this rule when the window is open */
       [&] () { return window_is_open(); } ) );
@@ -135,10 +143,10 @@ int DatagrumpSender::loop( void )
      process it and inform the controller
      (by using the sender's got_ack method) */
   poller.add_action( Action( socket_, Direction::In, [&] () {
-	const UDPSocket::received_datagram recd = socket_.recv();
-	const ContestMessage ack  = recd.payload;
-	got_ack( recd.timestamp, ack );
-	return ResultType::Continue;
+  const UDPSocket::received_datagram recd = socket_.recv();
+  const ContestMessage ack  = recd.payload;
+  got_ack( recd.timestamp, ack );
+  return ResultType::Continue;
       } ) );
 
   /* Run these two rules forever */

@@ -6,22 +6,22 @@
 using namespace std;
 
 /* Default constructor */
-Controller::Controller( const bool debug )
-  : debug_( debug )
+Controller::Controller( const bool debug, unsigned int delay_threshold)
+  : debug_( debug ),
+    delay_threshold(delay_threshold)
 {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  unsigned int the_window_size = 50;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
-	 << " window size is " << the_window_size << endl;
+	 << " window size is " << m_window_size << endl;
   }
 
-  return the_window_size;
+  return m_window_size;
 }
 
 /* A datagram was sent */
@@ -57,6 +57,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
 	 << endl;
   }
+  if(timestamp_ack_received - send_timestamp_acked > delay_threshold && m_window_size > 1) {
+    if(consecutive_decrease == max_consecutive_decrease) {
+      consecutive_decrease = 0;
+    }
+    else {
+      consecutive_decrease++;
+      m_window_size--;
+    }
+  }
+  else {
+    consecutive_decrease = 0;
+    m_window_size++;
+  }
+  //printf("Window Size: %u\n", m_window_size);
 }
 
 /* How long to wait (in milliseconds) if there are no acks
