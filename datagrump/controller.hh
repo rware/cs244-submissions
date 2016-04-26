@@ -3,7 +3,9 @@
 
 #include <cstdint>
 #include <deque>
+#include <vector>
 #include <utility>
+#include <mutex>
 
 /* Congestion controller interface */
 using namespace std;
@@ -25,7 +27,20 @@ public:
 	/* Public interface for the congestion controller */
 	/* You can change these if you prefer, but will need to change
 	 the call site as well (in sender.cc) */
-	
+  double distribution[256];
+  uint64_t tslice_start;
+  int64_t packets_sent_this_slice;
+  int64_t packets_queued;
+  
+  void updatePDF(void);
+  mutex mController;
+  void normalize(double * pdf, size_t len);
+  void applyBrownian(double * pdf, size_t len);
+  
+  double poissonProb(double sample_rate, int packet_counts);
+  int guessLinkRate(double * pdf, size_t len, double threshold);
+  unsigned int makeForecast(void);
+  
 	/* Default constructor */
 	Controller( const bool debug );
 	

@@ -95,6 +95,8 @@ void DatagrumpSender::got_ack( const uint64_t timestamp,
 			    timestamp );
 }
 
+unsigned long long int pno = 0;
+
 void DatagrumpSender::send_datagram( void )
 {
   /* All messages use the same dummy payload */
@@ -102,7 +104,9 @@ void DatagrumpSender::send_datagram( void )
 
   ContestMessage cm( sequence_number_++, dummy_payload );
   cm.set_send_timestamp();
+//  cout << " Packet no " << pno << endl;
   socket_.send( cm.to_string() );
+//  cout << " Packet no "  << pno++ << " was sent" << endl;
 
   /* Inform congestion controller */
   controller_.datagram_was_sent( cm.header.sequence_number,
