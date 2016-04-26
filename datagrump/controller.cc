@@ -13,19 +13,22 @@ using namespace std;
 /* AIMD Scheme : additive constant (> 0). */
 #define AIMD_ADD 1.0
 /* AIMD Scheme : multiplicative constant. */
-#define AIMD_MULT 5.0
+#define AIMD_MULT 6.0
 /* Halve window size on timeout */
 #define TIMEOUT_MULT 0.5
 
 #define TARGET_DELAY 75
 
-#define SMOOTHING_FACTOR 0.2
+#define AVG_GAIN 0.2
+#define VAR_GAIN 0.2
+#define VAR_MULT 0.0
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug )
   , cur_window_size( WINDOW_INIT )
   , avg_delay( -1.0 )
+  , var_delay( 0.0 )
 { }
 
 /* Get current window size, in datagrams */
@@ -67,18 +70,28 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   int delay = timestamp_ack_received - send_timestamp_acked;
+  double fdelay = delay;
   if ( avg_delay < 0 )
     avg_delay = delay;
-  else
-    avg_delay = (1.0 - SMOOTHING_FACTOR)*delay + SMOOTHING_FACTOR*avg_delay;
-  if ( avg_delay > TARGET_DELAY )
+  else {
+    delay -= (avg_delay * .2);
+    avg_delay += delay;
+    if (delay < 0)
+        delay = -1 * delay;
+    delay -= (var_delay * .2);
+    var_delay += delay;
+    if (var_delay < 0)
+        var_delay = 0;
+    fdelay = (avg_delay * .2) + (VAR_MULT * var_delay * .2);
+  }
+  if ( fdelay > TARGET_DELAY )
   {
-    cur_window_size -= AIMD_MULT * (avg_delay / TARGET_DELAY) / floor( cur_window_size );
+    cur_window_size -= AIMD_MULT * (fdelay / TARGET_DELAY) / floor( cur_window_size );
     if ( cur_window_size < AIMD_MIN )
       cur_window_size = AIMD_MIN;
   }
   else
-    cur_window_size += (TARGET_DELAY / avg_delay) * AIMD_ADD / floor( cur_window_size );
+    cur_window_size += (TARGET_DELAY / fdelay) * AIMD_ADD / floor( cur_window_size );
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
