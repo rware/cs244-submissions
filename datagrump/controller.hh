@@ -18,6 +18,7 @@ private:
   int hai_count;
   uint64_t timestamp_changed;
   int timeout_batch;
+  double increment_count;
 
 public:
   /* Public interface for the congestion controller */

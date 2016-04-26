@@ -11,8 +11,8 @@ static const double EWMA_WEIGHT = 0.4;
 static const uint64_t T_LOW = 50;
 static const uint64_t T_HIGH = 140;
 static const uint64_t MIN_RTT = 30;
-static const double ADDITIVE_INCREMENT = 2;
-static const double MULTIPLICATIVE_DECREMENT = 0.5;
+static const double ADDITIVE_INCREMENT = 1;
+static const double MULTIPLICATIVE_DECREMENT = 0.4;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
@@ -24,6 +24,7 @@ Controller::Controller( const bool debug )
   , rtt_diff(10) // TODO: initial value?
   , hai_count(0)
   , timestamp_changed(0)
+  , increment_count(0)
 {}
 
 /* Get current window size, in datagrams */
@@ -78,15 +79,19 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   if (new_rtt <= T_HIGH) timeout_batch = 0;
 
   if (new_rtt < T_LOW) {
-    window_size_double += 5 * ADDITIVE_INCREMENT / sqrt(window_size_double);
-    // cerr << "below T_LOW, window size increasing to " << window_size_double << endl;
+    increment_count++;
+    window_size_double += sqrt(increment_count) * ADDITIVE_INCREMENT / sqrt(window_size_double);
+    cerr << "below T_LOW, window size increasing to " << window_size_double 
+         << ", increment_count is " << increment_count << endl;
   } else if (new_rtt > T_HIGH) {
     if (new_rtt > 1000) {
       timeout_batch = 0;
       window_size_double = 1;
+      increment_count = 0;
     } else {
       if (timeout_batch) timeout_batch--;
       else {
+        increment_count = 0;
         timeout_batch = 3;
         window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*(1 - T_HIGH/new_rtt));
         if (window_size_double < 1) {
@@ -96,10 +101,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
     cerr << "above T_HIGH (rtt is " << new_rtt << "), window size decreasing to " << window_size_double << endl;
   } else if (normalized_gradient <= 0 && new_rtt < 100) {
+    increment_count += 0.5;
     int n = hai_count >= 3 ? hai_count / 2 : 1;
     window_size_double += n * ADDITIVE_INCREMENT / window_size_double;
     // cerr << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
   } else if (normalized_gradient > 0 && new_rtt > 90) {
+    increment_count = 0;
     window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient*0.7 / sqrt(window_size_double));
     if (window_size_double < 1) {
       window_size_double = 1;
