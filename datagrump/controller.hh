@@ -15,7 +15,6 @@ private:
 
   /* Average delay. */
   double avg_delay;
-  double var_delay;
 
 public:
   /* Public interface for the congestion controller */
