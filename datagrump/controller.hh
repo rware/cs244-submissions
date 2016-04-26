@@ -18,7 +18,8 @@ private:
   float cwnd_;
   float avg_rtt_;
   int rtt_samples_;
-  std::vector<uint64_t> outstanding_acks;
+  uint64_t last_scale_back_;
+  std::vector<uint64_t> outstanding_acks_;
 
   /* Add member variables here */
 
