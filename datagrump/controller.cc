@@ -11,11 +11,11 @@ using namespace std;
 /* AIMD Scheme : minimum window size. */
 #define AIMD_MIN 2.0
 /* AIMD Scheme : additive constant (> 0). */
-#define AIMD_ADD 1.0
+#define AIMD_ADD 1.5
 /* AIMD Scheme : multiplicative constant. */
 #define AIMD_MULT 3.0
 /* Halve window size on timeout */
-#define TIMEOUT_MULT 0.8
+#define TIMEOUT_MULT 0.9
 
 #define TARGET_DELAY 65
 
@@ -117,5 +117,5 @@ void Controller::timeout_experienced( void )
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 25; /* timeout of 200ms */
+  return 50; /* timeout of 200ms */
 }
