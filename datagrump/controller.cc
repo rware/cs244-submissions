@@ -65,11 +65,11 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     one_hundred_ms.tv_nsec = (TIMEOUT_IN_MS * 0.5) * 1e6;
 
     if (send_timestamp - timestamp_ms_raw(one_hundred_ms) > min) {
-      if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/4 > send_timestamp) {
-        cerr << "[-] No-op: " << outstanding_acks_.size() << endl;
+      if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/8 > send_timestamp) {
+     //   cerr << "[-] No-op: " << outstanding_acks_.size() << endl;
       } else {
-        cerr << "[&] Smart: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.97;
+   //     cerr << "[&] Smart: " << outstanding_acks_.size() << endl;
+        cwnd_ = cwnd_ * 0.98;
       }
 
       last_scale_back_ = send_timestamp;
@@ -96,7 +96,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
       float delta = 0.1;
       if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
          //no sign of delay! lets go.
-        cerr << "boosting" << endl;
+      //  cerr << "boosting" << endl;
          delta *= 4;
       }
       cwnd_ = cwnd_ + delta;
