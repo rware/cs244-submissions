@@ -9,6 +9,7 @@ if ( not defined $username ) {
   die "Usage: $0 USERNAME\n";
 }
 my $windowsize = $ARGV[ 1 ];
+my $maxpacketgap = $ARGV[ 2 ];
 
 my $receiver_pid = fork;
 
@@ -31,7 +32,7 @@ if ( defined $ENV{ 'DISPLAY' } ) {
 }
 
 push @command, qw{--once --uplink-log=/tmp/contest_uplink_log -- sh -c};
-push @command, qq{./sender 100.64.0.1 9090 $windowsize};
+push @command, qq{./sender 100.64.0.1 9090 $windowsize $maxpacketgap };
 
 # for the contest, we will send data over Verizon's downlink
 # (datagrump sender's uplink)

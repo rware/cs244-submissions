@@ -38,6 +38,7 @@ public:
 
 
 unsigned int delay_threshold;
+uint64_t max_packet_gap;
 
 int main( int argc, char *argv[] )
 {
@@ -49,9 +50,9 @@ int main( int argc, char *argv[] )
   printf("%s %s\n", argv[1], argv[2]);
   printf("%s \n", argv[3]);
   bool debug = false;
-  if ( argc == 5 and string( argv[ 4 ] ) == "debug" ) {
+  if ( argc == 6 and string( argv[ 5 ] ) == "debug" ) {
     debug = true;
-  } else if ( argc == 4 ) {
+  } else if ( argc == 5 ) {
     /* do nothing */
   } else {
     cerr << "Usage: " << argv[ 0 ] << " HOST PORT [debug]" << endl;
@@ -59,7 +60,9 @@ int main( int argc, char *argv[] )
   }
 
   sscanf(argv[3], "%u",&delay_threshold);
+  sscanf(argv[4], "%lu",&max_packet_gap);
   printf("delay_threshold %u\n", delay_threshold);
+  printf("max packet gap %lu\n", max_packet_gap);
 
   /* create sender object to handle the accounting */
   /* all the interesting work is done by the Controller */
@@ -71,7 +74,7 @@ DatagrumpSender::DatagrumpSender( const char * const host,
           const char * const port,
           const bool debug )
   : socket_(),
-    controller_( debug, delay_threshold),
+    controller_( debug, delay_threshold, max_packet_gap),
     sequence_number_( 0 ),
     next_ack_expected_( 0 )
 {
@@ -156,7 +159,9 @@ int DatagrumpSender::loop( void )
       return ret.exit_status;
     } else if ( ret.result == PollResult::Timeout ) {
       /* After a timeout, send one datagram to try to get things moving again */
-      send_datagram();
+      while ( window_is_open() ) {
+        send_datagram();
+      }
     }
   }
 }

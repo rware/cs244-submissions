@@ -18,7 +18,7 @@ public:
      the call site as well (in sender.cc) */
 
   /* Default constructor */
-  Controller( const bool debug, unsigned int delay_threshold);
+  Controller( const bool debug, unsigned int delay_threshold, uint64_t max_packet_gap);
 
   /* Get current window size, in datagrams */
   unsigned int window_size( void );
@@ -43,6 +43,8 @@ public:
 
   unsigned int max_consecutive_decrease = 1;
   unsigned int consecutive_decrease = 0;
+  uint64_t max_packet_gap;
+  uint64_t last_sent_datagram = 0;
 };
 
 
