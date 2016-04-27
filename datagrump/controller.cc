@@ -1,6 +1,8 @@
 #include <iostream>
 #include <algorithm>
 #include <cstdlib>
+#include <algorithm> // for copy
+#include <iterator> // for ostream_iterator
 #include <assert.h>
 #include "controller.hh"
 #include "timestamp.hh"
@@ -18,11 +20,19 @@
 #define SAMPLE_WIDTH 5
 #define FORECAST_WINDOW 5
 #define TARGET_DELAY 100
-#define TOLERANCE 5
+#define TOLERANCE 50
 
 using namespace std;
 
-
+template <typename T>
+std::ostream& operator<< (std::ostream& out, const std::vector<T>& v) {
+  if ( !v.empty() ) {
+    out << '[';
+    std::copy (v.begin(), v.end(), std::ostream_iterator<T>(out, ", "));
+    out << "\b\b]";
+  }
+  return out;
+}
 
 /* Default constructor */
 Controller::Controller( const bool debug) :
@@ -33,6 +43,7 @@ Controller::Controller( const bool debug) :
   rttvar ( 0 ),
   timeout ( 250 ),
   outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
+  distribution(SAMPLE_SIZE, 1.0 / SAMPLE_SIZE),
   tslice_start(timestamp_ms()),
   packets_sent_this_slice(0),
   packets_queued(0),
@@ -52,12 +63,12 @@ size_t rate_to_idx(double rate) {
 
 using boost::math::cdf;
 
-void Controller::applyBrownian(double * pdf, size_t len) {
+void Controller::applyBrownian(vector<double>& pdf) {
   double stddev = VOLATILITY * (sqrt(0.01 * TIME_SLICE));
 
   boost::math::normal motion_dist(0, stddev);
 
-  for (size_t i = 0; i < len; i++) {
+  for (size_t i = 0; i < pdf.size(); i++) {
     double link_rate = i * SAMPLE_WIDTH;
     for (size_t j = rate_to_idx(link_rate - 5 * stddev);
          j < rate_to_idx(link_rate + 5 * stddev); j++) {
@@ -77,10 +88,10 @@ void Controller::applyBrownian(double * pdf, size_t len) {
   }
 }
 
-void Controller::normalize(double * pdf, size_t len) {
+void Controller::normalize(vector<double>& pdf) {
   double sum = 0;
-  for (size_t i = 0; i < len; i++) { sum += pdf[i]; }
-  for (size_t i = 0; i < len; i++) { pdf[i] /= sum; }
+  for (size_t i = 0; i < pdf.size(); i++) { sum += pdf[i]; }
+  for (size_t i = 0; i < pdf.size(); i++) { pdf[i] /= sum; }
 
 }
 
@@ -93,9 +104,9 @@ double Controller::poissonProb(double sample_rate, int packet_counts) {
   }
 }
 
-int Controller::guessLinkRate(double * pdf, size_t len, double threshold) {
+int Controller::guessLinkRate(vector<double>& pdf, double threshold) {
   double sum = 0;
-  for (size_t i = 0; i < len; i++) {
+  for (size_t i = 0; i < pdf.size(); i++) {
     sum += pdf[i];
     if (sum > threshold)
       return i * SAMPLE_WIDTH;
@@ -106,39 +117,40 @@ int Controller::guessLinkRate(double * pdf, size_t len, double threshold) {
 
 unsigned int Controller::makeForecast(void) {
   mController.lock();
-  double future_pdf[SAMPLE_SIZE];
-  memcpy(future_pdf, distribution, SAMPLE_SIZE*sizeof(double));
+  vector<double> future_pdf(distribution);
   unsigned int sum_packets = 0;
   for (size_t i = 0; i < FORECAST_WINDOW; i++) {
-    applyBrownian(future_pdf, SAMPLE_SIZE);
-    normalize(future_pdf, SAMPLE_SIZE);
-    sum_packets += guessLinkRate(future_pdf, SAMPLE_SIZE, TOLERANCE);
+    applyBrownian(future_pdf);
+    normalize(future_pdf);
+    sum_packets += guessLinkRate(future_pdf, TOLERANCE);
   }
   mController.unlock();
   return sum_packets;
 }
 
 void Controller::updatePDF(void) {
-  
-  //Initialize as uniform
-  for (int i = 0; i < SAMPLE_SIZE; i++)
-    distribution[i] = 1.0 / SAMPLE_SIZE;
-  
-  
+ // int64_t start = timestamp_ms();
   while (true) {
     sleep(TIME_SLICE);
     
     mController.lock();
+//    cout << "SLICE: " << (timestamp_ms() - start)/TIME_SLICE;
+//    cout << "\t Before: " << distribution << endl;
     //Apply brownian motion
-    applyBrownian(distribution, SAMPLE_SIZE);
+    applyBrownian(distribution);
     
+//    cout << "\t Evolved: " << distribution << endl;
+
     for (int i = 0; i < SAMPLE_SIZE; i++) {
       distribution[i] *= poissonProb(i*SAMPLE_WIDTH * 0.01, packets_sent_this_slice);
     }
     packets_sent_this_slice = 0;
-    
+//    cout << "\t Observed: " << distribution << endl;
+
     //Normalize
-    normalize(distribution, SAMPLE_SIZE);
+    normalize(distribution);
+//    cout << "\t Normalized: " << distribution << endl;
+
     mController.unlock();
   }
 }
