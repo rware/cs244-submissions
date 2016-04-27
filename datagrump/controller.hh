@@ -9,6 +9,10 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
+  float cwnd;
+  float rtt_avg;
+  float slow_st_thresh;
+
 
   /* Add member variables here */
 
