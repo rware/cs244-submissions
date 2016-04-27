@@ -65,15 +65,21 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     one_hundred_ms.tv_nsec = TIMEOUT_IN_MS * 1e6;
 
     if (send_timestamp - timestamp_ms_raw(one_hundred_ms) > min) {
-      cerr << "Scaling back! " << outstanding_acks_.size() << endl;
 
       //last scale back occured less than TIMEOUT time ago.
-      //if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) > send_timestamp) {
-        cerr << "Triggered" << endl;
-        cwnd_ = cwnd_ * 0.9 + 1;
-      // } else {
+      if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/4 > send_timestamp) {
+        cerr << "[-] Minor: " << outstanding_acks_.size() << endl;
+        cwnd_ = cwnd_ * 0.95 + 1;
+      } else if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/2 > send_timestamp) {
+        cerr << "[~] Mediu: " << outstanding_acks_.size() << endl;
+        cwnd_ = cwnd_ * 0.85 + 1;
+      } else {
+
+        //if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) > send_timestamp) {
+        cwnd_ = cwnd_ * 0.8 + 1;
+        cerr << "[!] Major: " << outstanding_acks_.size() << endl;
       //   //cwnd_ = cwnd_ * 0.9 + 1;
-      // }
+      } 
 
       //network is lossless, ==> this is monotonically increasing
       last_scale_back_ = send_timestamp;
@@ -82,13 +88,9 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     } else {
       float delta = 0.02;
       //no timeout in last 100ms... increase by more!
-      if (last_scale_back_ + 2*timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
+      if (last_scale_back_ + 8*timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
         //no sign of delay! lets go.
-
-        delta = 0.1;
-        cerr << "yep" << endl;
-      } else {
-        cerr << "nop" << endl;
+        //delta = 0.08;
       }
       cwnd_ += delta;
     }
