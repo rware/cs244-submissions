@@ -62,37 +62,38 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 
     timespec one_hundred_ms;
     one_hundred_ms.tv_sec = 0;
-    one_hundred_ms.tv_nsec = TIMEOUT_IN_MS * 1e6;
+    one_hundred_ms.tv_nsec = (TIMEOUT_IN_MS * 0.5) * 1e6;
 
     if (send_timestamp - timestamp_ms_raw(one_hundred_ms) > min) {
-
+      cerr << "[&] Smart: " << outstanding_acks_.size() << endl;
+      cwnd_ = cwnd_ * 0.95;
+      last_scale_back_ = send_timestamp;
+/*
       //last scale back occured less than TIMEOUT time ago.
       if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/4 > send_timestamp) {
         cerr << "[-] Minor: " << outstanding_acks_.size() << endl;
         cwnd_ = cwnd_ * 0.95 + 1;
       } else if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/2 > send_timestamp) {
         cerr << "[~] Mediu: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.85 + 1;
-      } else {
-
-        //if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) > send_timestamp) {
+        cwnd_ = cwnd_ * 0.9 + 1;
+      } else if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) > send_timestamp) {
+        cerr << "[&] Smart: " << outstanding_acks_.size() << endl;
         cwnd_ = cwnd_ * 0.8 + 1;
-        cerr << "[!] Major: " << outstanding_acks_.size() << endl;
-      //   //cwnd_ = cwnd_ * 0.9 + 1;
-      } 
-
+      } else {
+        cerr << "[&] Major: " << outstanding_acks_.size() << endl;
+        cwnd_ = cwnd_ * 0.7 + 1;
+      }
       //network is lossless, ==> this is monotonically increasing
       last_scale_back_ = send_timestamp;
-
+*/
 
     } else {
-      float delta = 0.02;
-      //no timeout in last 100ms... increase by more!
-      if (last_scale_back_ + 8*timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
-        //no sign of delay! lets go.
-        //delta = 0.08;
-      }
-      cwnd_ += delta;
+      float delta = 0.4;
+      // if (last_scale_back_ + 2*timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
+      //    //no sign of delay! lets go.
+      //    delta *= 2;
+      // }
+      cwnd_ = cwnd_ + delta;
     }
 
   } else {
