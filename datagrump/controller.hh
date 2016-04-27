@@ -3,15 +3,26 @@
 
 #include <cstdint>
 
+#define NUM_RTTS 10
+
 /* Congestion controller interface */
 
 class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
-  float cwnd;
-  float rtt_avg;
-  float slow_st_thresh;
+  double cwnd;
+  double slow_st_thresh;
+
+  int acks_received;
+  unsigned int rtts[NUM_RTTS];
+  int index;
+  uint64_t time_slice_start;
+  double est_throughput;
+
+  void update(uint64_t cur_time);
+  void rtt_add(unsigned int rtt);
+  unsigned int rtt_avg();
 
 
   /* Add member variables here */
