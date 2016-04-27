@@ -97,7 +97,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
       if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
          //no sign of delay! lets go.
         cerr << "boosting" << endl;
-         delta *= 3;
+         delta *= 4;
       }
       cwnd_ = cwnd_ + delta;
     }
