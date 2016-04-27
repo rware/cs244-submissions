@@ -1,27 +1,31 @@
 #include <iostream>
+#include <algorithm>
 
 #include "controller.hh"
 #include "timestamp.hh"
 
 using namespace std;
 
+
+
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug )
-{}
+  : debug_( debug ), packetsUntilIncrease(0), curWinSize(100),
+    lastSendTimestamp(0)
+{
+}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  unsigned int the_window_size = 50;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
-	 << " window size is " << the_window_size << endl;
+	 << " window size is " << curWinSize << endl;
   }
 
-  return the_window_size;
+  return curWinSize;
 }
 
 /* A datagram was sent */
@@ -31,6 +35,14 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
                                     /* in milliseconds */
 {
   /* Default: take no action */
+  /*if (lastSendTimestamp != 0 && (send_timestamp - lastSendTimestamp) > timeout_ms()) {
+    curWinSize = max(curWinSize / 2, 1u);
+    packetsUntilIncrease = curWinSize;
+    cout << "Decreasing curWinSize to " << curWinSize << endl;
+  }
+
+  lastSendTimestamp = send_timestamp;
+  */
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -49,6 +61,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   /* Default: take no action */
+  /* AIMD */
+  if ((timestamp_ack_received - send_timestamp_acked) > timeout_ms()) {
+    curWinSize = max(curWinSize * 2 / 3, 1u);
+    packetsUntilIncrease = curWinSize;
+    cout << "Decreasing curWinSize to " << curWinSize << endl;
+  } else {
+    if (packetsUntilIncrease == 0) {
+      curWinSize++;
+      packetsUntilIncrease = curWinSize;
+      //cout << "Increasing curWinSize to " << curWinSize << endl;
+    }
+
+    packetsUntilIncrease--;
+  }
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -63,5 +89,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 1000; /* timeout of one second */
+  return 100; /* timeout of one second */
 }
