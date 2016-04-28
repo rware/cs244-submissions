@@ -17,9 +17,9 @@ Controller::Controller( const bool debug )
 unsigned int Controller::window_size( void )
 {
   unsigned int the_window_size = (unsigned int) cwnd;
-  /*
   uint64_t outstanding_packets =
     ((bytes_sent - bytes_ackd) / PACKET_SIZE);
+  /*
   if (outstanding_packets > 30) {
     return 1;
   }
