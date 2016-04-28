@@ -8,9 +8,9 @@ my $param1 = $ARGV[0];
 my $param2 = $ARGV[1];
 my $param3 = $ARGV[2];
 my $param4 = $ARGV[3];
-my $param5 = $ARGV[3];
+my $param5 = $ARGV[4];
 
-print "Got params $param1, $param2, $param3, $param4\n";
+print "Got params $param1, $param2, $param3, $param4, $param5\n";
 
 my $receiver_pid = fork;
 

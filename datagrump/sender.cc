@@ -51,11 +51,13 @@ int main( int argc, char *argv[] )
 
   bool debug = false;
 
+  cout << "Received " << argc << " arguments" << endl;
+
   if ( argc == 4 and string( argv[ 3 ] ) == "debug" ) {
     debug = true;
   } else if ( argc == 3 ) {
     /* do nothing */
-  } else if (argc == 7) {
+  } else if (argc == 8) {
       cout << "Got train args" << endl;
       rtt_timeout = atoi(argv[3]);
       timeout_reset = atoi(argv[4]);
