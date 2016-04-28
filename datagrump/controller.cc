@@ -102,13 +102,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   //if (measured_rtt > 1.20 * new_rtt) { // AIMD
   //if (measured_rtt > 150) { // Delay-Trigger
-  if (measured_rtt > 130) { // AIMD
+  if (measured_rtt > 110) { // AIMD
     cwnd = 1;
-  } else if (new_rtt > 120) { // Delay-Trigger
+  } else if (new_rtt > 100) { // Delay-Trigger
     // We detect congestion, so multiplicatively decrease
-    cwnd *= (4.0/5.0);
+    cwnd *= (3.0/5.0);
   } else {
-    if (cwnd < 20) { // acts as the SSTHRESHOLD
+    if (cwnd < 25) { // acts as the SSTHRESHOLD
       cwnd += 1;
     } else {
       cwnd += 1.0 / cwnd;
@@ -128,5 +128,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 50; /* timeout of one second */
+  return 40; /* timeout of one second */
 }
