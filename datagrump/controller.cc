@@ -14,16 +14,14 @@ Controller::Controller( const bool debug )
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
-  /* Default: fixed window size of 100 outstanding datagrams */
-  unsigned int the_window_size = 50;
+  unsigned int the_window_size = (unsigned int) cwnd;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
 	 << " window size is " << the_window_size << endl;
   }
 
-  //return the_window_size;
-  return (unsigned int) cwnd;
+  return the_window_size;
 }
 
 /* A datagram was sent */
@@ -50,7 +48,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  /* Default: take no action */
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -71,20 +68,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     // Initialization
     estimated_rtt = measured_rtt;
   }
+
   double alpha_ = 0.7;
   double new_rtt = (alpha_ * estimated_rtt) +
     ((1.0 - alpha_) * measured_rtt);
 
-  //if (measured_rtt > 1.20 * new_rtt) {
-  //if (measured_rtt > 150) { // this is the delay-trigger
-  if (measured_rtt > 170) {
+  //if (measured_rtt > 1.20 * new_rtt) { // AIMD
+  //if (measured_rtt > 150) { // Delay-Trigger
+  if (measured_rtt > 170) { // AIMD
     cwnd = 1;
-  } else if (new_rtt > 170) { // this is the delay-trigger
-    // We detect congestion,
-    // so multiplicatively decrease
+  } else if (new_rtt > 170) { // Delay-Trigger
+    // We detect congestion, so multiplicatively decrease
     cwnd *= (4.0/5.0);
   } else {
-    if (cwnd < 20) {
+    if (cwnd < 20) { // acts as the SSTHRESHOLD
       cwnd += 1;
     } else {
       cwnd += 1.0 / cwnd;
