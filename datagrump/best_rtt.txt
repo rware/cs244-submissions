@@ -1,3 +1,23 @@
+Additive Increase = 0.3
+Additive Decrease = 0.3
+Bound: > 1.5 * best_rtt
+
+Timeout is 50ms instead of 30ms.
+
+3.72	106	35.09
+
+====
+
+Additive Increase = 0.3
+Additive Decrease = 0.3
+Bound: > 1.5 * best_rtt
+
+Timeout is 40ms instead of 30ms.
+
+4.03	104	38.75
+
+====
+
 Additive Increase = 0.2
 Additive Decrease = 0.2
 Bound: > 1.5 * best_rtt
