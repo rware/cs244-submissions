@@ -96,8 +96,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     timestamp_ack_received - send_timestamp_acked;
 
   /**
-   * The best_rtt is presumably the best rtt possible.
-   * If we are too far from the best rtt, we penalize cwnd.
+   * The best_rtt is presumably the fastest rtt we've seen so far.
+   * If we are too far from the best_rtt, we penalize cwnd,
+   * additively, not multiplicatively! We see that multiplicative decrease
+   * was hard to control and caused a lot of sharp cwnd decreases that hurt
+   * throughput.
+   *
    * Increment cwnd if we are within best rtt by some
    * boundary.
    */
@@ -105,7 +109,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     best_rtt = measured_rtt;
   }
 
-  // std rtt?
+  // next to do: try std rtt?
   if (measured_rtt > 1.4 * best_rtt) {
     cwnd -= 0.3;
   } else {
