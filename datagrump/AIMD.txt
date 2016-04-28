@@ -1,0 +1,13 @@
+====================
+AIMD First Version: 5cea7f135ecf233310589883adf95cc40327c83e
+
+http://cs344g.keithw.org/report/?baller-1461806663-gaitaajo
+
+We're not incrementing the cwnd fast enough, so a lot of capacity is
+being wasted.
+
+Are we detecting congestion fast enough? We need to think of another
+way to detect congestion rather than some multiple of the estimated
+rtt.
+
+====================
