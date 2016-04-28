@@ -38,6 +38,10 @@ unsigned int Controller::window_size( void )
   }
   */
 
+  if (the_window_size < 1) {
+    return 1;
+  }
+
   return the_window_size;
 }
 
@@ -102,11 +106,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   //if (measured_rtt > 1.20 * new_rtt) { // AIMD
   //if (measured_rtt > 150) { // Delay-Trigger
-  if (measured_rtt > 110) { // AIMD
-    cwnd = 1;
+  if (measured_rtt > 120) {
+    cwnd *= (1.0 / 2);
+  } else if (measured_rtt > 110) { // AIMD
+    cwnd *= (2.0 / 3.0);
   } else if (new_rtt > 100) { // Delay-Trigger
     // We detect congestion, so multiplicatively decrease
-    cwnd *= (3.0/5.0);
+    cwnd *= (3.0/4.0);
   } else {
     if (cwnd < 25) { // acts as the SSTHRESHOLD
       cwnd += 1;
@@ -128,5 +134,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 40; /* timeout of one second */
+  return 30; /* timeout of one second */
 }
