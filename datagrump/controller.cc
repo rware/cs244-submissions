@@ -16,7 +16,7 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    timeout_( 54 ),
+    timeout_( 100 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
@@ -92,7 +92,6 @@ void Controller::remove_outstanding_packet(uint64_t seqno) {
     struct SentPacket acked = {seqno, 0};
     std::set<SentPacket>::iterator it = outstanding_packets_.find(acked);
     if(it != outstanding_packets_.end()) {
-      cout << "Removed ACK'd" << endl;
       outstanding_packets_.erase(it);
     }
 }
@@ -107,7 +106,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  if(mode == AIMD || mode == AIMD_INF || mode == AIMD_PROBABALISTIC) {
+  if(mode_ == AIMD || mode_ == AIMD_INF || mode_ == AIMD_PROBABALISTIC) {
     // Remove ACK'd packet from outstanding_packets
     remove_outstanding_packet(sequence_number_acked);
   }
@@ -121,7 +120,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       * when there's no timeouts for a while - indicative of
       * overshooting the network capacity */
     uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-    if((uint64_t)(rand() % (5698)) > (uint64_t) (time_since_timeout * time_since_timeout)) {
+    if((uint64_t)(rand() % (10000)) > std::min((uint64_t) (time_since_timeout * time_since_timeout), (uint64_t) 9750)) {
        win_size_++;
     }
   } else if (mode_ == SIMPLE_DELAY) {
