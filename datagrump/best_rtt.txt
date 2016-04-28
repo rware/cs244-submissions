@@ -1,3 +1,17 @@
+Additive Increase = 0.2
+Additive Decrease = 0.2
+Bound: > 1.5 * best_rtt
+
+http://cs344g.keithw.org/report/?baller-1461878870-eemeesea
+
+3.89	108	36.02
+
+====
+
+4.01	106	37.83
+
+Same as below but put timeout to 20ms instead of 30ms.
+
 ====
 
 Additive Increase = 0.3
