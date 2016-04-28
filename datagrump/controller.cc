@@ -15,7 +15,7 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
-    win_size_( 1 ),
+    win_size_( 10 ), // Start window size higher than 1, avoid very slow start
     timeout_( 100 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
@@ -120,7 +120,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       * when there's no timeouts for a while - indicative of
       * overshooting the network capacity */
     uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-    if((uint64_t)(rand() % (10000)) > std::min((uint64_t) (time_since_timeout * time_since_timeout), (uint64_t) 9750)) {
+    if((uint64_t)(rand() % (7000)) > std::min((uint64_t) (time_since_timeout * time_since_timeout), (uint64_t) 6800)) {
        win_size_++;
     }
   } else if (mode_ == SIMPLE_DELAY) {
