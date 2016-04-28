@@ -1,0 +1,20 @@
+=====
+
+Additive Increase = 0.5
+Additive Decrease = 0.5
+Bound: > 2.0 * best_rtt
+
+4.43	167	26.53
+
+http://cs344g.keithw.org/report?baller-1461877090-seicinae
+
+=====
+
+Additive Increase = 0.5
+Additive Decrease = 0.5
+Bound: > 1.5 * best_rtt
+
+3.69  100	36.90
+
+http://cs344g.keithw.org/report/?baller-1461876665-guhuvuxo
+
