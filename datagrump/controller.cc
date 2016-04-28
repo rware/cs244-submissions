@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define PACKET_SIZE 1424 // this is hardcoded in the sender.cc
+
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ), cwnd( 50.0 ),
@@ -15,11 +17,26 @@ Controller::Controller( const bool debug )
 unsigned int Controller::window_size( void )
 {
   unsigned int the_window_size = (unsigned int) cwnd;
+  /*
+  uint64_t outstanding_packets =
+    ((bytes_sent - bytes_ackd) / PACKET_SIZE);
+  if (outstanding_packets > 30) {
+    return 1;
+  }
+  */
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
-	 << " window size is " << the_window_size << endl;
+	 << " window size is " << the_window_size
+	 << " and outstanding packets is " << outstanding_packets << endl;
   }
+
+  /*
+  Attempt to limit window size
+  if (the_window_size > 20) {
+    return 20;
+  }
+  */
 
   return the_window_size;
 }
@@ -30,7 +47,11 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    const uint64_t send_timestamp )
                                     /* in milliseconds */
 {
-  /* Default: take no action */
+  /*
+  last_sent_seqno = sequence_number;
+  last_sent_timestamp = send_timestamp;
+  */
+  bytes_sent += PACKET_SIZE;
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -48,6 +69,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
+
+  /*
+   * Try to quantify how much outstanding data
+   * is on the network.
+   */
+  bytes_ackd += PACKET_SIZE;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -75,9 +102,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   //if (measured_rtt > 1.20 * new_rtt) { // AIMD
   //if (measured_rtt > 150) { // Delay-Trigger
-  if (measured_rtt > 170) { // AIMD
+  if (measured_rtt > 130) { // AIMD
     cwnd = 1;
-  } else if (new_rtt > 170) { // Delay-Trigger
+  } else if (new_rtt > 120) { // Delay-Trigger
     // We detect congestion, so multiplicatively decrease
     cwnd *= (4.0/5.0);
   } else {
@@ -86,6 +113,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     } else {
       cwnd += 1.0 / cwnd;
     }
+  }
+
+  if ( true ) {
+    cerr << "Measured RTT: " << measured_rtt
+	 << ", Estimated RTT: " << estimated_rtt
+	 << ", CWND: " << cwnd << endl;
   }
 
   estimated_rtt = new_rtt;

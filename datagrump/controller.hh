@@ -11,6 +11,8 @@ private:
   bool debug_; /* Enables debugging output */
   double cwnd; // double, rounded to integer
   double estimated_rtt;
+  uint64_t bytes_sent = 0;
+  uint64_t bytes_ackd = 0;
 
   /* Add member variables here */
 
