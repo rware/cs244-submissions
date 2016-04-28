@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <climits>
 #include <time.h>
 
 #include "controller.hh"
@@ -24,7 +25,7 @@ Controller::Controller( const bool debug, float cwnd_sz)
   , cwnd_ (cwnd_sz)
   , avg_rtt_ (0.0)
   , rtt_samples_ (0)
-  , last_scale_back_ (0)
+  , last_scale_back_ (INT_MAX)
   , outstanding_acks_ ()
 {
   make_heap(outstanding_acks_.begin(), outstanding_acks_.end(), comp);
@@ -60,50 +61,61 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
   if (!outstanding_acks_.empty()) {
     uint64_t min = outstanding_acks_.at(0);
 
-    timespec one_hundred_ms;
-    one_hundred_ms.tv_sec = 0;
-    one_hundred_ms.tv_nsec = (TIMEOUT_IN_MS * 0.5) * 1e6;
+    timespec fifty_ms;
+    fifty_ms.tv_sec = 0;
+    fifty_ms.tv_nsec = (TIMEOUT_IN_MS * 0.5) * 1e6;
 
-    if (send_timestamp - timestamp_ms_raw(one_hundred_ms) > min) {
-      if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/8 > send_timestamp) {
-     //   cerr << "[-] No-op: " << outstanding_acks_.size() << endl;
-      } else {
-   //     cerr << "[&] Smart: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.98;
+    //smooth updates only over every 12.5ms, at most
+    bool should_scale_back = (send_timestamp > TIMEOUT_IN_MS*2) 
+         && (last_scale_back_ + timestamp_ms_raw(fifty_ms)/4 < send_timestamp);
+
+    if (send_timestamp - 8 * timestamp_ms_raw(fifty_ms) > min) {
+      
+      if (should_scale_back) {
+      //  cerr << "[!] UBER: " << cwnd_ << endl;
+        cwnd_ *= 0.5;
       }
 
       last_scale_back_ = send_timestamp;
-/*
-      //last scale back occured less than TIMEOUT time ago.
-      if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/4 > send_timestamp) {
-        cerr << "[-] Minor: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.95 + 1;
-      } else if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms)/2 > send_timestamp) {
-        cerr << "[~] Mediu: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.9 + 1;
-      } else if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) > send_timestamp) {
-        cerr << "[&] Smart: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.8 + 1;
-      } else {
-        cerr << "[&] Major: " << outstanding_acks_.size() << endl;
-        cwnd_ = cwnd_ * 0.7 + 1;
+
+    } else if (send_timestamp - 4 * timestamp_ms_raw(fifty_ms) > min) {
+      
+      if (should_scale_back) {
+       // cerr << "[!] EXPLOSION: " << cwnd_ << endl;
+        cwnd_ *= 0.8;
       }
-      //network is lossless, ==> this is monotonically increasing
+
       last_scale_back_ = send_timestamp;
-*/
+
+    } else if (send_timestamp - 2 * timestamp_ms_raw(fifty_ms) > min) {
+      
+      if (should_scale_back) {
+        //cerr << "[!] Major: " << cwnd_ << endl;
+        cwnd_ *= 0.95;
+      }
+
+      last_scale_back_ = send_timestamp;
+
+    } else if (send_timestamp - timestamp_ms_raw(fifty_ms) > min) {
+
+      if (should_scale_back) {
+       // cerr << "[!] Minor: " << cwnd_ << endl;
+        cwnd_ *= 0.97;
+      }
+
+      last_scale_back_ = send_timestamp;
 
     } else {
       float delta = 0.1;
-      if (last_scale_back_ + timestamp_ms_raw(one_hundred_ms) < send_timestamp) {
-         //no sign of delay! lets go.
-      //  cerr << "boosting" << endl;
-         delta *= 4;
-      }
+      // if (last_scale_back_ + timestamp_ms_raw(fifty_ms) < send_timestamp) {
+      //    //no sign of delay! lets go.
+      // //  cerr << "boosting" << endl;
+      //    delta *= 2;
+      // }
       cwnd_ = cwnd_ + delta;
     }
 
   } else {
-    last_scale_back_ = 0;
     cerr << "none outstanding" << endl;
     cwnd_ += 1;
   }
