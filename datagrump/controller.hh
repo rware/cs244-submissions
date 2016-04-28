@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <set>
 
-enum Controller_State { SS, CA };
-enum Controller_Mode { NA, AIMD, AIMD_INF, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
+enum Controller_Mode { NA, AIMD, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
 /* Congestion controller interface */
 
 struct SentPacket {
@@ -27,7 +26,6 @@ private:
   unsigned int min_rtt_thresh_;
   unsigned int max_rtt_thresh_;
   uint64_t last_rtt_timestamp_;
-  Controller_State state_;
   Controller_Mode mode_;
   std::set<SentPacket> outstanding_packets_;
   uint64_t last_timeout_;

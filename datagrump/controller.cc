@@ -17,10 +17,9 @@ Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
     timeout_( 42 ),
-    min_rtt_thresh_( 50 ),
+    min_rtt_thresh_( 30 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
-    state_( SS ),
     mode_( AIMD_PROBABALISTIC ),
     outstanding_packets_( ),
     last_timeout_( 0 )
@@ -47,16 +46,16 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    const uint64_t send_timestamp )
                                     /* in milliseconds */
 {
-  /* Default: take no action */
-
   /* Keep track of sent packets and their times,
    * for our own implementation of timeouts */
   if (mode_ == SIMPLE_DELAY || mode_ == AIMD || mode_ == AIMD_PROBABALISTIC) {
     struct SentPacket sent = {sequence_number, send_timestamp};
     outstanding_packets_.insert(sent);
 
-    /* Check if a timeout should have triggered */
-    if(is_timeout(send_timestamp) && send_timestamp - last_timeout_ > TIMEOUT_RESET) {
+    /* Check if a timeout should have triggered. Also, don't call timeout too often.
+     * We only call at most one timeout during TIMEOUT_RESET. This is because we can get
+     * a batch of timeout packets that may reduce our window too much. */
+    if(is_timeout(send_timestamp) && (send_timestamp - last_timeout_ > TIMEOUT_RESET)) {
         timeout_received();
         last_timeout_ = send_timestamp;
     }
@@ -101,7 +100,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 {
   unsigned int rtt;
   rtt = timestamp_ack_received - send_timestamp_acked;
-  if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
+  if (mode_ == AIMD) {
       win_size_++;
   } else if (mode_ == AIMD_PROBABALISTIC) {
       /* Don't want to increase window size too quickly
@@ -137,8 +136,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
   }
 
-  // cout << "winsize: " << win_size_ << "rtt: " << rtt << endl;
-
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
 	 << " received ack for datagram " << sequence_number_acked
@@ -152,7 +149,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
+  if ((mode_ == AIMD) || (mode_ == AIMD_PROBABALISTIC)) {
     win_size_ = (win_size_ + 1) / 2;
   }
   return;
