@@ -1,4 +1,17 @@
 ====================
+AIMD + Delay hybrid:
+
+AIMD+Delay v6: 3.87 184 21.03 cs344g.keithw.org/report/?baller-1461856571-ohwoofoh
+
+It was very clear that we needed to work on delay. Throughput of the
+other competitors is around the same but our delay needs to
+significantly improve.
+
+The AIMD+Delay doesn't take into account what is the outstanding
+traffic capacity nor the outstanding traffic of the sender, so we need
+to focus on that.
+
+====================
 AIMD Second Version: 9-something
 
 If we move to 1.4 * new_rtt, we get 11.68. Finally past 10.0

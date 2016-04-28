@@ -61,7 +61,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   /*
-   * AIMD algorithm
+   * AIMD algorithm + Delay Trigger
    * https://en.wikipedia.org/wiki/Additive_increase/multiplicative_decrease
    */
   const uint64_t measured_rtt =
