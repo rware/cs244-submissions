@@ -9,6 +9,8 @@ class Controller
 {
 private:
   bool debug_; /* Enables debugging output */
+  double cwnd; // double, rounded to integer
+  double estimated_rtt;
 
   /* Add member variables here */
 
