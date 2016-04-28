@@ -18,7 +18,7 @@ using namespace std;
 
 #define DELTA_DELAY false
 
-#define DEFAULT_CWIND 80
+#define DEFAULT_CWIND 10
 #define DEFAULT_TIMEOUT 45
 #define MIN_CWIND 2
 
@@ -26,7 +26,9 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), cwind(DEFAULT_CWIND), lastDelay(-1)
+  : debug_( debug ), cwind(DEFAULT_CWIND), lastDelay(-1), minDelay(10000),
+  cwinds(), maxPower(0), bestCwind(0), bestDelay(0), maxDelayThreshold(0),
+  minFullIncrease(0), minDelayThreshold(0)
 {}
 
 /* Get current window size, in datagrams */
@@ -48,6 +50,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
                                     /* in milliseconds */
 {
   /* Default: take no action */
+  cwinds.insert({sequence_number, window_size()});
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -65,34 +68,44 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  if (USING_AIMD){
-    cwind += ADDITIVE_INCREASE / cwind;
-  }
 
   float increaseFactor = ADDITIVE_INCREASE;
 
   float delay = timestamp_ack_received - send_timestamp_acked;
+
+  float dataSize = cwinds.at(sequence_number_acked);
+  cwinds.erase(cwinds.find(sequence_number_acked));
+
+  float power = dataSize / delay / delay;
+  if (power > maxPower){
+    maxPower = power;
+    bestCwind = cwind;
+    bestDelay = delay;
+  }
+
   float diff = delay - lastDelay;
   float prediction = delay + cwind * diff;
 
-  if (diff > EPSILON || prediction > MAX_DELAY_THRESHOLD){
+  maxDelayThreshold = 2.2 * bestDelay;
+  minFullIncrease = 1.75 * bestDelay;
+  minDelayThreshold = 1.25 * bestDelay;  
+
+  if (diff > EPSILON || prediction > maxDelayThreshold){
     increaseFactor *= lastDelay / delay * .25;
   }
 
-  float scaledDelay = delay - MIN_FULL_INCREASE;
-  if (delay > MIN_FULL_INCREASE && delay <= MIN_DELAY_THRESHOLD){
-    increaseFactor *= (1 - scaledDelay / (MAX_DELAY_THRESHOLD - MIN_FULL_INCREASE));
+  float scaledDelay = delay - minFullIncrease;
+  if (delay > minFullIncrease && delay <= minDelayThreshold){
+    increaseFactor *= (1 - scaledDelay / (maxDelayThreshold - minFullIncrease));
   }
-
-  cerr << "Diff: " << diff << endl;
-
+  cerr << "maxPower: " << maxPower << endl << "bestCwind: " << bestCwind << endl << "bestDelay: " << bestDelay << endl;
   lastDelay = delay;
 
   if (DELAY_TRIGGER){
-    if (delay < MIN_DELAY_THRESHOLD && prediction < MAX_DELAY_THRESHOLD){
-      cwind += (MIN_DELAY_THRESHOLD / delay) * increaseFactor / cwind;
+    if (delay < minDelayThreshold && prediction < maxDelayThreshold){
+      cwind += (minDelayThreshold / delay) * increaseFactor / cwind;
     }
-    else if (delay > MAX_DELAY_THRESHOLD && cwind > MIN_CWIND){
+    else if (delay > maxDelayThreshold && cwind > MIN_CWIND){
       cwind -= .25;
     }
   }

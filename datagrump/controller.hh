@@ -2,6 +2,9 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#include <unordered_map>
+
+using namespace std;
 
 /* Congestion controller interface */
 
@@ -11,6 +14,14 @@ private:
   bool debug_; /* Enables debugging output */
   float cwind;
   float lastDelay;
+  float minDelay;
+  unordered_map<int, float> cwinds;
+  float maxPower;
+  float bestCwind;
+  float bestDelay;
+  float maxDelayThreshold;
+  float minFullIncrease;
+  float minDelayThreshold;
 
   /* Add member variables here */
 
