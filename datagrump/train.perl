@@ -37,7 +37,8 @@ sub gen_base_candidate() {
                      'param1' => 0,
                      'param2' => 0,
                      'param3' => 0,
-                     'param4' => 0 };
+                     'param4' => 0,
+                     'param5' => 0 };
 
     return $candidate;
 }
@@ -45,11 +46,11 @@ sub gen_base_candidate() {
 sub gen_random_candidate() {
     my $candidate = gen_base_candidate();    
 
-    # TODO add params 
-    $candidate->{'param1'} = int(40 + rand(40));
-    $candidate->{'param2'} = int(40 + rand(40));
+    $candidate->{'param1'} = int(40 + rand(70));
+    $candidate->{'param2'} = int(40 + rand(70));
     $candidate->{'param3'} = int(30*30+rand(80*80));
     $candidate->{'param4'} = nearest(0.01, rand(66)/100.0 + 0.01);
+    $candidate->{'param5'} = int(30*30+rand(80*80));
 
     return $candidate;
 }
@@ -80,6 +81,7 @@ sub mate_candidates() {
             $c->{'param2'} = ceil( (($c1->{'param2'} + $c2->{'param2'}) / 2.0) * ((80 + rand(40)) / 100.0) );
             $c->{'param3'} = ceil( (($c1->{'param3'} + $c2->{'param3'}) / 2.0) * ((80 + rand(40)) / 100.0) );
             $c->{'param4'} = nearest(0.01, (($c1->{'param4'} + $c2->{'param4'}) / 2.0) * ((80 + rand(40)) / 100.0) );
+            $c->{'param5'} = ceil( (($c1->{'param5'} + $c2->{'param5'}) / 2.0) * ((80 + rand(40)) / 100.0) );
 
             push(@candidates, $c);
         }
@@ -118,7 +120,7 @@ sub run_candidate($) {
 
     my $c = $_[0];
 
-    my $command = "./run-train $c->{'param1'} $c->{'param2'} $c->{'param3'} $c->{'param4'} 2>&1";
+    my $command = "./run-train $c->{'param1'} $c->{'param2'} $c->{'param3'} $c->{'param4'} $c->{'param5'} 2>&1";
     
     print "Runing $command...\n";
 

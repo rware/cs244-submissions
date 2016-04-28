@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <set>
 
-enum Controller_State { SS, CA };
 enum Controller_Mode { NA, AIMD, AIMD_INF, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
 /* Congestion controller interface */
 
@@ -27,7 +26,6 @@ private:
   unsigned int min_rtt_thresh_;
   unsigned int max_rtt_thresh_;
   uint64_t last_rtt_timestamp_;
-  Controller_State state_;
   Controller_Mode mode_;
   std::set<SentPacket> outstanding_packets_;
   uint64_t last_timeout_;
@@ -37,8 +35,10 @@ private:
   uint64_t timeout_reset_;
   uint64_t rand_linear_;
   float timeout_multiplier_;
+  uint64_t minimum_rand_target_;
 
   bool is_timeout(uint64_t current_time);
+  void remove_outstanding_packet(uint64_t seqno);
 
 public:
   /* Public interface for the congestion controller */
@@ -64,7 +64,9 @@ public:
   /* A timeout was received */
   void timeout_received( void );
 
-  void set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear, float timeout_multiplier);
+  void set_params(uint64_t rtt_timeout, uint64_t timeout_reset, 
+                  uint64_t rand_linear, float timeout_multiplier,
+                  uint64_t min_rand_target);
 
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */

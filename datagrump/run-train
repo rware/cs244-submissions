@@ -8,6 +8,7 @@ my $param1 = $ARGV[0];
 my $param2 = $ARGV[1];
 my $param3 = $ARGV[2];
 my $param4 = $ARGV[3];
+my $param5 = $ARGV[3];
 
 print "Got params $param1, $param2, $param3, $param4\n";
 
@@ -33,7 +34,7 @@ if ( defined $ENV{ 'DISPLAY' } ) {
 
 push @command, qw{--once --uplink-log=/tmp/contest_uplink_log -- sh -c};
 
-push @command, "./sender \$MAHIMAHI_BASE 9090 $param1 $param2 $param3 $param4";
+push @command, "./sender \$MAHIMAHI_BASE 9090 $param1 $param2 $param3 $param4 $param5";
 
 # for the contest, we will send data over Verizon's downlink
 # (datagrump sender's uplink)

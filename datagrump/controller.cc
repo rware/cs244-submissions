@@ -13,21 +13,21 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
-    win_size_( 1 ),
-    timeout_( 50 ),
+    win_size_( 15 ), // Start window size higher than 1, avoid very slow start
+    timeout_( 100 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
-    state_( SS ),
     mode_( AIMD_PROBABALISTIC ),
     outstanding_packets_( ),
     last_timeout_( 0 ),
     timeout_reset_( 50 ),
-    rand_linear_( 70 ),
-    timeout_multiplier_( 0.5 )
+    rand_linear_( 7000 ),
+    timeout_multiplier_( 0.5 ),
+    minimum_rand_target_( 6800 )
 {}
 
-void Controller::set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear, float timeout_multiplier) {
+void Controller::set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear, float timeout_multiplier, uint64_t min_rand_target) {
     if(rtt_timeout != 0) {
         timeout_ = rtt_timeout;
     }
@@ -42,6 +42,10 @@ void Controller::set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64
 
     if(timeout_multiplier != 0) {
         timeout_multiplier_ = timeout_multiplier;
+    }
+
+    if(min_rand_target != 0) {
+        minimum_rand_target_ = min_rand_target;
     }
 }
 
@@ -66,8 +70,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    const uint64_t send_timestamp )
                                     /* in milliseconds */
 {
-  /* Default: take no action */
-
   /* Keep track of sent packets and their times,
    * for our own implementation of timeouts */
   if (mode_ == SIMPLE_DELAY || mode_ == AIMD || mode_ == AIMD_PROBABALISTIC) {
@@ -78,6 +80,12 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     if(is_timeout(send_timestamp) && send_timestamp - last_timeout_ > timeout_reset_) {
         timeout_received();
         last_timeout_ = send_timestamp;
+    } else if (last_timeout_ == 0) {
+      /* Improve startup behavior by sending last_timeout time to NOW.
+       * This allows for a higher probability of increasing send window size
+       * on startup (otherwise last_timeout ~= infinute, so relying on the 
+       * fixed minimum percent chance to send */
+      last_timeout_ = send_timestamp;
     }
   } 
 
@@ -96,8 +104,7 @@ bool Controller::is_timeout(uint64_t current_time) {
     it = outstanding_packets_.begin();
     while (it != outstanding_packets_.end())
     {
-       if(current_time - (*it).sent_time > timeout_  ||
-          current_time - (*it).sent_time > timeout_ ) {
+       if(current_time - (*it).sent_time > timeout_) {
          it = outstanding_packets_.erase(it);
          timeout = 1;
        } else {
@@ -106,6 +113,15 @@ bool Controller::is_timeout(uint64_t current_time) {
     }
 
     return timeout;
+}
+
+
+void Controller::remove_outstanding_packet(uint64_t seqno) {
+    struct SentPacket acked = {seqno, 0};
+    std::set<SentPacket>::iterator it = outstanding_packets_.find(acked);
+    if(it != outstanding_packets_.end()) {
+      outstanding_packets_.erase(it);
+    }
 }
 
 /* An ack was received */
@@ -118,22 +134,24 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
+  if(mode_ == AIMD || mode_ == AIMD_INF || mode_ == AIMD_PROBABALISTIC) {
+    // Remove ACK'd packet from outstanding_packets
+    remove_outstanding_packet(sequence_number_acked);
+  }
+
   unsigned int rtt;
   rtt = timestamp_ack_received - send_timestamp_acked;
-  if ((mode_ == AIMD) || (mode_ == AIMD_INF)) {
+  if (mode_ == AIMD) {
       win_size_++;
   } else if (mode_ == AIMD_PROBABALISTIC) {
       /* Don't want to increase window size too quickly
        * when there's no timeouts for a while - indicative of
        * overshooting the network capacity */
      uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % (rand_linear_)) > (time_since_timeout*time_since_timeout)) {
-        // cout << "Window++" << endl;
+     if((uint64_t)(rand() % (rand_linear_)) > std::min((uint64_t) time_since_timeout*time_since_timeout, minimum_rand_target_)) {
         win_size_++;
-     } else {
-        // cout << "Window Throttled" << endl;
      }
-  } else if (mode_ == SIMPLE_DELAY) {
+   } else if (mode_ == SIMPLE_DELAY) {
     if (rtt < max_rtt_thresh_) {
       win_size_++;
     } else {
@@ -158,8 +176,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
         win_size_ = MAX_WIN_SIZE;
     }
   }
-
-  // cout << "winsize: " << win_size_ << "rtt: " << rtt << endl;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
