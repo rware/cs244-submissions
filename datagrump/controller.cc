@@ -10,14 +10,14 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 46
+#define TIMEOUT_RESET 51
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 1 ),
-    timeout_( 42 ),
-    min_rtt_thresh_( 30 ),
+    timeout_( 54 ),
+    min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
     mode_( AIMD_PROBABALISTIC ),
@@ -76,8 +76,7 @@ bool Controller::is_timeout(uint64_t current_time) {
     it = outstanding_packets_.begin();
     while (it != outstanding_packets_.end())
     {
-       if(current_time - (*it).sent_time > timeout_  ||
-          current_time - (*it).sent_time > timeout_ ) {
+       if(current_time - (*it).sent_time > timeout_) {
          it = outstanding_packets_.erase(it);
          timeout = 1;
        } else {
@@ -86,6 +85,16 @@ bool Controller::is_timeout(uint64_t current_time) {
     }
 
     return timeout;
+}
+
+
+void Controller::remove_outstanding_packet(uint64_t seqno) {
+    struct SentPacket acked = {seqno, 0};
+    std::set<SentPacket>::iterator it = outstanding_packets_.find(acked);
+    if(it != outstanding_packets_.end()) {
+      cout << "Removed ACK'd" << endl;
+      outstanding_packets_.erase(it);
+    }
 }
 
 /* An ack was received */
@@ -98,18 +107,23 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
+  if(mode == AIMD || mode == AIMD_INF || mode == AIMD_PROBABALISTIC) {
+    // Remove ACK'd packet from outstanding_packets
+    remove_outstanding_packet(sequence_number_acked);
+  }
+
   unsigned int rtt;
   rtt = timestamp_ack_received - send_timestamp_acked;
   if (mode_ == AIMD) {
       win_size_++;
   } else if (mode_ == AIMD_PROBABALISTIC) {
-      /* Don't want to increase window size too quickly
-       * when there's no timeouts for a while - indicative of
-       * overshooting the network capacity */
-     uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
-     if((uint64_t)(rand() % (73)) > time_since_timeout) {
-        win_size_++;
-     }
+     /* Don't want to increase window size too quickly
+      * when there's no timeouts for a while - indicative of
+      * overshooting the network capacity */
+    uint64_t time_since_timeout = timestamp_ack_received - last_timeout_;
+    if((uint64_t)(rand() % (5698)) > (uint64_t) (time_since_timeout * time_since_timeout)) {
+       win_size_++;
+    }
   } else if (mode_ == SIMPLE_DELAY) {
     if (rtt < max_rtt_thresh_) {
       win_size_++;
@@ -149,8 +163,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  if ((mode_ == AIMD) || (mode_ == AIMD_PROBABALISTIC)) {
-    win_size_ = (win_size_ + 1) / 2;
+  if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
+    win_size_ = std::max(1, (int) (win_size_ * 0.36));
   }
   return;
 }

@@ -1,0 +1,1802 @@
+Running candiate: 
+$c = {
+       'param1' => 45,
+       'param3' => 9,
+       'param2' => 70,
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 45 70 9 2>&1...
+Throughput: 1.27
+Signal Delay: 69
+Power: 18.4057971014493
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => 54,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 79,
+       'param3' => 11
+     };
+Runing ./run-train 79 54 11 2>&1...
+Throughput: 3.38
+Signal Delay: 94
+Power: 35.9574468085106
+
+Running candiate: 
+$c = {
+       'param1' => 61,
+       'param3' => 10,
+       'param2' => 43,
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 61 43 10 2>&1...
+Throughput: 1.58
+Signal Delay: 72
+Power: 21.9444444444444
+
+Running candiate: 
+$c = {
+       'param3' => 9,
+       'param1' => 54,
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => 69
+     };
+Runing ./run-train 54 69 9 2>&1...
+Throughput: 1.57
+Signal Delay: 68
+Power: 23.0882352941176
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => 78,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => 40,
+       'param3' => 8
+     };
+Runing ./run-train 40 78 8 2>&1...
+Throughput: 0.38
+Signal Delay: 65
+Power: 5.84615384615385
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => 44,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 43,
+       'param3' => 10
+     };
+Runing ./run-train 43 44 10 2>&1...
+Throughput: 1.02
+Signal Delay: 66
+Power: 15.4545454545455
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => 64,
+       'throughput' => 0,
+       'param3' => 11,
+       'param1' => 61
+     };
+Runing ./run-train 61 64 11 2>&1...
+Throughput: 3.66
+Signal Delay: 98
+Power: 37.3469387755102
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => 52,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 71,
+       'param3' => 11
+     };
+Runing ./run-train 71 52 11 2>&1...
+Throughput: 3.31
+Signal Delay: 92
+Power: 35.9782608695652
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => 66,
+       'param3' => 9,
+       'param1' => 41
+     };
+Runing ./run-train 41 66 9 2>&1...
+Throughput: 1.32
+Signal Delay: 67
+Power: 19.7014925373134
+
+Running candiate: 
+$c = {
+       'param2' => 69,
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 44,
+       'param3' => 11
+     };
+Runing ./run-train 44 69 11 2>&1...
+Throughput: 3.51
+Signal Delay: 97
+Power: 36.1855670103093
+
+Running candiate: 
+$c = {
+       'param3' => 9,
+       'param1' => 64,
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => 65
+     };
+Runing ./run-train 64 65 9 2>&1...
+Throughput: 1.66
+Signal Delay: 70
+Power: 23.7142857142857
+
+Running candiate: 
+$c = {
+       'param2' => 50,
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 51,
+       'param3' => 9
+     };
+Runing ./run-train 51 50 9 2>&1...
+Throughput: 1.48
+Signal Delay: 70
+Power: 21.1428571428571
+
+Running candiate: 
+$c = {
+       'param2' => 74,
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => 56,
+       'param3' => 10
+     };
+Runing ./run-train 56 74 10 2>&1...
+Throughput: 3.00
+Signal Delay: 82
+Power: 36.5853658536585
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => 43,
+       'throughput' => 0,
+       'param3' => 10,
+       'param1' => 53
+     };
+Runing ./run-train 53 43 10 2>&1...
+Throughput: 1.76
+Signal Delay: 73
+Power: 24.1095890410959
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => 41,
+       'param3' => 8,
+       'param1' => 74
+     };
+Runing ./run-train 74 41 8 2>&1...
+Throughput: 0.25
+Signal Delay: 74
+Power: 3.37837837837838
+
+Running candiate: 
+$c = {
+       'param2' => 63,
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 75,
+       'param3' => 8
+     };
+Runing ./run-train 75 63 8 2>&1...
+Throughput: 0.49
+Signal Delay: 76
+Power: 6.44736842105263
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => 52,
+       'throughput' => 0,
+       'param3' => 10,
+       'param1' => 67
+     };
+Runing ./run-train 67 52 10 2>&1...
+Throughput: 2.61
+Signal Delay: 75
+Power: 34.8
+
+Running candiate: 
+$c = {
+       'param2' => 71,
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => 60,
+       'param3' => 11
+     };
+Runing ./run-train 60 71 11 2>&1...
+Throughput: 3.63
+Signal Delay: 101
+Power: 35.9405940594059
+
+Running candiate: 
+$c = {
+       'param3' => 11,
+       'param1' => 49,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => 78,
+       'throughput' => 0
+     };
+Runing ./run-train 49 78 11 2>&1...
+Throughput: 3.74
+Signal Delay: 103
+Power: 36.3106796116505
+
+Running candiate: 
+$c = {
+       'param1' => 67,
+       'param3' => 9,
+       'param2' => 50,
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 67 50 9 2>&1...
+Throughput: 1.79
+Signal Delay: 71
+Power: 25.2112676056338
+
+Running candiate: 
+$c = {
+       'param3' => 9,
+       'param1' => 50,
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => 61
+     };
+Runing ./run-train 50 61 9 2>&1...
+Throughput: 1.43
+Signal Delay: 69
+Power: 20.7246376811594
+
+Running candiate: 
+$c = {
+       'param2' => 46,
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => 43,
+       'param3' => 8
+     };
+Runing ./run-train 43 46 8 2>&1...
+Throughput: 0.40
+Signal Delay: 68
+Power: 5.88235294117647
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => 42,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 58,
+       'param3' => 11
+     };
+Runing ./run-train 58 42 11 2>&1...
+Throughput: 1.99
+Signal Delay: 76
+Power: 26.1842105263158
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => 78,
+       'throughput' => 0,
+       'param3' => 11,
+       'param1' => 52
+     };
+Runing ./run-train 52 78 11 2>&1...
+Throughput: 3.74
+Signal Delay: 100
+Power: 37.4
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => 48,
+       'param3' => 11,
+       'param1' => 53
+     };
+Runing ./run-train 53 48 11 2>&1...
+Throughput: 3.01
+Signal Delay: 85
+Power: 35.4117647058823
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => 70,
+       'throughput' => 0,
+       'param3' => 9,
+       'param1' => 51
+     };
+Runing ./run-train 51 70 9 2>&1...
+Throughput: 1.40
+Signal Delay: 69
+Power: 20.2898550724638
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => 71,
+       'throughput' => 0,
+       'param3' => 11,
+       'param1' => 76
+     };
+Runing ./run-train 76 71 11 2>&1...
+Throughput: 3.90
+Signal Delay: 103
+Power: 37.8640776699029
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => 70,
+       'throughput' => 0,
+       'param3' => 11,
+       'param1' => 65
+     };
+Runing ./run-train 65 70 11 2>&1...
+Throughput: 3.75
+Signal Delay: 97
+Power: 38.659793814433
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => 72,
+       'throughput' => 0,
+       'param3' => 8,
+       'param1' => 56
+     };
+Runing ./run-train 56 72 8 2>&1...
+Throughput: 0.48
+Signal Delay: 68
+Power: 7.05882352941176
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => 62,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => 72,
+       'param3' => 11
+     };
+Runing ./run-train 72 62 11 2>&1...
+Throughput: 3.59
+Signal Delay: 104
+Power: 34.5192307692308
+
+Iteration 0 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'power' => '38.659793814433',
+       'signal_delay' => 97,
+       'param2' => 70,
+       'throughput' => '3.75',
+       'param3' => 11,
+       'param1' => 65
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 103,
+       'power' => '37.8640776699029',
+       'param2' => 71,
+       'throughput' => '3.90',
+       'param3' => 11,
+       'param1' => 76
+     };
+Running candiate: 
+$c = {
+       'power' => '37.4',
+       'signal_delay' => 100,
+       'param2' => 78,
+       'throughput' => '3.74',
+       'param3' => 11,
+       'param1' => 52
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 98,
+       'power' => '37.3469387755102',
+       'param2' => 64,
+       'throughput' => '3.66',
+       'param3' => 11,
+       'param1' => 61
+     };
+Running candiate: 
+$c = {
+       'param2' => 74,
+       'throughput' => '3.00',
+       'signal_delay' => 82,
+       'power' => '36.5853658536585',
+       'param1' => 56,
+       'param3' => 10
+     };
+Running candiate: 
+$c = {
+       'param1' => '70',
+       'param3' => '13',
+       'param2' => '74',
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 70 74 13 2>&1...
+Throughput: 4.49
+Signal Delay: 140
+Power: 32.0714285714286
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '78',
+       'param3' => '10',
+       'param1' => '54'
+     };
+Runing ./run-train 54 78 10 2>&1...
+Throughput: 3.05
+Signal Delay: 83
+Power: 36.7469879518072
+
+Running candiate: 
+$c = {
+       'param3' => '13',
+       'param1' => '58',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '60',
+       'throughput' => 0
+     };
+Runing ./run-train 58 60 13 2>&1...
+Throughput: 4.17
+Signal Delay: 117
+Power: 35.6410256410256
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '67',
+       'throughput' => 0,
+       'param3' => '12',
+       'param1' => '58'
+     };
+Runing ./run-train 58 67 12 2>&1...
+Throughput: 4.17
+Signal Delay: 109
+Power: 38.256880733945
+
+Running candiate: 
+$c = {
+       'param1' => '75',
+       'param3' => '11',
+       'throughput' => 0,
+       'param2' => '84',
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 75 84 11 2>&1...
+Throughput: 3.93
+Signal Delay: 109
+Power: 36.0550458715596
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => '65',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '82',
+       'param3' => '9'
+     };
+Runing ./run-train 82 65 9 2>&1...
+Throughput: 2.07
+Signal Delay: 80
+Power: 25.875
+
+Running candiate: 
+$c = {
+       'param3' => '12',
+       'param1' => '62',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '64',
+       'throughput' => 0
+     };
+Runing ./run-train 62 64 12 2>&1...
+Throughput: 4.04
+Signal Delay: 103
+Power: 39.2233009708738
+
+Running candiate: 
+$c = {
+       'param1' => '59',
+       'param3' => '12',
+       'throughput' => 0,
+       'param2' => '77',
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 59 77 12 2>&1...
+Throughput: 4.30
+Signal Delay: 116
+Power: 37.0689655172414
+
+Running candiate: 
+$c = {
+       'param1' => '51',
+       'param3' => '9',
+       'param2' => '73',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 51 73 9 2>&1...
+Throughput: 1.69
+Signal Delay: 68
+Power: 24.8529411764706
+
+Running candiate: 
+$c = {
+       'param1' => '67',
+       'param3' => '12',
+       'param2' => '82',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 67 82 12 2>&1...
+Throughput: 4.32
+Signal Delay: 125
+Power: 34.56
+
+Iteration 1 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 62,
+       'power' => '39.2233009708738',
+       'signal_delay' => 103,
+       'param2' => 64,
+       'throughput' => '4.04'
+     };
+Running candiate: 
+$c = {
+       'power' => '38.659793814433',
+       'signal_delay' => 97,
+       'param2' => 70,
+       'throughput' => '3.75',
+       'param3' => 11,
+       'param1' => 65
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 109,
+       'power' => '38.256880733945',
+       'param2' => 67,
+       'throughput' => '4.17',
+       'param3' => 12,
+       'param1' => 58
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 103,
+       'power' => '37.8640776699029',
+       'param2' => 71,
+       'throughput' => '3.90',
+       'param3' => 11,
+       'param1' => 76
+     };
+Running candiate: 
+$c = {
+       'power' => '37.4',
+       'signal_delay' => 100,
+       'param2' => 78,
+       'throughput' => '3.74',
+       'param3' => 11,
+       'param1' => 52
+     };
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '61',
+       'param3' => '14',
+       'param1' => '71'
+     };
+Runing ./run-train 71 61 14 2>&1...
+Throughput: 4.42
+Signal Delay: 134
+Power: 32.9850746268657
+
+Running candiate: 
+$c = {
+       'param2' => '61',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '54',
+       'param3' => '12'
+     };
+Runing ./run-train 54 61 12 2>&1...
+Throughput: 4.02
+Signal Delay: 107
+Power: 37.5700934579439
+
+Running candiate: 
+$c = {
+       'param1' => '77',
+       'param3' => '12',
+       'throughput' => 0,
+       'param2' => '64',
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 77 64 12 2>&1...
+Throughput: 4.10
+Signal Delay: 116
+Power: 35.3448275862069
+
+Running candiate: 
+$c = {
+       'param2' => '76',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '55',
+       'param3' => '12'
+     };
+Runing ./run-train 55 76 12 2>&1...
+Throughput: 4.23
+Signal Delay: 121
+Power: 34.9586776859504
+
+Running candiate: 
+$c = {
+       'param1' => '50',
+       'param3' => '14',
+       'throughput' => 0,
+       'param2' => '63',
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 50 63 14 2>&1...
+Throughput: 4.47
+Signal Delay: 133
+Power: 33.609022556391
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '81',
+       'throughput' => 0,
+       'param3' => '10',
+       'param1' => '80'
+     };
+Runing ./run-train 80 81 10 2>&1...
+Throughput: 3.31
+Signal Delay: 89
+Power: 37.1910112359551
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '67',
+       'throughput' => 0,
+       'param3' => '12',
+       'param1' => '52'
+     };
+Runing ./run-train 52 67 12 2>&1...
+Throughput: 4.11
+Signal Delay: 107
+Power: 38.411214953271
+
+Running candiate: 
+$c = {
+       'param1' => '79',
+       'param3' => '11',
+       'param2' => '71',
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 79 71 11 2>&1...
+Throughput: 3.93
+Signal Delay: 106
+Power: 37.0754716981132
+
+Running candiate: 
+$c = {
+       'param1' => '65',
+       'param3' => '10',
+       'param2' => '84',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 65 84 10 2>&1...
+Throughput: 3.07
+Signal Delay: 91
+Power: 33.7362637362637
+
+Running candiate: 
+$c = {
+       'param1' => '68',
+       'param3' => '11',
+       'param2' => '67',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 68 67 11 2>&1...
+Throughput: 3.68
+Signal Delay: 100
+Power: 36.8
+
+Iteration 2 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 62,
+       'power' => '39.2233009708738',
+       'signal_delay' => 103,
+       'param2' => 64,
+       'throughput' => '4.04'
+     };
+Running candiate: 
+$c = {
+       'power' => '38.659793814433',
+       'signal_delay' => 97,
+       'param2' => 70,
+       'throughput' => '3.75',
+       'param3' => 11,
+       'param1' => 65
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 107,
+       'power' => '38.411214953271',
+       'param2' => 67,
+       'throughput' => '4.11',
+       'param3' => 12,
+       'param1' => 52
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 109,
+       'power' => '38.256880733945',
+       'param2' => 67,
+       'throughput' => '4.17',
+       'param3' => 12,
+       'param1' => 58
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 103,
+       'power' => '37.8640776699029',
+       'param2' => 71,
+       'throughput' => '3.90',
+       'param3' => 11,
+       'param1' => 76
+     };
+Running candiate: 
+$c = {
+       'param2' => '54',
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => '52',
+       'param3' => '12'
+     };
+Runing ./run-train 52 54 12 2>&1...
+Throughput: 3.73
+Signal Delay: 92
+Power: 40.5434782608696
+
+Running candiate: 
+$c = {
+       'param3' => '15',
+       'param1' => '55',
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '65'
+     };
+Runing ./run-train 55 65 15 2>&1...
+Throughput: 4.65
+Signal Delay: 149
+Power: 31.2080536912752
+
+Running candiate: 
+$c = {
+       'param2' => '54',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '51',
+       'param3' => '13'
+     };
+Runing ./run-train 51 54 13 2>&1...
+Throughput: 4.04
+Signal Delay: 109
+Power: 37.0642201834862
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '74',
+       'param3' => '12',
+       'param1' => '72'
+     };
+Runing ./run-train 72 74 12 2>&1...
+Throughput: 4.32
+Signal Delay: 119
+Power: 36.3025210084034
+
+Running candiate: 
+$c = {
+       'param3' => '12',
+       'param1' => '51',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '56',
+       'throughput' => 0
+     };
+Runing ./run-train 51 56 12 2>&1...
+Throughput: 3.82
+Signal Delay: 99
+Power: 38.5858585858586
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '74',
+       'throughput' => 0,
+       'param3' => '13',
+       'param1' => '51'
+     };
+Runing ./run-train 51 74 13 2>&1...
+Throughput: 4.41
+Signal Delay: 127
+Power: 34.7244094488189
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '59',
+       'param3' => '10',
+       'param1' => '68'
+     };
+Runing ./run-train 68 59 10 2>&1...
+Throughput: 2.86
+Signal Delay: 81
+Power: 35.3086419753086
+
+Running candiate: 
+$c = {
+       'param3' => '14',
+       'param1' => '64',
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '68'
+     };
+Runing ./run-train 64 68 14 2>&1...
+Throughput: 4.54
+Signal Delay: 143
+Power: 31.7482517482518
+
+Running candiate: 
+$c = {
+       'param3' => '12',
+       'param1' => '71',
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '71'
+     };
+Runing ./run-train 71 71 12 2>&1...
+Throughput: 4.16
+Signal Delay: 114
+Power: 36.4912280701754
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '62',
+       'throughput' => 0,
+       'param3' => '10',
+       'param1' => '67'
+     };
+Runing ./run-train 67 62 10 2>&1...
+Throughput: 3.00
+Signal Delay: 80
+Power: 37.5
+
+Iteration 3 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'param2' => 54,
+       'throughput' => '3.73',
+       'signal_delay' => 92,
+       'power' => '40.5434782608696',
+       'param1' => 52,
+       'param3' => 12
+     };
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 62,
+       'power' => '39.2233009708738',
+       'signal_delay' => 103,
+       'param2' => 64,
+       'throughput' => '4.04'
+     };
+Running candiate: 
+$c = {
+       'power' => '38.659793814433',
+       'signal_delay' => 97,
+       'param2' => 70,
+       'throughput' => '3.75',
+       'param3' => 11,
+       'param1' => 65
+     };
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 51,
+       'signal_delay' => 99,
+       'power' => '38.5858585858586',
+       'param2' => 56,
+       'throughput' => '3.82'
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 107,
+       'power' => '38.411214953271',
+       'param2' => 67,
+       'throughput' => '4.11',
+       'param3' => 12,
+       'param1' => 52
+     };
+Running candiate: 
+$c = {
+       'param1' => '50',
+       'param3' => '11',
+       'param2' => '70',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 50 70 11 2>&1...
+Throughput: 3.68
+Signal Delay: 93
+Power: 39.5698924731183
+
+Running candiate: 
+$c = {
+       'param3' => '13',
+       'param1' => '65',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '69',
+       'throughput' => 0
+     };
+Runing ./run-train 65 69 13 2>&1...
+Throughput: 4.45
+Signal Delay: 134
+Power: 33.2089552238806
+
+Running candiate: 
+$c = {
+       'param3' => '14',
+       'param1' => '60',
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '54'
+     };
+Runing ./run-train 60 54 14 2>&1...
+Throughput: 4.18
+Signal Delay: 115
+Power: 36.3478260869565
+
+Running candiate: 
+$c = {
+       'param3' => '13',
+       'param1' => '58',
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '49'
+     };
+Runing ./run-train 58 49 13 2>&1...
+Throughput: 3.82
+Signal Delay: 103
+Power: 37.0873786407767
+
+Running candiate: 
+$c = {
+       'param1' => '65',
+       'param3' => '13',
+       'param2' => '55',
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 65 55 13 2>&1...
+Throughput: 4.01
+Signal Delay: 109
+Power: 36.7889908256881
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '70',
+       'param3' => '11',
+       'param1' => '68'
+     };
+Runing ./run-train 68 70 11 2>&1...
+Throughput: 3.74
+Signal Delay: 103
+Power: 36.3106796116505
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '75',
+       'throughput' => 0,
+       'param3' => '14',
+       'param1' => '57'
+     };
+Runing ./run-train 57 75 14 2>&1...
+Throughput: 4.59
+Signal Delay: 144
+Power: 31.875
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '53',
+       'param3' => '12',
+       'param1' => '60'
+     };
+Runing ./run-train 60 53 12 2>&1...
+Throughput: 3.76
+Signal Delay: 100
+Power: 37.6
+
+Running candiate: 
+$c = {
+       'param1' => '55',
+       'param3' => '14',
+       'throughput' => 0,
+       'param2' => '69',
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 55 69 14 2>&1...
+Throughput: 4.55
+Signal Delay: 139
+Power: 32.7338129496403
+
+Running candiate: 
+$c = {
+       'param2' => '73',
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => '53',
+       'param3' => '11'
+     };
+Runing ./run-train 53 73 11 2>&1...
+Throughput: 3.80
+Signal Delay: 102
+Power: 37.2549019607843
+
+Iteration 4 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'param2' => 54,
+       'throughput' => '3.73',
+       'signal_delay' => 92,
+       'power' => '40.5434782608696',
+       'param1' => 52,
+       'param3' => 12
+     };
+Running candiate: 
+$c = {
+       'param1' => 50,
+       'param3' => 11,
+       'param2' => 70,
+       'throughput' => '3.68',
+       'power' => '39.5698924731183',
+       'signal_delay' => 93
+     };
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 62,
+       'power' => '39.2233009708738',
+       'signal_delay' => 103,
+       'param2' => 64,
+       'throughput' => '4.04'
+     };
+Running candiate: 
+$c = {
+       'power' => '38.659793814433',
+       'signal_delay' => 97,
+       'param2' => 70,
+       'throughput' => '3.75',
+       'param3' => 11,
+       'param1' => 65
+     };
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 51,
+       'signal_delay' => 99,
+       'power' => '38.5858585858586',
+       'param2' => 56,
+       'throughput' => '3.82'
+     };
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '67',
+       'throughput' => 0,
+       'param3' => '11',
+       'param1' => '60'
+     };
+Runing ./run-train 60 67 11 2>&1...
+Throughput: 3.74
+Signal Delay: 97
+Power: 38.5567010309278
+
+Running candiate: 
+$c = {
+       'param1' => '65',
+       'param3' => '13',
+       'param2' => '63',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 65 63 13 2>&1...
+Throughput: 4.24
+Signal Delay: 122
+Power: 34.7540983606557
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => '65',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => '67',
+       'param3' => '14'
+     };
+Runing ./run-train 67 65 14 2>&1...
+Throughput: 4.45
+Signal Delay: 126
+Power: 35.3174603174603
+
+Running candiate: 
+$c = {
+       'param3' => '11',
+       'param1' => '49',
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '66'
+     };
+Runing ./run-train 49 66 11 2>&1...
+Throughput: 3.56
+Signal Delay: 96
+Power: 37.0833333333333
+
+Running candiate: 
+$c = {
+       'param3' => '12',
+       'param1' => '66',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '75',
+       'throughput' => 0
+     };
+Runing ./run-train 66 75 12 2>&1...
+Throughput: 4.31
+Signal Delay: 129
+Power: 33.4108527131783
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '77',
+       'param3' => '10',
+       'param1' => '55'
+     };
+Runing ./run-train 55 77 10 2>&1...
+Throughput: 3.06
+Signal Delay: 83
+Power: 36.8674698795181
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => '67',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '60',
+       'param3' => '10'
+     };
+Runing ./run-train 60 67 10 2>&1...
+Throughput: 3.08
+Signal Delay: 86
+Power: 35.8139534883721
+
+Running candiate: 
+$c = {
+       'param3' => '11',
+       'param1' => '70',
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '80'
+     };
+Runing ./run-train 70 80 11 2>&1...
+Throughput: 4.01
+Signal Delay: 104
+Power: 38.5576923076923
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => '56',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '57',
+       'param3' => '12'
+     };
+Runing ./run-train 57 56 12 2>&1...
+Throughput: 3.65
+Signal Delay: 94
+Power: 38.8297872340426
+
+Running candiate: 
+$c = {
+       'param2' => '75',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '54',
+       'param3' => '13'
+     };
+Runing ./run-train 54 75 13 2>&1...
+Throughput: 4.41
+Signal Delay: 134
+Power: 32.910447761194
+
+Iteration 5 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'param2' => 54,
+       'throughput' => '3.73',
+       'signal_delay' => 92,
+       'power' => '40.5434782608696',
+       'param1' => 52,
+       'param3' => 12
+     };
+Running candiate: 
+$c = {
+       'param1' => 50,
+       'param3' => 11,
+       'param2' => 70,
+       'throughput' => '3.68',
+       'power' => '39.5698924731183',
+       'signal_delay' => 93
+     };
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 62,
+       'power' => '39.2233009708738',
+       'signal_delay' => 103,
+       'param2' => 64,
+       'throughput' => '4.04'
+     };
+Running candiate: 
+$c = {
+       'throughput' => '3.65',
+       'param2' => 56,
+       'power' => '38.8297872340426',
+       'signal_delay' => 94,
+       'param1' => 57,
+       'param3' => 12
+     };
+Running candiate: 
+$c = {
+       'power' => '38.659793814433',
+       'signal_delay' => 97,
+       'param2' => 70,
+       'throughput' => '3.75',
+       'param3' => 11,
+       'param1' => 65
+     };
+Running candiate: 
+$c = {
+       'param3' => '14',
+       'param1' => '53',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '51',
+       'throughput' => 0
+     };
+Runing ./run-train 53 51 14 2>&1...
+Throughput: 3.91
+Signal Delay: 111
+Power: 35.2252252252252
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '60',
+       'throughput' => 0,
+       'param3' => '14',
+       'param1' => '62'
+     };
+Runing ./run-train 62 60 14 2>&1...
+Throughput: 4.23
+Signal Delay: 123
+Power: 34.390243902439
+
+Running candiate: 
+$c = {
+       'param2' => '45',
+       'throughput' => 0,
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => '50',
+       'param3' => '11'
+     };
+Runing ./run-train 50 45 11 2>&1...
+Throughput: 2.61
+Signal Delay: 79
+Power: 33.0379746835443
+
+Running candiate: 
+$c = {
+       'param1' => '64',
+       'param3' => '11',
+       'param2' => '54',
+       'throughput' => 0,
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 64 54 11 2>&1...
+Throughput: 3.34
+Signal Delay: 88
+Power: 37.9545454545455
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '56',
+       'param3' => '14',
+       'param1' => '58'
+     };
+Runing ./run-train 58 56 14 2>&1...
+Throughput: 4.16
+Signal Delay: 115
+Power: 36.1739130434783
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '62',
+       'param3' => '11',
+       'param1' => '63'
+     };
+Runing ./run-train 63 62 11 2>&1...
+Throughput: 3.51
+Signal Delay: 90
+Power: 39
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => '82',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param1' => '68',
+       'param3' => '13'
+     };
+Runing ./run-train 68 82 13 2>&1...
+Throughput: 4.54
+Signal Delay: 146
+Power: 31.0958904109589
+
+Running candiate: 
+$c = {
+       'param3' => '12',
+       'param1' => '69',
+       'signal_delay' => 0,
+       'power' => 0,
+       'throughput' => 0,
+       'param2' => '65'
+     };
+Runing ./run-train 69 65 12 2>&1...
+Throughput: 4.14
+Signal Delay: 117
+Power: 35.3846153846154
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '71',
+       'param3' => '13',
+       'param1' => '66'
+     };
+Runing ./run-train 66 71 13 2>&1...
+Throughput: 4.43
+Signal Delay: 138
+Power: 32.1014492753623
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '63',
+       'throughput' => 0,
+       'param3' => '14',
+       'param1' => '61'
+     };
+Runing ./run-train 61 63 14 2>&1...
+Throughput: 4.39
+Signal Delay: 135
+Power: 32.5185185185185
+
+Iteration 6 results:
+Mating 0 and 1
+Mating 0 and 2
+Mating 0 and 3
+Mating 0 and 4
+Mating 1 and 2
+Mating 1 and 3
+Mating 1 and 4
+Mating 2 and 3
+Mating 2 and 4
+Mating 3 and 4
+After mating, 15 candidates
+
+Running candiate: 
+$c = {
+       'param2' => 54,
+       'throughput' => '3.73',
+       'signal_delay' => 92,
+       'power' => '40.5434782608696',
+       'param1' => 52,
+       'param3' => 12
+     };
+Running candiate: 
+$c = {
+       'param1' => 50,
+       'param3' => 11,
+       'param2' => 70,
+       'throughput' => '3.68',
+       'power' => '39.5698924731183',
+       'signal_delay' => 93
+     };
+Running candiate: 
+$c = {
+       'param3' => 12,
+       'param1' => 62,
+       'power' => '39.2233009708738',
+       'signal_delay' => 103,
+       'param2' => 64,
+       'throughput' => '4.04'
+     };
+Running candiate: 
+$c = {
+       'power' => 39,
+       'signal_delay' => 90,
+       'throughput' => '3.51',
+       'param2' => 62,
+       'param3' => 11,
+       'param1' => 63
+     };
+Running candiate: 
+$c = {
+       'throughput' => '3.65',
+       'param2' => 56,
+       'power' => '38.8297872340426',
+       'signal_delay' => 94,
+       'param1' => 57,
+       'param3' => 12
+     };
+Running candiate: 
+$c = {
+       'param3' => '12',
+       'param1' => '57',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '58',
+       'throughput' => 0
+     };
+Runing ./run-train 57 58 12 2>&1...
+Throughput: 3.68
+Signal Delay: 94
+Power: 39.1489361702128
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '64',
+       'param3' => '15',
+       'param1' => '56'
+     };
+Runing ./run-train 56 64 15 2>&1...
+Throughput: 4.61
+Signal Delay: 157
+Power: 29.3630573248408
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '59',
+       'throughput' => 0,
+       'param3' => '12',
+       'param1' => '62'
+     };
+Runing ./run-train 62 59 12 2>&1...
+Throughput: 3.87
+Signal Delay: 107
+Power: 36.1682242990654
+
+Running candiate: 
+$c = {
+       'param1' => '59',
+       'param3' => '11',
+       'throughput' => 0,
+       'param2' => '46',
+       'power' => 0,
+       'signal_delay' => 0
+     };
+Runing ./run-train 59 46 11 2>&1...
+Throughput: 2.81
+Signal Delay: 85
+Power: 33.0588235294118
+
+Running candiate: 
+$c = {
+       'throughput' => 0,
+       'param2' => '61',
+       'power' => 0,
+       'signal_delay' => 0,
+       'param1' => '66',
+       'param3' => '14'
+     };
+Runing ./run-train 66 61 14 2>&1...
+Throughput: 4.38
+Signal Delay: 127
+Power: 34.4881889763779
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'throughput' => 0,
+       'param2' => '78',
+       'param3' => '10',
+       'param1' => '65'
+     };
+Runing ./run-train 65 78 10 2>&1...
+Throughput: 3.02
+Signal Delay: 89
+Power: 33.9325842696629
+
+Running candiate: 
+$c = {
+       'param1' => '58',
+       'param3' => '11',
+       'throughput' => 0,
+       'param2' => '69',
+       'signal_delay' => 0,
+       'power' => 0
+     };
+Runing ./run-train 58 69 11 2>&1...
+Throughput: 3.72
+Signal Delay: 97
+Power: 38.3505154639175
+
+Running candiate: 
+$c = {
+       'power' => 0,
+       'signal_delay' => 0,
+       'param2' => '66',
+       'throughput' => 0,
+       'param3' => '10',
+       'param1' => '58'
+     };
+Runing ./run-train 58 66 10 2>&1...
+Throughput: 2.99
+Signal Delay: 84
+Power: 35.5952380952381
+
+Running candiate: 
+$c = {
+       'param3' => '13',
+       'param1' => '56',
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '54',
+       'throughput' => 0
+     };
+Runing ./run-train 56 54 13 2>&1...
+Throughput: 3.93
+Signal Delay: 107
+Power: 36.7289719626168
+
+Running candiate: 
+$c = {
+       'signal_delay' => 0,
+       'power' => 0,
+       'param2' => '54',
+       'throughput' => 0,
+       'param3' => '11',
+       'param1' => '49'
+     };
+Runing ./run-train 49 54 11 2>&1...

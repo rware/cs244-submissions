@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <set>
 
-enum Controller_Mode { NA, AIMD, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
+enum Controller_Mode { NA, AIMD, AIMD_INF, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
 /* Congestion controller interface */
 
 struct SentPacket {
@@ -31,6 +31,7 @@ private:
   uint64_t last_timeout_;
 
   bool is_timeout(uint64_t current_time);
+  void remove_outstanding_packet(uint64_t seqno);
 
 public:
   /* Public interface for the congestion controller */
