@@ -105,10 +105,11 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     best_rtt = measured_rtt;
   }
 
-  if (measured_rtt - best_rtt > (0.5 * best_rtt)) {
-    cwnd -= 0.5;
+  // std rtt?
+  if (measured_rtt > 1.5 * best_rtt) {
+    cwnd -= 0.3;
   } else {
-    cwnd += 0.5;
+    cwnd += 0.3;
   }
 
   /*
