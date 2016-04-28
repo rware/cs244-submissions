@@ -10,7 +10,13 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 40
+/**
+ * Minimum amount of between reducing
+ * window size due to timeout, this 
+ * prevents against burst losses killing
+ * our window size
+ */
+#define TIMEOUT_RESET 30
 
 /* Default constructor */
 Controller::Controller( const bool debug )
@@ -169,7 +175,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 void Controller::timeout_received( void )
 {
   if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
-    win_size_ = std::max(1, (int) (win_size_ * 0.4));
+    win_size_ = std::max(1, (int) (win_size_ * 0.3));
   }
   return;
 }
