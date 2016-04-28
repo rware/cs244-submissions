@@ -71,17 +71,18 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     // Initialization
     estimated_rtt = measured_rtt;
   }
-  double alpha_ = 0.9;
+  double alpha_ = 0.7;
   double new_rtt = (alpha_ * estimated_rtt) +
     ((1.0 - alpha_) * measured_rtt);
 
   //if (measured_rtt > 1.20 * new_rtt) {
-  if (measured_rtt > 150) {
+  //if (measured_rtt > 150) { // this is the delay-trigger
+  if (new_rtt > 170) { // this is the delay-trigger
     // We detect congestion,
     // so multiplicatively decrease
-    cwnd /= 2.0;
+    cwnd *= (2.0/3.0);
   } else {
-    if (cwnd < 30) {
+    if (cwnd < 20) {
       cwnd += 1;
     } else {
       cwnd += 1.0 / cwnd;
