@@ -75,15 +75,15 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   double new_rtt = (alpha_ * estimated_rtt) +
     ((1.0 - alpha_) * measured_rtt);
 
-  if (measured_rtt > 1.30 * new_rtt) {
+  if (measured_rtt > 1.20 * new_rtt) {
     // We detect congestion,
     // so multiplicatively decrease
     cwnd /= 2.0;
   } else {
-    if (cwnd < 25) {
+    if (cwnd < 30) {
       cwnd += 1;
     } else {
-      cwnd += 1 / cwnd;
+      cwnd += 1.0 / cwnd;
     }
   }
 
