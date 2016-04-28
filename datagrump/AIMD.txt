@@ -1,4 +1,10 @@
 ====================
+AIMD Second Version: 9-something
+
+If we move to 1.4 * new_rtt, we get 11.68. Finally past 10.0
+http://cs344g.keithw.org/report/?baller-1461809344-fierohbi
+
+====================
 AIMD First Version: 5cea7f135ecf233310589883adf95cc40327c83e
 
 http://cs344g.keithw.org/report/?baller-1461806663-gaitaajo
