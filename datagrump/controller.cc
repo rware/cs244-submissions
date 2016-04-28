@@ -12,8 +12,9 @@ using namespace std;
 
 //Delay triggered values
 #define DELAY_TRIGGER true
-#define MAX_DELAY_THRESHOLD 120
-#define MIN_DELAY_THRESHOLD 60
+#define MAX_DELAY_THRESHOLD 80
+#define MIN_DELAY_THRESHOLD 70
+#define MIN_FULL_INCREASE 50
 
 #define DELTA_DELAY false
 
@@ -72,10 +73,15 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   float delay = timestamp_ack_received - send_timestamp_acked;
   float diff = delay - lastDelay;
-  float prediction = delay + 2 * diff;
+  float prediction = delay + cwind * diff;
 
-  if (diff > EPSILON){
-    increaseFactor *= lastDelay / delay * .5;
+  if (diff > EPSILON || prediction > MAX_DELAY_THRESHOLD){
+    increaseFactor *= lastDelay / delay * .25;
+  }
+
+  float scaledDelay = delay - MIN_FULL_INCREASE;
+  if (delay > MIN_FULL_INCREASE && delay <= MIN_DELAY_THRESHOLD){
+    increaseFactor *= (1 - scaledDelay / (MAX_DELAY_THRESHOLD - MIN_FULL_INCREASE));
   }
 
   cerr << "Diff: " << diff << endl;
@@ -87,7 +93,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       cwind += (MIN_DELAY_THRESHOLD / delay) * increaseFactor / cwind;
     }
     else if (delay > MAX_DELAY_THRESHOLD && cwind > MIN_CWIND){
-      cwind *= DECREASE_FACTOR * (MAX_DELAY_THRESHOLD / delay);
+      cwind -= .5;
     }
   }
 
