@@ -10,7 +10,8 @@ Controller::Controller( const bool debug, unsigned int delay_threshold, uint64_t
   : debug_( debug ),
     delay_threshold(delay_threshold),
     max_packet_gap(max_packet_gap)
-{}
+{
+}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
@@ -25,7 +26,7 @@ unsigned int Controller::window_size( void )
   if((((int64_t)current_time) - ((int64_t)last_sent_datagram)) > (int64_t) max_packet_gap) {
     m_window_size++;
     last_sent_datagram = current_time;
-    consecutive_decrease = 0;
+    decrease_counter = counter_denom - 1;
   }
 
   if ( debug_ ) {
@@ -87,21 +88,48 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     m_window_size++;
   }*/
 
-  if(timestamp_ack_received - send_timestamp_acked > delay_threshold) {
+
+  int64_t delay = ((int64_t)timestamp_ack_received) - ((int64_t)send_timestamp_acked);
+
+  if(delay < min_seen_delay)
+    min_seen_delay = delay;
+  //printf("min delay: %ld\n", min_seen_delay);
+
+  if(ptindex == -1) {
+    ptindex = 0;
+    for(int i = 0; i < PACKET_TIMES; i++) {
+      packet_times[i] = (double) delay;
+    }
+  }
+
+  double mean = 0;
+  for(int i = 0; i < PACKET_TIMES; i++) {
+    mean += packet_times[i];
+  }
+  mean /= PACKET_TIMES;
+  ptindex = (ptindex+1)%PACKET_TIMES;
+
+  packet_times[ptindex] = (double) delay;
+
+
+  if(delay > mean+1 || delay > delay_threshold) {
+  //if(((int64_t)timestamp_ack_received) - ((int64_t)send_timestamp_acked) > (int64_t) delay_threshold) {
     if(m_window_size > 1) {
-      if(consecutive_decrease == max_consecutive_decrease) {
-        consecutive_decrease = 0;
-      }
-      else {
-        consecutive_decrease++;
+      if((decrease_counter + counter_num)/counter_denom > decrease_counter/counter_denom) {
         m_window_size--;
       }
+      decrease_counter += counter_num;
+      increase_counter = 0;
     }
   }
   else {
-    consecutive_decrease = 0;
-    m_window_size++;
+    decrease_counter = counter_denom - 1;
+    m_window_size += (increase_counter+counter2_num)/counter2_denom - increase_counter/counter2_denom;
+    increase_counter += counter2_num;
   }
+
+
+  //printf("mean %lf delay %ld window size %u\n", mean, delay, m_window_size);
   //printf("Window Size: %u\n", m_window_size);
 }
 

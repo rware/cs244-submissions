@@ -2,6 +2,7 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#define PACKET_TIMES 10
 
 /* Congestion controller interface */
 
@@ -41,10 +42,18 @@ public:
 
   unsigned int delay_threshold;
 
-  unsigned int max_consecutive_decrease = 1;
-  unsigned int consecutive_decrease = 0;
+  uint64_t counter_num = 5;
+  uint64_t counter_denom = 10;
+  uint64_t counter2_num = 1;
+  uint64_t counter2_denom = 1;
+  uint64_t decrease_counter = counter_denom-1;
+  uint64_t increase_counter = 0;
   uint64_t max_packet_gap;
   uint64_t last_sent_datagram = 0;
+  int64_t min_seen_delay = 100000;
+
+  double packet_times[PACKET_TIMES];
+  int ptindex = -1;
 };
 
 
