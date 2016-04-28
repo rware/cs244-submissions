@@ -149,7 +149,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
   */
 
-  if ( true ) {
+  if ( debug_ ) {
     cerr << "Measured RTT: " << measured_rtt
 	 << ", Estimated RTT: " << estimated_rtt
 	 << ", CWND: " << cwnd << endl;
