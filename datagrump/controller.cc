@@ -95,6 +95,25 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   const uint64_t measured_rtt =
     timestamp_ack_received - send_timestamp_acked;
 
+  /**
+   * The best_rtt is presumably the best rtt possible.
+   * If we are too far from the best rtt, we penalize cwnd.
+   * Increment cwnd if we are within best rtt by some
+   * boundary.
+   */
+  if (measured_rtt < best_rtt) {
+    best_rtt = measured_rtt;
+  }
+
+  if (measured_rtt - best_rtt > (0.5 * best_rtt)) {
+    cwnd *= 9.0/10;
+  } else {
+    cwnd += 0.5;
+  }
+
+  /*
+   * Estimated RTT is used for AIMD + Delay-Trigger
+   */
   if (estimated_rtt == 0) {
     // Initialization
     estimated_rtt = measured_rtt;
@@ -103,6 +122,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   double alpha_ = 0.7;
   double new_rtt = (alpha_ * estimated_rtt) +
     ((1.0 - alpha_) * measured_rtt);
+
+  /*
+  // AIMD + Delay-Trigger
 
   //if (measured_rtt > 1.20 * new_rtt) { // AIMD
   //if (measured_rtt > 150) { // Delay-Trigger
@@ -120,11 +142,19 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       cwnd += 1.0 / cwnd;
     }
   }
+  */
 
   if ( true ) {
     cerr << "Measured RTT: " << measured_rtt
 	 << ", Estimated RTT: " << estimated_rtt
 	 << ", CWND: " << cwnd << endl;
+  }
+
+  if (cwnd < 1) {
+    // Lower bound to ensure window size >= 1
+    // If cwnd < 0, delay starts increasing and can't capture
+    // accurate RTT anymore.
+    cwnd = 1;
   }
 
   estimated_rtt = new_rtt;

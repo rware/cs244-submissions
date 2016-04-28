@@ -13,6 +13,9 @@ private:
   double estimated_rtt;
   uint64_t bytes_sent = 0;
   uint64_t bytes_ackd = 0;
+  uint64_t best_rtt = 100000;
+  uint64_t best_sender_to_rcv = 100000;
+  uint64_t best_rcv_to_sender = 100000;
 
   /* Add member variables here */
 
