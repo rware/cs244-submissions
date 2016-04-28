@@ -16,6 +16,8 @@ using namespace std;
 #define MIN_DELAY_THRESHOLD 70
 #define MIN_FULL_INCREASE 50
 
+#define UPDATE_TIME 5000
+
 #define DELTA_DELAY false
 
 #define DEFAULT_CWIND 10
@@ -28,7 +30,8 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ), cwind(DEFAULT_CWIND), lastDelay(-1), minDelay(10000),
   cwinds(), maxPower(0), bestCwind(0), bestDelay(0), maxDelayThreshold(0),
-  minFullIncrease(0), minDelayThreshold(0)
+  minFullIncrease(0), minDelayThreshold(0), newMaxPower(0), newBestDelay(0),
+  newBestCwind(0), lastUpdated(0)
 {}
 
 /* Get current window size, in datagrams */
@@ -76,19 +79,43 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   float dataSize = cwinds.at(sequence_number_acked);
   cwinds.erase(cwinds.find(sequence_number_acked));
 
+  bool update = true;
+
   float power = dataSize / delay / delay;
   if (power > maxPower){
     maxPower = power;
-    bestCwind = cwind;
+    bestCwind = dataSize;
     bestDelay = delay;
+
+    newMaxPower = 0;
+    newBestDelay = 0;
+    lastUpdated = timestamp_ack_received;
+    update = false;
+  }
+
+  if (timestamp_ack_received - lastUpdated > UPDATE_TIME) {
+    maxPower = newMaxPower;
+    bestDelay = newBestDelay;
+    bestCwind = newBestCwind;
+
+    newMaxPower = 0;
+    newBestDelay = 0;
+    lastUpdated = timestamp_ack_received;
+    update = false;
+  }
+
+  if (power > newMaxPower && update) {
+    newMaxPower = power;
+    newBestCwind = dataSize;
+    newBestDelay = delay;
   }
 
   float diff = delay - lastDelay;
   float prediction = delay + cwind * diff;
 
-  maxDelayThreshold = 2.2 * bestDelay;
-  minFullIncrease = 1.75 * bestDelay;
-  minDelayThreshold = 1.25 * bestDelay;  
+  maxDelayThreshold = 2 * bestDelay;
+  minFullIncrease = 1.7 * bestDelay;
+  minDelayThreshold = 1.2 * bestDelay;  
 
   if (diff > EPSILON || prediction > maxDelayThreshold){
     increaseFactor *= lastDelay / delay * .25;

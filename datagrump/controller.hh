@@ -22,6 +22,11 @@ private:
   float maxDelayThreshold;
   float minFullIncrease;
   float minDelayThreshold;
+  float newMaxPower;
+  float newBestDelay;
+  float newBestCwind;
+  uint64_t lastUpdated;
+
 
   /* Add member variables here */
 
