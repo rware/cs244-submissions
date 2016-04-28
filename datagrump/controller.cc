@@ -77,12 +77,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   //if (measured_rtt > 1.20 * new_rtt) {
   //if (measured_rtt > 150) { // this is the delay-trigger
-  if (measured_rtt > 220) {
+  if (measured_rtt > 170) {
     cwnd = 1;
   } else if (new_rtt > 170) { // this is the delay-trigger
     // We detect congestion,
     // so multiplicatively decrease
-    cwnd *= (3.0/4.0);
+    cwnd *= (4.0/5.0);
   } else {
     if (cwnd < 20) {
       cwnd += 1;
