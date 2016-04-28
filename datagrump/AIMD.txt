@@ -10,4 +10,14 @@ Are we detecting congestion fast enough? We need to think of another
 way to detect congestion rather than some multiple of the estimated
 rtt.
 
+If we lower timeout from 1000ms to 100ms, we get a slight improvement
+ to 9.03: http://cs344g.keithw.org/report?baller-1461808000-uteeshee
+
+If we then detected congestion at 1.75 * new_rtt and incremented by
+2.0/cwnd, we suffered a horrible result of 2:
+http://cs344g.keithw.org/report/?baller-1461808364-eichichu
+
+Using 1.5 * new_rtt and 1.5/cwnd still had a bad score of 5-something
+http://cs344g.keithw.org/report?baller-1461808643-quahxaeg
+
 ====================
