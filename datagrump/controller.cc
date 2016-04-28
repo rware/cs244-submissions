@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define TIMEOUT_RESET 51
+#define TIMEOUT_RESET 40
 
 /* Default constructor */
 Controller::Controller( const bool debug )
@@ -59,6 +59,10 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
         timeout_received();
         last_timeout_ = send_timestamp;
     } else if (last_timeout_ == 0) {
+      /* Improve startup behavior by sending last_timeout time to NOW.
+       * This allows for a higher probability of increasing send window size
+       * on startup (otherwise last_timeout ~= infinute, so relying on the 
+       * fixed minimum percent chance to send */
       last_timeout_ = send_timestamp;
     }
   } 
@@ -165,7 +169,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 void Controller::timeout_received( void )
 {
   if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
-    win_size_ = std::max(1, (int) (win_size_ * 0.36));
+    win_size_ = std::max(1, (int) (win_size_ * 0.4));
   }
   return;
 }
