@@ -19,10 +19,8 @@ unsigned int Controller::window_size( void )
   /* Default: fixed window size of 100 outstanding datagrams */
 
   uint64_t current_time = timestamp_ms();
-  if((((int64_t)current_time) - ((int64_t)last_sent_datagram)) > 40) {
-    //printf("long time since last sent packet: %ld\n", (((int64_t)current_time) - ((int64_t)last_sent_datagram)));
-  }
 
+  //send one packet if we go more than max_packet_gap without sending one, regardless of congestion status
   if((((int64_t)current_time) - ((int64_t)last_sent_datagram)) > (int64_t) max_packet_gap) {
     m_window_size++;
     last_sent_datagram = current_time;
@@ -73,27 +71,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 	 << endl;
   }
 
-  //printf("time since last sent packet: %ld\n", (((int64_t)timestamp_ack_received) - ((int64_t)last_sent_datagram)));
-
-  /*if((((int64_t)timestamp_ack_received) - ((int64_t)last_sent_datagram)) > 40) {
-    printf("long time since last sent packet: %ld\n", (((int64_t)timestamp_ack_received) - ((int64_t)last_sent_datagram)));
-  }
-
-  if((timestamp_ack_received - send_timestamp_acked) > delay_threshold) {
-    if((((int64_t)timestamp_ack_received) - ((int64_t)last_sent_datagram)) < (int64_t) max_packet_gap && m_window_size > 1) {
-      m_window_size--;
-    }
-  }
-  else {
-    m_window_size++;
-  }*/
 
 
   int64_t delay = ((int64_t)timestamp_ack_received) - ((int64_t)send_timestamp_acked);
 
   if(delay < min_seen_delay)
     min_seen_delay = delay;
-  //printf("min delay: %ld\n", min_seen_delay);
 
   if(ptindex == -1) {
     ptindex = 0;
@@ -102,6 +85,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
   }
 
+  //calculate mean of last 10 packet times
   double mean = 0;
   for(int i = 0; i < PACKET_TIMES; i++) {
     mean += packet_times[i];
@@ -112,8 +96,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   packet_times[ptindex] = (double) delay;
 
 
-  if(delay > mean+1 || delay > delay_threshold) {
-  //if(((int64_t)timestamp_ack_received) - ((int64_t)send_timestamp_acked) > (int64_t) delay_threshold) {
+  //decrease window size only every other packet
+  if(delay > mean+1 || delay > delay_threshold+min_seen_delay) {
     if(m_window_size > 1) {
       if((decrease_counter + counter_num)/counter_denom > decrease_counter/counter_denom) {
         m_window_size--;
@@ -137,5 +121,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 2; /* timeout of one second */
+  //we have to reduce the timeout so that we can execute the code that limits the inter-packet gap to 55ms
+  return 2; /* timeout of 2ms */
 }

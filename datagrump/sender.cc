@@ -37,8 +37,8 @@ public:
 };
 
 
-unsigned int delay_threshold;
-uint64_t max_packet_gap;
+uint64_t delay_threshold = 11;
+uint64_t max_packet_gap = 55;
 
 int main( int argc, char *argv[] )
 {
@@ -46,23 +46,16 @@ int main( int argc, char *argv[] )
   if ( argc < 1 ) { /* for sticklers */
     abort();
   }
-  printf("%i\n", argc);
-  printf("%s %s\n", argv[1], argv[2]);
-  printf("%s \n", argv[3]);
   bool debug = false;
-  if ( argc == 6 and string( argv[ 5 ] ) == "debug" ) {
+  if ( argc == 4 and string( argv[ 3 ] ) == "debug" ) {
     debug = true;
-  } else if ( argc == 5 ) {
+  } else if ( argc == 3 ) {
     /* do nothing */
   } else {
     cerr << "Usage: " << argv[ 0 ] << " HOST PORT [debug]" << endl;
     return EXIT_FAILURE;
   }
 
-  sscanf(argv[3], "%u",&delay_threshold);
-  sscanf(argv[4], "%lu",&max_packet_gap);
-  printf("delay_threshold %u\n", delay_threshold);
-  printf("max packet gap %lu\n", max_packet_gap);
 
   /* create sender object to handle the accounting */
   /* all the interesting work is done by the Controller */
@@ -158,7 +151,7 @@ int DatagrumpSender::loop( void )
     if ( ret.result == PollResult::Exit ) {
       return ret.exit_status;
     } else if ( ret.result == PollResult::Timeout ) {
-      /* After a timeout, send one datagram to try to get things moving again */
+      //we send a packet at least once every 55 ms, regardless of congestion
       while ( window_is_open() ) {
         send_datagram();
       }
