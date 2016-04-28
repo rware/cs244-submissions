@@ -15,7 +15,7 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ),
-    win_size_( 10 ), // Start window size higher than 1, avoid very slow start
+    win_size_( 15 ), // Start window size higher than 1, avoid very slow start
     timeout_( 100 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
@@ -58,6 +58,8 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     if(is_timeout(send_timestamp) && (send_timestamp - last_timeout_ > TIMEOUT_RESET)) {
         timeout_received();
         last_timeout_ = send_timestamp;
+    } else if (last_timeout_ == 0) {
+      last_timeout_ = send_timestamp;
     }
   } 
 
