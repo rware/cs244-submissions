@@ -20,7 +20,7 @@ using namespace std;
 
 #define DEFAULT_CWIND 80
 #define DEFAULT_TIMEOUT 45
-#define MIN_CWIND 6
+#define MIN_CWIND 2
 
 #define EPSILON 3
 
@@ -93,7 +93,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       cwind += (MIN_DELAY_THRESHOLD / delay) * increaseFactor / cwind;
     }
     else if (delay > MAX_DELAY_THRESHOLD && cwind > MIN_CWIND){
-      cwind -= .5;
+      cwind -= .25;
     }
   }
 
