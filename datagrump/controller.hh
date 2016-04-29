@@ -20,6 +20,11 @@ private:
   double avgRTT;
   uint64_t targetRTT;
 
+  uint64_t linkRateStartTime;
+  double curLinkRate;
+  uint64_t linkRateNumPackets;
+  double prevLinkRate;
+
 public:
   /* Public interface for the congestion controller */
   /* You can change these if you prefer, but will need to change

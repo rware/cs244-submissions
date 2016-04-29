@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <math.h>
 
 #include "controller.hh"
 #include "timestamp.hh"
@@ -20,7 +21,8 @@ Controller::Controller( const bool debug )
   : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
     lastSendTimestamp(0), packetsUntilDecrease(0),
     slowStartThreshold(5), minRTT(~0u), avgRTT(0),
-    targetRTT(100)
+    targetRTT(100), linkRateStartTime(0), curLinkRate(0),
+    linkRateNumPackets(0), prevLinkRate(0)
 {
 }
 
@@ -36,6 +38,8 @@ unsigned int Controller::window_size( void )
 
   return curWinSize;
 }
+
+uint64_t lastPacketTimestamp = 0;
 
 /* A datagram was sent */
 void Controller::datagram_was_sent( const uint64_t sequence_number,
@@ -61,6 +65,31 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
+  // update statistics for link rate info
+  if (linkRateStartTime == 0) {
+    linkRateStartTime = timestamp_ack_received;
+  } else {
+    if (linkRateStartTime + 50 < timestamp_ack_received) {
+      prevLinkRate = curLinkRate;
+      curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
+      linkRateStartTime = timestamp_ack_received;
+      linkRateNumPackets = 0;
+      cout << "Link Rate: " << curLinkRate << "    Curwinsize: " << curWinSize << endl;
+    }
+  }
+
+  // Estimate num packets can be sent in next 50mS
+  if (curLinkRate != 0) {
+    //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate);
+    if (ctr % 40 == 0) {
+      //cout << "Predicted Link Rate: " << nextLinkRate << endl;
+    }
+    double numPacketsCanBeSent = 70.0 * curLinkRate / 12.0;
+    curWinSize = max(numPacketsCanBeSent, 1.0);
+  }
+
+  linkRateNumPackets++;
+
   uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
   uint64_t packetIndex = ctr % TRACKED_PKTS;
   ctr++;
@@ -69,17 +98,17 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     minRTT = ackedRTT;
     targetRTT = 2 * minRTT;
   }
-
+ /*
   if (avgRTT == 0) {
     avgRTT = ackedRTT;
     targetRTT = ackedRTT;
   } else {
     avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
-    double changeFactor = (avgRTT - targetRTT) * (avgRTT - targetRTT) * 0.001 / curWinSize;
+    double changeFactor =  (avgRTT - targetRTT) * 0.005;
     if (avgRTT > targetRTT) {
-      curWinSize -= changeFactor;
+      curWinSize -= changeFactor * sqrt(curWinSize);
     } else {
-      curWinSize += changeFactor;
+      curWinSize -= changeFactor / sqrt(curWinSize);
     }
     if (curWinSize < 1) curWinSize = 1;
 
@@ -90,10 +119,14 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     //   }
     //   targetRTT = 2 * minRTT;
     // }
+
+    // Second attempt to compute current throughput
+
     if (ctr % 40 == 0) {
-      cout << targetRTT << "    " << avgRTT << "    " << curWinSize << endl;
+      //cout << targetRTT << "    " << avgRTT << "    " << curWinSize << endl;
     }
   }
+  */
   /* AIMD */
 
 
