@@ -6,11 +6,12 @@
 #define RTT_GUESS 70
 #define CWND_DEFAULT 30
 #define CWND_MIN 1
-#define TIMEOUT 100
+#define TIMEOUT 60
 #define RTT_THRESH 110
 #define SLOW_ST_THRESH 13
 #define RTT_WEIGHT 1.25
 #define RTT_GAIN_FACTOR 0.001
+#define MULT_DECREASE_FACTOR 2.5
 
 using namespace std;
 
@@ -83,7 +84,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       cwnd = CWND_MIN;
   } else if (rtt_avg > old_avg && old_avg < RTT_THRESH) {
       if (rtt_avg > RTT_THRESH) {
-          cwnd /= 2.5;
+          cwnd /= MULT_DECREASE_FACTOR;
       }
   } else if (cwnd < SLOW_ST_THRESH) {
     cwnd += 1;
