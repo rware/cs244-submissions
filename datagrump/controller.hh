@@ -15,8 +15,9 @@ private:
   /* Add member variables here */
   uint64_t min_rtt = 20; 
   uint64_t prev_rtt = 20;
-  float t_low = 60;
-  float t_high = 110;
+  float avg_rtt = 20;
+  float t_low = 50;
+  float t_high = 100;
 
   float rtt_diff = 0;
   uint8_t N = 1;
@@ -43,6 +44,9 @@ public:
 
   /* Get current window size, in datagrams */
   unsigned int window_size( void );
+
+  /* Get current send delay, in milliseconds */
+  unsigned int send_delay( void );
 
   /* A datagram was sent */
   void datagram_was_sent( const uint64_t sequence_number,

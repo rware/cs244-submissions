@@ -77,6 +77,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   if (delay < min_rtt) min_rtt = delay;
 
+  avg_rtt = (1 - alpha) * avg_rtt + alpha * delay;
+
   //if (abs(delay - t_low) < abs(delay - t_high)) {
   //  t_low = (1 - gamma) * t_low + gamma * delay;
   //  std::cerr << "t_low: " << t_low << endl;
@@ -96,31 +98,31 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   //else
   //  t_high -= gamma;
 
-  float avg_delay;
+  //float avg_delay;
 
-  if (!filled) {
-    samples[num_samples] = delay;
-    delay_sum += delay;
-    num_samples++;
-    avg_delay = delay_sum / num_samples;
-    if (num_samples == NUM_SAMPLES) {
-      num_samples = 0;
-      filled = true;
-    }
-  }
-  else {
-    int prev_sample = samples[(num_samples + 1) % NUM_SAMPLES];
+  //if (!filled) {
+  //  samples[num_samples] = delay;
+  //  delay_sum += delay;
+  //  num_samples++;
+  //  avg_delay = delay_sum / num_samples;
+  //  if (num_samples == NUM_SAMPLES) {
+  //    num_samples = 0;
+  //    filled = true;
+  //  }
+  //}
+  //else {
+  //  int prev_sample = samples[(num_samples + 1) % NUM_SAMPLES];
 
-    delay_sum -= prev_sample;
-    delay_sum += delay;
-    samples[num_samples] = delay;
-    avg_delay = delay_sum / NUM_SAMPLES;
+  //  delay_sum -= prev_sample;
+  //  delay_sum += delay;
+  //  samples[num_samples] = delay;
+  //  avg_delay = delay_sum / NUM_SAMPLES;
 
-    num_samples = (num_samples + 1) % NUM_SAMPLES;
-  }
+  //  num_samples = (num_samples + 1) % NUM_SAMPLES;
+  //}
 
-  t_high = avg_delay * 1.2;
-  t_low = avg_delay * 0.6;
+  //t_high = avg_rtt * 1.8;
+  //t_low = avg_rtt * 0.6;
 
   int64_t new_rtt_diff = delay - prev_rtt;
 
@@ -134,12 +136,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   float gradient = rtt_diff / min_rtt;
   prev_rtt = delay;
 
-  std::cerr << "t_high: " << t_high 
-            << " t_low: " << t_low 
-            << " delay: " << delay 
-            << " gradient: " << gradient 
-            << " window: " << the_window_size 
-            << endl;
+  //std::cerr << "t_high: " << t_high 
+  //          << " t_low: " << t_low 
+  //          << " delay: " << delay 
+  //          << " gradient: " << gradient 
+  //          << " window: " << the_window_size 
+  //          << endl;
 
   //if ( gradient <= 0) {
   //  num_neg_gradients ++;
@@ -159,33 +161,17 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   //  M = 1;
   //}
 
-  //float interpolated_delay = delay + gradient * the_window_size;
-
-  //if (delay < t_low) {
-  //  the_window_size += (float) min_rtt / delay;
+  //if (delay - avg_delay > avg_delay * 4) { 
+  //  the_window_size = 0;
+  //  cerr << "returning" << endl;
+  //  return;
   //}
-  //else if (interpolated_delay > t_high) {
-  //  //cerr << "too high, size " << the_window_size << endl;
-  //  the_window_size = the_window_size * (1 - beta * (1 - t_high / interpolated_delay));
-  //  //cerr << "new size: " << the_window_size << endl;
-  //}
-  //else if (gradient <= 0) {
-  //  if ( debug_ ) 
-  //    cerr << "neg gradient" << endl;
-  //  the_window_size = the_window_size + (float) min_rtt / delay;
-  //} else {
-  //  if ( debug_ ) 
-  //    cerr << "pos gradient: " << gradient << endl;
-  //  the_window_size = the_window_size * (1 - beta * gradient);
-  //}
-
-
 
   if (delay < t_low) {
     the_window_size += N * (float) min_rtt / delay;
   }
   else if (delay > t_high) {
-    the_window_size = the_window_size * (1 - beta * M * (1 - t_high / delay));
+    the_window_size = the_window_size * (1 - beta * (1 - t_high / delay));
   }
   else if (gradient <= 0) {
     if ( debug_ ) 
@@ -194,25 +180,10 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   } else {
     if ( debug_ ) 
       cerr << "pos gradient: " << gradient << endl;
-    the_window_size = the_window_size * (1 - M * beta * gradient);
+    the_window_size = the_window_size * (1 - beta * gradient);
   }
 
   the_window_size = (the_window_size < 1) ? 1 : the_window_size;
-
-  //if (delay >= DELAY_THRESHOLD && timestamp_ack_received > next_loss_time){
-  //  // Multiplicative Decrease
-  //  the_window_size = the_window_size * mult_decrease;
-
-  //  // Lowerbound the window size to 1
-  //  the_window_size = the_window_size < 1 ? 1 : the_window_size;
-
-  //  next_loss_time = timestamp_ack_received + delay;
-  //}
-  //else{
-  //  // Additive Increase
-  //  the_window_size = the_window_size + 3.0 / delay;
-  //}
-
 
   if ( debug_ ) {
     cerr << "At time "                    << timestamp_ack_received
@@ -228,5 +199,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 1000; /* timeout of one second */
+  return avg_rtt * 2;
+  //return 250; /* timeout of 0.5 seconds */
 }
