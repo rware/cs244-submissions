@@ -6,9 +6,7 @@
 using namespace std;
 
 //AIMD values
-#define USING_AIMD false
-#define ADDITIVE_INCREASE 1.2
-#define DECREASE_FACTOR .6
+#define ADDITIVE_INCREASE 1.5
 
 //Delay triggered values
 #define DELAY_TRIGGER true
@@ -17,8 +15,6 @@ using namespace std;
 #define MIN_FULL_INCREASE 50
 
 #define UPDATE_TIME 5000
-
-#define DELTA_DELAY false
 
 #define DEFAULT_CWIND 10
 #define DEFAULT_TIMEOUT 45
@@ -76,12 +72,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   float delay = timestamp_ack_received - send_timestamp_acked;
 
+  //Find the cwind at the time when this packet was sent
   float dataSize = cwinds.at(sequence_number_acked);
   cwinds.erase(cwinds.find(sequence_number_acked));
 
   bool update = true;
 
+  //The power over a given interval is packets/time^2
   float power = dataSize / delay / delay;
+  
+  //We are always trying to maximize power
   if (power > maxPower){
     maxPower = power;
     bestCwind = dataSize;
@@ -113,49 +113,42 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   float diff = delay - lastDelay;
   float prediction = delay + cwind * diff;
 
+
+  //heuristic values. In a perfect world we would find some non-heuristic method
   maxDelayThreshold = 2 * bestDelay;
   minFullIncrease = 1.7 * bestDelay;
   minDelayThreshold = 1.2 * bestDelay;  
 
+  //If the delay is increasing such that we will have too high of delay, 
+  //Do not increase as much
   if (diff > EPSILON || prediction > maxDelayThreshold){
     increaseFactor *= lastDelay / delay * .25;
   }
 
+  //Slow down how quickly we are increasing cwind if the delay is getting high
   float scaledDelay = delay - minFullIncrease;
   if (delay > minFullIncrease && delay <= minDelayThreshold){
     increaseFactor *= (1 - scaledDelay / (maxDelayThreshold - minFullIncrease));
   }
-  cerr << "maxPower: " << maxPower << endl << "bestCwind: " << bestCwind << endl << "bestDelay: " << bestDelay << endl;
+
+
   lastDelay = delay;
 
   if (DELAY_TRIGGER){
     if (delay < minDelayThreshold && prediction < maxDelayThreshold){
+      //increase cwind faster if delay is low
       cwind += (minDelayThreshold / delay) * increaseFactor / cwind;
     }
     else if (delay > maxDelayThreshold && cwind > MIN_CWIND){
+      //Decrease cwind to minimum over 4 RTTs.
       cwind -= .25;
     }
-  }
-
-  if (DELTA_DELAY && lastDelay > 0){
-    
-    if (diff > 0){
-      cwind *= (diff / lastDelay);
-    }
-    else {
-      cwind += - diff / cwind;
-    }
-    lastDelay = delay;
-  }
-  else if (lastDelay <= 0) {
-    lastDelay = delay;
   }
 
   if (cwind < MIN_CWIND){
     cwind = MIN_CWIND;
   }
 
-  /* Default: take no action */
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -167,9 +160,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 }
 
 void Controller::timeout() {
-  if (cwind > MIN_CWIND){
-    //cwind *= DECREASE_FACTOR;
-  }
+  //Do nothing on timeout.
+  //We already have delay triggered decrease.
 }
 
 /* How long to wait (in milliseconds) if there are no acks
