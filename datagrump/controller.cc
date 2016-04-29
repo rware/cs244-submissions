@@ -5,8 +5,11 @@
 #include "timestamp.hh"
 
 #define AVG_MULT 0.95
+#define TRACKED_PKTS 200
 
 uint64_t ctr = 0;
+
+uint64_t lastPackets[TRACKED_PKTS];
 
 using namespace std;
 
@@ -17,7 +20,7 @@ Controller::Controller( const bool debug )
   : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
     lastSendTimestamp(0), packetsUntilDecrease(0),
     slowStartThreshold(5), minRTT(~0u), avgRTT(0),
-    targetRTT(~0u)
+    targetRTT(100)
 {
 }
 
@@ -59,22 +62,35 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
+  uint64_t packetIndex = ctr % TRACKED_PKTS;
+  ctr++;
+  lastPackets[packetIndex] = ackedRTT;
   if (ackedRTT < minRTT) {
     minRTT = ackedRTT;
     targetRTT = 2 * minRTT;
   }
+
   if (avgRTT == 0) {
     avgRTT = ackedRTT;
+    targetRTT = ackedRTT;
   } else {
     avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
-    double changeFactor = (avgRTT - targetRTT) * (avgRTT - targetRTT) * 0.0001;
+    double changeFactor = (avgRTT - targetRTT) * (avgRTT - targetRTT) * 0.001 / curWinSize;
     if (avgRTT > targetRTT) {
       curWinSize -= changeFactor;
     } else {
       curWinSize += changeFactor;
     }
     if (curWinSize < 1) curWinSize = 1;
-    if (ctr++ % 20 == 0) {
+
+    // if (ctr > TRACKED_PKTS && packetIndex == 0) {
+    //   minRTT = lastPackets[0];
+    //   for (int i = 0; i < TRACKED_PKTS; i++) {
+    //     if (lastPackets[i] < minRTT) minRTT = lastPackets[i];
+    //   }
+    //   targetRTT = 2 * minRTT;
+    // }
+    if (ctr % 40 == 0) {
       cout << targetRTT << "    " << avgRTT << "    " << curWinSize << endl;
     }
   }
