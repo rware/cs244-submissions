@@ -70,7 +70,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
         (send_timestamp - 8 * timestamp_ms_raw(fifty_ms) > min)) {
       
       if (should_scale_back) {
-        cerr << "[!] UBER: " << cwnd_ << endl;
         cwnd_ *= 0.5;
       }
 
@@ -80,7 +79,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
             (send_timestamp - 4 * timestamp_ms_raw(fifty_ms) > min)) {
       
       if (should_scale_back) {
-        cerr << "[!] EXPLOSION: " << cwnd_ << endl;
         cwnd_ *= 0.8;
       }
 
@@ -90,7 +88,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
             (send_timestamp - 2 * timestamp_ms_raw(fifty_ms) > min)) {
 
       if (should_scale_back) {
-        cerr << "[!] Major: " << cwnd_ << endl;
         cwnd_ *= 0.95;
       }
 
@@ -100,7 +97,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
             (send_timestamp - timestamp_ms_raw(fifty_ms) > min)) {
 
       if (should_scale_back) {
-        cerr << "[!] Minor: " << cwnd_ << endl;
         cwnd_ *= 0.97;
       }
 
@@ -117,7 +113,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     }
 
   } else {
-    cerr << "none outstanding" << endl;
+    //cerr << "none outstanding" << endl;
     cwnd_ += 1;
   }
 
