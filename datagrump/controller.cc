@@ -25,7 +25,7 @@ Controller::Controller( const bool debug, float cwnd_sz)
   , cwnd_ (cwnd_sz)
   , avg_rtt_ (0.0)
   , rtt_samples_ (0)
-  , last_scale_back_ (INT_MAX)
+  , last_scale_back_ (0)
   , outstanding_acks_ ()
 {
   make_heap(outstanding_acks_.begin(), outstanding_acks_.end(), comp);
@@ -51,13 +51,9 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    const uint64_t send_timestamp )
                                     /* in milliseconds */
 {
-   /* A packet is sent, add it to the heap */
 
- /*  cerr << outstanding_acks_.size() << endl
-        << cwnd_ << endl;
-*/
-
-  /* Check if min value of heap is greater than now - 100ms */
+  /* If there are packets outstanding in the network, check if min value of heap
+     is greater than now - 100ms */
   if (!outstanding_acks_.empty()) {
     uint64_t min = outstanding_acks_.at(0);
 
@@ -65,41 +61,46 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     fifty_ms.tv_sec = 0;
     fifty_ms.tv_nsec = (TIMEOUT_IN_MS * 0.5) * 1e6;
 
-    //smooth updates only over every 12.5ms, at most
-    bool should_scale_back = (send_timestamp > TIMEOUT_IN_MS*2) 
+    /* Smooth updates only over every 12.5ms, at most; also only allow scaling
+       back after one timestamp durations have passed */ 
+    bool should_scale_back = (send_timestamp > TIMEOUT_IN_MS) 
          && (last_scale_back_ + timestamp_ms_raw(fifty_ms)/4 < send_timestamp);
 
-    if (send_timestamp - 8 * timestamp_ms_raw(fifty_ms) > min) {
+    if ((send_timestamp > 8 * timestamp_ms_raw(fifty_ms)) &&
+        (send_timestamp - 8 * timestamp_ms_raw(fifty_ms) > min)) {
       
       if (should_scale_back) {
-      //  cerr << "[!] UBER: " << cwnd_ << endl;
+        cerr << "[!] UBER: " << cwnd_ << endl;
         cwnd_ *= 0.5;
       }
 
       last_scale_back_ = send_timestamp;
 
-    } else if (send_timestamp - 4 * timestamp_ms_raw(fifty_ms) > min) {
+    } else if ((send_timestamp > 4 * timestamp_ms_raw(fifty_ms)) &&
+            (send_timestamp - 4 * timestamp_ms_raw(fifty_ms) > min)) {
       
       if (should_scale_back) {
-       // cerr << "[!] EXPLOSION: " << cwnd_ << endl;
+        cerr << "[!] EXPLOSION: " << cwnd_ << endl;
         cwnd_ *= 0.8;
       }
 
       last_scale_back_ = send_timestamp;
 
-    } else if (send_timestamp - 2 * timestamp_ms_raw(fifty_ms) > min) {
-      
+    } else if ((send_timestamp > 2 * timestamp_ms_raw(fifty_ms)) &&
+            (send_timestamp - 2 * timestamp_ms_raw(fifty_ms) > min)) {
+
       if (should_scale_back) {
-        //cerr << "[!] Major: " << cwnd_ << endl;
+        cerr << "[!] Major: " << cwnd_ << endl;
         cwnd_ *= 0.95;
       }
 
       last_scale_back_ = send_timestamp;
 
-    } else if (send_timestamp - timestamp_ms_raw(fifty_ms) > min) {
+    } else if ((send_timestamp > timestamp_ms_raw(fifty_ms)) &&
+            (send_timestamp - timestamp_ms_raw(fifty_ms) > min)) {
 
       if (should_scale_back) {
-       // cerr << "[!] Minor: " << cwnd_ << endl;
+        cerr << "[!] Minor: " << cwnd_ << endl;
         cwnd_ *= 0.97;
       }
 
@@ -119,6 +120,8 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     cerr << "none outstanding" << endl;
     cwnd_ += 1;
   }
+
+  /* A packet is sent, add it to the heap */
 
   outstanding_acks_.push_back(send_timestamp);
   push_heap(outstanding_acks_.begin(), outstanding_acks_.end(), comp);
@@ -151,25 +154,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     make_heap(outstanding_acks_.begin(), outstanding_acks_.end(), comp);
   }
 
-
-
-/*
-
-  uint64_t rtt = (timestamp_ack_received - send_timestamp_acked);
-  avg_rtt_ = (avg_rtt_ * rtt_samples_ + rtt)/(rtt_samples_ + 1);
-  rtt_samples_ += 1;
-  Simple AIMD, when ACK received, increment cwnd_ by 1 / cwnd_ 
-
-  if (rtt <= avg_rtt_) {
-    cwnd_ += 1 / cwnd_;
-  } else {
-    cwnd_ -= 1 / cwnd_;
-  }
-  cerr << "avg_rtt = " << avg_rtt_ << endl
-       << " cwnd = " << cwnd_ << endl;
-
-       */
-  
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
 	 << " received ack for datagram " << sequence_number_acked
@@ -180,12 +164,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 }
 
 void Controller::timeout_occured( void ) {
-  /* Simple AIMD, decrement by 1/2 */
-  /*
-  cerr << "Timeout occured!" << endl
-       << "avg_rtt = " << avg_rtt_ << endl
-       << " cwnd = " << cwnd_ << endl;*/
-
+  //noop
 } 
 
 /* How long to wait (in milliseconds) if there are no acks
