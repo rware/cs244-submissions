@@ -18,7 +18,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), packetsUntilIncrease(0), curWinSize(100),
+  : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
     lastSendTimestamp(0), packetsUntilDecrease(0),
     slowStartThreshold(5), minRTT(~0u), avgRTT(0),
     targetRTT(100), linkRateStartTime(0), curLinkRate(0),
@@ -66,6 +66,11 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
    uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
+
+   if (ackedRTT < minRTT) {
+    minRTT = ackedRTT;
+    targetRTT = 2 * minRTT;
+  }
   // update statistics for link rate info
   if (linkRateStartTime == 0) {
     linkRateStartTime = timestamp_ack_received;
@@ -80,25 +85,30 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
 
   // Estimate num packets can be sent in next 50mS
-  if (curLinkRate != 0) {
-    //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate);
-    if (ctr % 40 == 0) {
-      //cout << "Predicted Link Rate: " << nextLinkRate << endl;
-    }
-    double numPacketsCanBeSent = 60.0 * curLinkRate / 12.0;
-    curWinSize = max(numPacketsCanBeSent, 1.0);
-  }
+
 
   linkRateNumPackets++;
 
+
+  if (ackedRTT < 60) {
+    if (curLinkRate != 0 && prevLinkRate != 0) {
+      double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
+      double numPacketsCanBeSent = 70 * nextLinkRate / 12.0;
+      curWinSize = max(numPacketsCanBeSent, 1.0);
+    }
+  } else {
+    if (curLinkRate != 0 && prevLinkRate != 0) {
+      double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
+      double numPacketsCanBeSent = 50 * nextLinkRate / 12.0;
+      curWinSize = max(numPacketsCanBeSent, 1.0);
+    }
+  }
+  
  
   uint64_t packetIndex = ctr % TRACKED_PKTS;
   ctr++;
   lastPackets[packetIndex] = ackedRTT;
-  if (ackedRTT < minRTT) {
-    minRTT = ackedRTT;
-    targetRTT = 2 * minRTT;
-  }
+  
  
   if (avgRTT == 0) {
     avgRTT = ackedRTT;
@@ -146,5 +156,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 25; /* timeout of one second */
+  return 40; /* timeout of one second */
 }
