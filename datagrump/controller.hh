@@ -3,9 +3,7 @@
 
 #include <cstdint>
 #include <deque>
-#include <vector>
 #include <utility>
-#include <mutex>
 
 /* Congestion controller interface */
 using namespace std;
@@ -14,40 +12,27 @@ class Controller
 {
 private:
 	bool debug_; /* Enables debugging output */
-  double windowSize;
+  unsigned int windowSize;
+  float windowGrowing;
   unsigned int ssthresh;
-  int64_t srtt;
-  int64_t rttvar;
-  uint64_t timeout;
-  
   deque<pair<uint64_t, uint64_t> > outgoingPackets;
+  uint64_t receivedAckno;
+  unsigned int ackCount;
+  unsigned int timeout;
+  deque<uint64_t> arrivalTimes;
   /* Add member variables here */
 	
 public:
 	/* Public interface for the congestion controller */
 	/* You can change these if you prefer, but will need to change
 	 the call site as well (in sender.cc) */
-  vector<double> distribution;
-  uint64_t tslice_start;
-  int64_t packets_sent_this_slice;
-  int64_t packets_queued;
-  
-  void updatePDF(void);
-  mutex mController;
-  void normalize(vector<double> &pdf);
-  void applyBrownian(vector<double> &pdf);
-  
-  double poissonProb(double sample_rate, int packet_counts);
-  int guessLinkRate(vector<double> &pdf, double threshold);
-  unsigned int makeForecast(void);
-  
+	
 	/* Default constructor */
 	Controller( const bool debug );
 	
 	/* Get current window size, in datagrams */
 	unsigned int window_size( void );
 	
-  void update_rtt( int64_t diff );
 	/* A datagram was sent */
 	void datagram_was_sent( const uint64_t sequence_number,
 						   const uint64_t send_timestamp );
