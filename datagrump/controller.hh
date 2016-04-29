@@ -10,7 +10,24 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
 
-  /* Add member variables here */
+  double window_size_;
+  uint64_t rtt_min_;
+
+  /* Double exponential smoothing estimators */
+  double capacity_est_a_;
+  double capacity_est_b_;
+  
+  unsigned int epoch_packets_;
+  bool slow_start_;
+
+  /* EPIK parameters */
+  const double ALPHA_CAPACITY = 0.41;
+  const double BETA_CAPACITY = 0.2;
+  const uint64_t DESIRED_RTT = 60;
+  const uint64_t EPOCH = 58;
+  const double DELTA = 0.45;
+
+  void update_capacity_estimate ( const uint64_t event_timestamp );
 
 public:
   /* Public interface for the congestion controller */
