@@ -13,9 +13,8 @@ private:
   bool debug_; /* Enables debugging output */
   float cwnd;
   float rtt_avg;
-  float slow_st_thresh;
-  float avg_array[NUM_DELTAS];
-  int index;
+  int rtt_gain;
+  int up_count;
 
   float update_avg(float new_val);
 
