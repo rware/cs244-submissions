@@ -6,6 +6,8 @@
 
 #define AVG_MULT 0.95
 
+uint64_t ctr = 0;
+
 using namespace std;
 
 
@@ -14,7 +16,8 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
     lastSendTimestamp(0), packetsUntilDecrease(0),
-    slowStartThreshold(5), minRTT(~0u), avgRTT(0)
+    slowStartThreshold(5), minRTT(~0u), avgRTT(0),
+    targetRTT(~0u)
 {
 }
 
@@ -56,15 +59,24 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
-  minRTT = min(minRTT, ackedRTT);
+  if (ackedRTT < minRTT) {
+    minRTT = ackedRTT;
+    targetRTT = 2 * minRTT;
+  }
   if (avgRTT == 0) {
     avgRTT = ackedRTT;
   } else {
-    double newAvgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
-    curWinSize += (100 - newAvgRTT) * 0.01;
-    avgRTT = newAvgRTT;
+    avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
+    double changeFactor = (avgRTT - targetRTT) * (avgRTT - targetRTT) * 0.0001;
+    if (avgRTT > targetRTT) {
+      curWinSize -= changeFactor;
+    } else {
+      curWinSize += changeFactor;
+    }
     if (curWinSize < 1) curWinSize = 1;
-    cout << curWinSize << endl;
+    if (ctr++ % 20 == 0) {
+      cout << targetRTT << "    " << avgRTT << "    " << curWinSize << endl;
+    }
   }
   /* AIMD */
 

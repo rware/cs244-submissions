@@ -18,6 +18,7 @@ private:
   uint64_t slowStartThreshold;
   uint64_t minRTT;
   double avgRTT;
+  uint64_t targetRTT;
 
 public:
   /* Public interface for the congestion controller */
