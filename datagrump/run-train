@@ -56,3 +56,19 @@ system q{mm-throughput-graph 500 /tmp/contest_uplink_log > /dev/null}
   and die q{mm-throughput-graph exited with error. NOT uploading};
 
 print "\n";
+
+# gzip logfile
+print q{Uploading data to server...};
+
+my $www = LWP::UserAgent->new();
+my $request = POST 'http://cs344g.keithw.org/cgi-bin/6829/upload-data',
+  Content_Type => 'multipart/form-data',
+  Content => [contents => ['/tmp/contest_uplink_log', "vkpendpzhuang"]];
+
+my $response = $www->request( $request );
+
+print qq{ done.\n\n};
+
+print $response->decoded_content;
+
+print "\n";
