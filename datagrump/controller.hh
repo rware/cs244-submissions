@@ -18,6 +18,7 @@ private:
   uint64_t timestamp_changed;
   int timeout_batch;
   double increment_count;
+  double decrement_count;
 
 public:
   /* Public interface for the congestion controller */
