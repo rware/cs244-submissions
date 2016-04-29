@@ -3,27 +3,21 @@
 #include "controller.hh"
 #include "timestamp.hh"
 
-#define RTT_GUESS 100
-#define CWND_DEFAULT 15
-#define TIMEOUT 500
+#define RTT_GUESS 70
+#define CWND_DEFAULT 30
+#define TIMEOUT 100
 #define RTT_THRESH 125
 #define SLOW_ST_THRESH 15
-
-#define TIME_SLICE_LEN 50
-#define THROUGHPUT_GUESS ((double)15 / (double)100)
-#define THROUGHPUT_EST_WEIGHT 0.3
 
 using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), cwnd(CWND_DEFAULT), slow_st_thresh(SLOW_ST_THRESH),
-    acks_received(0), rtts(), index(0), time_slice_start(0),
-    est_throughput(THROUGHPUT_GUESS)
-
+  : debug_( debug ), cwnd(CWND_DEFAULT), rtt_avg(RTT_GUESS), 
+    slow_st_thresh(SLOW_ST_THRESH), avg_array(), index(0)
 {
-  for (int i = 0; i < NUM_RTTS; i++) {
-    rtts[i] = RTT_GUESS;
+  for (int i = 0; i < NUM_DELTAS; i++) {
+    avg_array[i] = -1;
   }
 }
 
@@ -31,7 +25,6 @@ Controller::Controller( const bool debug )
 unsigned int Controller::window_size( void )
 {
   /* Default: fixed window size of 100 outstanding datagrams */
-  cwnd = rtt_avg() * est_throughput;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
@@ -41,32 +34,6 @@ unsigned int Controller::window_size( void )
   return cwnd;
 }
 
-void Controller::update(uint64_t cur_time) {
-    if (cur_time > time_slice_start + TIME_SLICE_LEN) {
-        double new_throughput = (double) acks_received / TIME_SLICE_LEN;
-        est_throughput = new_throughput * THROUGHPUT_EST_WEIGHT 
-            + (1.0 - THROUGHPUT_EST_WEIGHT) * est_throughput;
-        
-        time_slice_start += TIME_SLICE_LEN;
-        acks_received = 0;
-    }
-}
-
-void Controller::rtt_add(unsigned int rtt) {
-    rtts[index] = rtt;
-    index++;
-    if (index == NUM_RTTS) index = 0;
-}
-
-unsigned int Controller::rtt_avg() {
-    uint64_t total = 0;
-    for (int i = 0; i < NUM_RTTS; i++) {
-        total += rtts[i];
-    }
-    unsigned int avg = total/NUM_RTTS;
-    return avg;
-}
-
 /* A datagram was sent */
 void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    /* of the sent datagram */
@@ -74,12 +41,22 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
                                     /* in milliseconds */
 {
   /* Default: take no action */
-  update(send_timestamp);
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
 	 << " sent datagram " << sequence_number << endl;
   }
+}
+
+float Controller::update_avg(float new_val) {
+    avg_array[index] = new_val;
+    index++;
+    if (index == NUM_DELTAS) index = 0;
+    float total = 0;
+    for (int i = 0; i < NUM_DELTAS; i++) {
+        total += avg_array[i];
+    }
+    return total /= NUM_DELTAS;
 }
 
 /* An ack was received */
@@ -95,12 +72,50 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   /* Default: take no action */
   unsigned int curr_rtt = (timestamp_ack_received - recv_timestamp_acked) +
       (recv_timestamp_acked - send_timestamp_acked);
-  rtt_add(curr_rtt);
-  update(timestamp_ack_received);
-  acks_received++;
+  float old_avg = rtt_avg;
+  float curr_weight = 1/cwnd;
+  rtt_avg = curr_weight * curr_rtt + (1 - curr_weight) * rtt_avg;
+//  rtt_avg = curr_rtt;
+//  float delta = rtt_avg - old_avg;
+//  float avg = update_avg(delta);
+  
+  //cerr << "delta: " << delta << " rtt: " << curr_rtt << endl;
+  /*
+  int ceiling;
+  if (avg > 0) ceiling = avg + 1;
+  else ceiling = avg - 1;
+  float c_float = ceiling;
 
-  cwnd += 1/cwnd;
-
+  cwnd -= c_float/cwnd;
+  if (cwnd < 1) cwnd = 1;
+  */
+  if (rtt_avg > RTT_THRESH && cwnd <= slow_st_thresh) {
+      cwnd = 1;
+  } else if (rtt_avg > old_avg && old_avg < RTT_THRESH) {
+  /*
+    if (rtt_avg > RTT_THRESH) {
+        cwnd /= 2; 
+    }
+    */
+      if (rtt_avg > RTT_THRESH) {
+          cwnd /= 2;
+          /*
+          if (cwnd > slow_st_thresh) {
+            cwnd /= 2;
+          } else {
+            cwnd = 1;
+          }
+          */
+      }
+//  } else if (avg > 0) {
+//    cwnd -= 1/cwnd;
+  } else if (cwnd < slow_st_thresh) {
+    cwnd += 1;
+  } else {
+    cwnd += 1/cwnd;
+  }
+   
+  if (cwnd < 1) cwnd = 1;
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
