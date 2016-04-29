@@ -8,7 +8,8 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_(debug), rtt_estimate(0), the_window_size(1.0), num_packets_received(0), first_of_burst(0), curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map(), rtt_total(0)
+  : debug_(debug), rtt_estimate(0), the_window_size(1.0), num_packets_received(0), first_of_burst(0), 
+    curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map(), rtt_total(0), num_packets_sent(0), last_queue_occ(-1), increase_rate(3.0), num_increase(0.0), last_calculated_rate(-1)
 {
   debug_ = false;
 }
@@ -41,6 +42,7 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     cerr << "At time " << send_timestamp
 	 << " sent datagram " << sequence_number << endl;
   }
+  num_packets_sent++;
 }
 
 uint64_t abs_(uint64_t first, uint64_t second) 
@@ -72,23 +74,28 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
   rtt_total += newRoundTripTime;
   // unsigned int window_int = 70;
   // cerr << sequence_number_acked << " " << rtt_estimate << " " << window_size() << endl;
+  int newBufferOcc = num_packets_sent - num_packets_received;
   if (num_packets_received == 1) {
     first_of_burst = recv_timestamp_acked;
-    burst_timer = min_(rtt_estimate, 200);
-    if (newRoundTripTime > 200) {
-      the_window_size -= 2.0/window_size();
-    } else {
+    // burst_timer = min_(rtt_estimate, 200);
+    if (newRoundTripTime <= 200) {
       the_window_size += 2.0/window_size();  
     }
     rtt_estimate = newRoundTripTime;
   } else {
-    if (newRoundTripTime > 70) {
-      the_window_size -= 2.0/window_size();
-    // cerr << newRoundTripTime << " " << rtt_estimate << " decrease" << endl;
+    if (last_queue_occ < newBufferOcc - 1) {
+      the_window_size -= 5.0/window_size();
     } else {
-      // cerr << newRoundTripTime << " " << rtt_estimate << " increase" << endl;
-      the_window_size += 2.0/window_size();
+      the_window_size += increase_rate/window_size();
     }
+
+    // if (newRoundTripTime > 70) {
+    //   the_window_size -= 2.0/window_size();
+    // // cerr << newRoundTripTime << " " << rtt_estimate << " decrease" << endl;
+    // } else {
+      // cerr << newRoundTripTime << " " << rtt_estimate << " increase" << endl;
+    
+    // }
     // if (send_map.find(sequence_number_acked) == send_map.end()) {
       rtt_estimate = 0.7 * rtt_estimate + 0.3 * newRoundTripTime;
       // rtt_estimate = rtt_total / (float)(num_packets_received); 
@@ -98,14 +105,42 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
     } else {
       // cerr << burst_count << " packets with recv_timestamp_acked of " << recv_timestamp_acked << " with estimated rtt of " << rtt_estimate << endl;
       // cerr << sequence_number_acked << ": " << (burst_count * 1424 * 8)/ (130 * 1000) << endl;
+      // int difference = (int)(burst_count) > newBufferOcc - 1 ? (burst_count - newBufferOcc + 1) : 0;
+      double new_window_size = 0.5 * the_window_size + 0.4 * burst_count;
+      // if (new_window_size < the_window_size) {
+      //   increase_rate *= 0.9;
+      // } else {
+      //   increase_rate *= 1.1;
+      // }
+      if (last_calculated_rate == -1) {
+        last_calculated_rate = new_window_size;
+      } else {
+        if (new_window_size < last_calculated_rate) {
+          num_increase = num_increase >= 0 ? -1 : (num_increase - 1);
+          if (num_increase <= -2) {
+            increase_rate = 1.0;
+          } else {
+            increase_rate = 3.0;
+          }
+        } else {
+          num_increase = num_increase <= 0 ? 1 : (num_increase + 1);
+          if (num_increase >= 5) {
+            increase_rate = 8.0;
+          } else {
+            increase_rate = 3.0;
+          }
+        }
+        last_calculated_rate = new_window_size;
+      }
       
-      the_window_size = 0.4 * the_window_size + 0.5 * burst_count;
+      the_window_size = new_window_size;
       // cerr << burst_count << " " << window_size() << endl;
       // cerr << burst_count << " " << the_window_size << " " << rtt_estimate << endl;
       burst_count = 1;
       first_of_burst = recv_timestamp_acked;
     }
   }
+  last_queue_occ = newBufferOcc;
   if (debug_) {
     cerr << sequence_number_acked << endl;
   }

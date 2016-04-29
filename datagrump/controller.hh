@@ -22,6 +22,12 @@ private:
   std::map<uint64_t, uint64_t> send_map;
   uint64_t rtt_total;
 
+  uint64_t num_packets_sent;
+  int last_queue_occ;
+  double increase_rate;
+  int num_increase;
+  double last_calculated_rate;
+
   /* Add member variables here */
   void delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
              const uint64_t send_timestamp_acked,
