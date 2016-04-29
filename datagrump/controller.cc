@@ -6,7 +6,7 @@
 #include "controller.hh"
 #include "timestamp.hh"
 
-#define AVG_MULT 0.75
+#define AVG_MULT 0.85
 #define TRACKED_PKTS 200
 
 uint64_t ctr = 0;
