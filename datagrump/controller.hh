@@ -2,6 +2,7 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#include <queue>
 
 /* Congestion controller interface */
 
@@ -11,6 +12,16 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
+  int cond_window_size;  /* Congestion Window size */
+  int queue_size;        /* Packets in queue */
+  int target_delay;      /* Goal for delay */
+  double last_receipt;   /* Previous calculation of LR deriv */
+
+  std::queue <int> queue_sizes;  /* Holds queue size of packets */
+  double LR_err;                 /* Derivative  of LR */
+  double old_link_rate;          /* Previous link rate */
+  double error_gain;             /* Gain on error */
+ 
 
 public:
   /* Public interface for the congestion controller */
@@ -20,6 +31,7 @@ public:
   /* Default constructor */
   Controller( const bool debug );
 
+  
   /* Get current window size, in datagrams */
   unsigned int window_size( void );
 
