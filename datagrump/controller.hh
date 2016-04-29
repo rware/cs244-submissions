@@ -14,6 +14,8 @@ private:
   unsigned int packetsUntilIncrease;
   unsigned int curWinSize;
   uint64_t lastSendTimestamp;
+  unsigned int packetsUntilDecrease;
+  unsigned int slowStartThreshold;
 
 public:
   /* Public interface for the congestion controller */

@@ -10,8 +10,9 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), packetsUntilIncrease(0), curWinSize(100),
-    lastSendTimestamp(0)
+  : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
+    lastSendTimestamp(0), packetsUntilDecrease(0),
+    slowStartThreshold(5)
 {
 }
 
@@ -62,18 +63,31 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 {
   /* Default: take no action */
   /* AIMD */
-  if ((timestamp_ack_received - send_timestamp_acked) > timeout_ms()) {
-    curWinSize = max(curWinSize * 2 / 3, 1u);
+  if ((timestamp_ack_received - send_timestamp_acked) > 100 && packetsUntilDecrease == 0) {
+    curWinSize = max(curWinSize  / 2, 1u);
+    slowStartThreshold = curWinSize;
+    packetsUntilDecrease = max(curWinSize, 1u);
     packetsUntilIncrease = curWinSize;
+    curWinSize = 1;
+    
     cout << "Decreasing curWinSize to " << curWinSize << endl;
+    
   } else {
-    if (packetsUntilIncrease == 0) {
+    // Exponential slow start
+    if (curWinSize < slowStartThreshold) {
       curWinSize++;
       packetsUntilIncrease = curWinSize;
-      //cout << "Increasing curWinSize to " << curWinSize << endl;
+    } else {
+      if (packetsUntilIncrease == 0) {
+        curWinSize++;
+        packetsUntilIncrease = curWinSize;
+        //cout << "Increasing curWinSize to " << curWinSize << endl;
+      }
+
+      packetsUntilIncrease = (packetsUntilIncrease == 0) ? 0 : packetsUntilIncrease - 1;
     }
 
-    packetsUntilIncrease--;
+    packetsUntilDecrease = (packetsUntilDecrease == 0) ? 0 : packetsUntilDecrease - 1;
   }
 
   if ( debug_ ) {
@@ -89,5 +103,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 100; /* timeout of one second */
+  return 30; /* timeout of one second */
 }
