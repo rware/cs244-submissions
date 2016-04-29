@@ -12,17 +12,15 @@ static const uint64_t T_LOW = 50;
 static const uint64_t T_HIGH = 140;
 static const uint64_t MIN_RTT = 30;
 static const double ADDITIVE_INCREMENT = 1;
-static const double MULTIPLICATIVE_DECREMENT = 0.4;
+static const double MULTIPLICATIVE_DECREMENT = 0.5;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug )
-  // , window_size_int(10)
   , window_size_double(10)
   , timeout_batch(0)
   , prev_rtt(100) // TODO: initial value?
   , rtt_diff(10) // TODO: initial value?
-  , hai_count(0)
   , timestamp_changed(0)
   , increment_count(0)
 {}
@@ -69,51 +67,59 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
   timestamp_changed = now;
 
+  cout << "*********************************************" << endl;
   int64_t new_rtt_diff = new_rtt - prev_rtt;
-  // cerr << "rtt diff is " << new_rtt_diff << endl;
+  cout << "time: " << now << endl;
+  cout << "rtt diff is " << new_rtt_diff << endl;
+  cout << "new_rtt is " << new_rtt << endl;
   prev_rtt = new_rtt;
   rtt_diff = (1 - EWMA_WEIGHT)*rtt_diff + EWMA_WEIGHT*new_rtt_diff;
   double normalized_gradient = rtt_diff / MIN_RTT;
-  hai_count = normalized_gradient < 0 ? hai_count+1 : 0;
 
   if (new_rtt <= T_HIGH) timeout_batch = 0;
 
   if (new_rtt < T_LOW) {
-    increment_count++;
-    window_size_double += sqrt(increment_count) * ADDITIVE_INCREMENT / sqrt(window_size_double);
-    cerr << "below T_LOW, window size increasing to " << window_size_double 
+    increment_count += 1.5;
+    window_size_double += increment_count * ADDITIVE_INCREMENT / sqrt(window_size_double);
+    cout << "below T_LOW, increasing window size to " << window_size_double 
          << ", increment_count is " << increment_count << endl;
   } else if (new_rtt > T_HIGH) {
     if (new_rtt > 1000) {
       timeout_batch = 0;
       window_size_double = 1;
       increment_count = 0;
+      cout << "rtt > 1000, decreasing window size to 1" << endl;
     } else {
-      if (timeout_batch) timeout_batch--;
+      if (timeout_batch) {
+        cout << "rtt > T_HIGH, but in timeout batch" << endl;
+        timeout_batch--;
+      }
       else {
         increment_count = 0;
-        timeout_batch = 3;
+        // timeout_batch = 3;
+        timeout_batch = sqrt(window_size_double);
         window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*(1 - T_HIGH/new_rtt));
         if (window_size_double < 1) {
           window_size_double = 1;
         }
+        cout << "rtt > T_HIGH, decreasing window size to " << window_size_double << endl;
       }
     }
-    cerr << "above T_HIGH (rtt is " << new_rtt << "), window size decreasing to " << window_size_double << endl;
   } else if (normalized_gradient <= 0 && new_rtt < 100) {
-    increment_count += 0.5;
-    int n = hai_count >= 3 ? hai_count / 2 : 1;
+    // increment_count += 0.5;
+    increment_count++;
+    int n = increment_count / 2;
+    if (n < 1) n = 1;
     window_size_double += n * ADDITIVE_INCREMENT / window_size_double;
-    // cerr << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
-  } else if (normalized_gradient > 0 && new_rtt > 90) {
+    cout << "gradient is " << normalized_gradient << ", increasing window size to " << window_size_double << endl;
+  } else if (normalized_gradient > 0) {
     increment_count = 0;
-    window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient*0.7 / sqrt(window_size_double));
+    window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient / sqrt(window_size_double));
     if (window_size_double < 1) {
       window_size_double = 1;
     }
-    // cerr << "gradient is " << normalized_gradient << ", decreasing window size to " << window_size_double << endl;
-  }
-  
+    cout << "gradient is " << normalized_gradient << ", decreasing window size to " << window_size_double << endl;
+  }  
 
   // if ( debug_ ) {
   //   cerr << "At time " << timestamp_ack_received

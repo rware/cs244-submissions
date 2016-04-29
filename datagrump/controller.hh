@@ -15,7 +15,6 @@ private:
   double window_size_double;
   uint64_t prev_rtt;
   double rtt_diff;
-  int hai_count;
   uint64_t timestamp_changed;
   int timeout_batch;
   double increment_count;
