@@ -11,7 +11,7 @@
 #define SLOW_ST_THRESH 13
 #define RTT_WEIGHT 1.25
 #define RTT_GAIN_FACTOR 0.005
-#define MULT_DECREASE_FACTOR 2.5
+#define MULT_DECREASE_FACTOR 2.25
 #define TIME_SLICE 10
 using namespace std;
 
@@ -89,9 +89,9 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       if (rtt_avg > RTT_THRESH) {
           cwnd /= MULT_DECREASE_FACTOR;
       }
-  } else if (cwnd < SLOW_ST_THRESH) {
+  }/* else if (cwnd < SLOW_ST_THRESH) {
     cwnd += 1;
-  } else {
+  }*/ else {
     cwnd += 1/cwnd;
   }
    
