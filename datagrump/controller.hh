@@ -14,8 +14,9 @@ private:
   float cwnd;
   float rtt_avg;
   int rtt_gain;
+  uint64_t curr_timeslice;
+  float num_packets_in_timeslice;
   int up_count;
-
   float update_avg(float new_val);
 
   /* Add member variables here */

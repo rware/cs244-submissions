@@ -10,15 +10,15 @@
 #define RTT_THRESH 110
 #define SLOW_ST_THRESH 13
 #define RTT_WEIGHT 1.25
-#define RTT_GAIN_FACTOR 0.001
+#define RTT_GAIN_FACTOR 0.005
 #define MULT_DECREASE_FACTOR 2.5
-
+#define TIME_SLICE 10
 using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_( debug ), cwnd(CWND_DEFAULT), rtt_avg(RTT_GUESS), rtt_gain(0),
-    up_count(0)
+    curr_timeslice(), num_packets_in_timeslice(), up_count(0)
 {
 }
 
@@ -66,19 +66,22 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   float old_avg = rtt_avg;
   float curr_weight = RTT_WEIGHT/cwnd;
   rtt_avg = curr_weight * curr_rtt + (1 - curr_weight) * rtt_avg;
-
-  if (rtt_avg > old_avg) {
-      if (rtt_gain > 0) rtt_gain = 0;
-      rtt_gain--;
-  } else if (rtt_avg <= old_avg) {
-//      rtt_gain = 0;
-      up_count++;
-      if (rtt_gain < 0 && up_count >= 2) {
-          rtt_gain = 0;
-          up_count = 0;
-      }
+  if (num_packets_in_timeslice != 0 && curr_timeslice < timestamp_ack_received/TIME_SLICE) {
+    if (rtt_gain < 0) {
+      //cerr << "cwnd RTT Gain Factor" << (1.0 + (rtt_gain/num_packets_in_timeslice) * RTT_GAIN_FACTOR) << endl;
+      cwnd *= (1.0 + (rtt_gain/num_packets_in_timeslice) * RTT_GAIN_FACTOR);
+    } 
+    rtt_gain = 0;
+    num_packets_in_timeslice = 0;
   }
-  cwnd *= (1.0 + (rtt_gain/cwnd) * RTT_GAIN_FACTOR);
+  curr_timeslice = timestamp_ack_received/TIME_SLICE;
+  num_packets_in_timeslice++;  
+  if (rtt_avg > old_avg) {
+    rtt_gain--;
+  } else if (rtt_avg <= old_avg) {
+    rtt_gain++;
+  }
+  //cwnd *= (1.0 + (rtt_gain/cwnd) * RTT_GAIN_FACTOR);
 
   if (rtt_avg > RTT_THRESH && cwnd <= SLOW_ST_THRESH) {
       cwnd = CWND_MIN;
