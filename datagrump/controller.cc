@@ -1,16 +1,19 @@
 #include <iostream>
 #include <algorithm>
 #include <math.h>
+#include <stdio.h>
 
 #include "controller.hh"
 #include "timestamp.hh"
 
-#define AVG_MULT 0.95
+#define AVG_MULT 0.75
 #define TRACKED_PKTS 200
 
 uint64_t ctr = 0;
 
 uint64_t lastPackets[TRACKED_PKTS];
+double lastSlope = 0;
+
 
 using namespace std;
 
@@ -65,12 +68,26 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-   uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
+  uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
 
-   if (ackedRTT < minRTT) {
+  if (ackedRTT < minRTT) {
     minRTT = ackedRTT;
     targetRTT = 2 * minRTT;
   }
+
+  if (avgRTT == 0) {
+    avgRTT = ackedRTT;
+  } else {
+    avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
+  }
+
+  double currSlope = ackedRTT - avgRTT;
+  double slopeDiff = currSlope - lastSlope;
+  slopeDiff = slopeDiff;
+  lastSlope = currSlope;
+
+  
+
   // update statistics for link rate info
   if (linkRateStartTime == 0) {
     linkRateStartTime = timestamp_ack_received;
@@ -80,7 +97,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
       linkRateStartTime = timestamp_ack_received;
       linkRateNumPackets = 0;
-      cout << "Link Rate: " << curLinkRate << "    Curwinsize: " << curWinSize << " RTT: " << avgRTT << endl;
+      printf("Link rate: %6.2f   cwnd: %7.3f   avgRTT: %6.2f\n", curLinkRate, curWinSize, avgRTT);
     }
   }
 
@@ -90,16 +107,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   linkRateNumPackets++;
 
 
-  if (ackedRTT < 60) {
+  if (avgRTT < 60) {
     if (curLinkRate != 0 && prevLinkRate != 0) {
-      double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
-      double numPacketsCanBeSent = 70 * nextLinkRate / 12.0;
+      //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
+      double numPacketsCanBeSent = 70 * curLinkRate / 12.0;
       curWinSize = max(numPacketsCanBeSent, 1.0);
     }
   } else {
     if (curLinkRate != 0 && prevLinkRate != 0) {
-      double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
-      double numPacketsCanBeSent = 50 * nextLinkRate / 12.0;
+      //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
+      double numPacketsCanBeSent = 50 * curLinkRate / 12.0;
       curWinSize = max(numPacketsCanBeSent, 1.0);
     }
   }
@@ -109,40 +126,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   ctr++;
   lastPackets[packetIndex] = ackedRTT;
   
- 
-  if (avgRTT == 0) {
-    avgRTT = ackedRTT;
-    targetRTT = ackedRTT;
-  } else {
-    avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
-    /*double changeFactor =  (avgRTT - targetRTT) * 0.005;
-    if (avgRTT > targetRTT) {
-      curWinSize -= changeFactor * sqrt(curWinSize);
-    } else {
-      curWinSize -= changeFactor / sqrt(curWinSize);
-    }
-    if (curWinSize < 1) curWinSize = 1;
-   */
-    // if (ctr > TRACKED_PKTS && packetIndex == 0) {
-    //   minRTT = lastPackets[0];
-    //   for (int i = 0; i < TRACKED_PKTS; i++) {
-    //     if (lastPackets[i] < minRTT) minRTT = lastPackets[i];
-    //   }
-    //   targetRTT = 2 * minRTT;
-    // }
-
-    // Second attempt to compute current throughput
-
-    if (ctr % 40 == 0) {
-      //cout << targetRTT << "    " << avgRTT << "    " << curWinSize << endl;
-    }
-  }
-  
-  /* AIMD */
-
-
-
-
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
 	 << " received ack for datagram " << sequence_number_acked
@@ -156,5 +139,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 40; /* timeout of one second */
+  return 30; /* timeout of one second */
 }
