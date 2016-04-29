@@ -98,7 +98,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     }
     */
       if (rtt_avg > RTT_THRESH) {
-          cwnd /= 2;
+          cwnd /= 2.5;
           /*
           if (cwnd > slow_st_thresh) {
             cwnd /= 2;
