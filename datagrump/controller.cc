@@ -18,7 +18,7 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
+  : debug_( debug ), packetsUntilIncrease(0), curWinSize(100),
     lastSendTimestamp(0), packetsUntilDecrease(0),
     slowStartThreshold(5), minRTT(~0u), avgRTT(0),
     targetRTT(100), linkRateStartTime(0), curLinkRate(0),
@@ -65,16 +65,17 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
+   uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
   // update statistics for link rate info
   if (linkRateStartTime == 0) {
     linkRateStartTime = timestamp_ack_received;
   } else {
-    if (linkRateStartTime + 60 < timestamp_ack_received) {
+    if (linkRateStartTime + 100 < timestamp_ack_received) {
       prevLinkRate = curLinkRate;
       curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
       linkRateStartTime = timestamp_ack_received;
       linkRateNumPackets = 0;
-      cout << "Link Rate: " << curLinkRate << "    Curwinsize: " << curWinSize << endl;
+      cout << "Link Rate: " << curLinkRate << "    Curwinsize: " << curWinSize << " RTT: " << avgRTT << endl;
     }
   }
 
@@ -90,7 +91,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 
   linkRateNumPackets++;
 
-  uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
+ 
   uint64_t packetIndex = ctr % TRACKED_PKTS;
   ctr++;
   lastPackets[packetIndex] = ackedRTT;
@@ -98,20 +99,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     minRTT = ackedRTT;
     targetRTT = 2 * minRTT;
   }
- /*
+ 
   if (avgRTT == 0) {
     avgRTT = ackedRTT;
     targetRTT = ackedRTT;
   } else {
     avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
-    double changeFactor =  (avgRTT - targetRTT) * 0.005;
+    /*double changeFactor =  (avgRTT - targetRTT) * 0.005;
     if (avgRTT > targetRTT) {
       curWinSize -= changeFactor * sqrt(curWinSize);
     } else {
       curWinSize -= changeFactor / sqrt(curWinSize);
     }
     if (curWinSize < 1) curWinSize = 1;
-
+   */
     // if (ctr > TRACKED_PKTS && packetIndex == 0) {
     //   minRTT = lastPackets[0];
     //   for (int i = 0; i < TRACKED_PKTS; i++) {
@@ -126,7 +127,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       //cout << targetRTT << "    " << avgRTT << "    " << curWinSize << endl;
     }
   }
-  */
+  
   /* AIMD */
 
 
@@ -145,5 +146,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 30; /* timeout of one second */
+  return 25; /* timeout of one second */
 }
