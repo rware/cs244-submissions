@@ -69,7 +69,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   if (linkRateStartTime == 0) {
     linkRateStartTime = timestamp_ack_received;
   } else {
-    if (linkRateStartTime + 50 < timestamp_ack_received) {
+    if (linkRateStartTime + 60 < timestamp_ack_received) {
       prevLinkRate = curLinkRate;
       curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
       linkRateStartTime = timestamp_ack_received;
@@ -84,7 +84,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     if (ctr % 40 == 0) {
       //cout << "Predicted Link Rate: " << nextLinkRate << endl;
     }
-    double numPacketsCanBeSent = 70.0 * curLinkRate / 12.0;
+    double numPacketsCanBeSent = 60.0 * curLinkRate / 12.0;
     curWinSize = max(numPacketsCanBeSent, 1.0);
   }
 
@@ -145,5 +145,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 100; /* timeout of one second */
+  return 60; /* timeout of one second */
 }
