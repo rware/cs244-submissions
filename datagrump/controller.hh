@@ -11,11 +11,13 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
-  unsigned int packetsUntilIncrease;
-  unsigned int curWinSize;
+  uint64_t packetsUntilIncrease;
+  double curWinSize;
   uint64_t lastSendTimestamp;
-  unsigned int packetsUntilDecrease;
-  unsigned int slowStartThreshold;
+  uint64_t packetsUntilDecrease;
+  uint64_t slowStartThreshold;
+  uint64_t minRTT;
+  double avgRTT;
 
 public:
   /* Public interface for the congestion controller */

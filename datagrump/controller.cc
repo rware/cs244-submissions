@@ -4,6 +4,8 @@
 #include "controller.hh"
 #include "timestamp.hh"
 
+#define AVG_MULT 0.95
+
 using namespace std;
 
 
@@ -12,7 +14,7 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
     lastSendTimestamp(0), packetsUntilDecrease(0),
-    slowStartThreshold(5)
+    slowStartThreshold(5), minRTT(~0u), avgRTT(0)
 {
 }
 
@@ -36,14 +38,6 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
                                     /* in milliseconds */
 {
   /* Default: take no action */
-  /*if (lastSendTimestamp != 0 && (send_timestamp - lastSendTimestamp) > timeout_ms()) {
-    curWinSize = max(curWinSize / 2, 1u);
-    packetsUntilIncrease = curWinSize;
-    cout << "Decreasing curWinSize to " << curWinSize << endl;
-  }
-
-  lastSendTimestamp = send_timestamp;
-  */
 
   if ( debug_ ) {
     cerr << "At time " << send_timestamp
@@ -61,34 +55,21 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  /* Default: take no action */
-  /* AIMD */
-  if ((timestamp_ack_received - send_timestamp_acked) > 100 && packetsUntilDecrease == 0) {
-    curWinSize = max(curWinSize  / 2, 1u);
-    slowStartThreshold = curWinSize;
-    packetsUntilDecrease = max(curWinSize, 1u);
-    packetsUntilIncrease = curWinSize;
-    curWinSize = 1;
-    
-    cout << "Decreasing curWinSize to " << curWinSize << endl;
-    
+  uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
+  minRTT = min(minRTT, ackedRTT);
+  if (avgRTT == 0) {
+    avgRTT = ackedRTT;
   } else {
-    // Exponential slow start
-    if (curWinSize < slowStartThreshold) {
-      curWinSize++;
-      packetsUntilIncrease = curWinSize;
-    } else {
-      if (packetsUntilIncrease == 0) {
-        curWinSize++;
-        packetsUntilIncrease = curWinSize;
-        //cout << "Increasing curWinSize to " << curWinSize << endl;
-      }
-
-      packetsUntilIncrease = (packetsUntilIncrease == 0) ? 0 : packetsUntilIncrease - 1;
-    }
-
-    packetsUntilDecrease = (packetsUntilDecrease == 0) ? 0 : packetsUntilDecrease - 1;
+    double newAvgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
+    curWinSize += (100 - newAvgRTT) * 0.01;
+    avgRTT = newAvgRTT;
+    if (curWinSize < 1) curWinSize = 1;
+    cout << curWinSize << endl;
   }
+  /* AIMD */
+
+
+
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ack_received
@@ -103,5 +84,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 30; /* timeout of one second */
+  return 100; /* timeout of one second */
 }
