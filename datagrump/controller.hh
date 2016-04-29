@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#define NUM_SAMPLES 25
+
 /* Congestion controller interface */
 
 class Controller
@@ -11,10 +13,25 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
-  uint64_t next_loss_time = 0;
+  uint64_t min_rtt = 20; 
+  uint64_t prev_rtt = 20;
+  float t_low = 60;
+  float t_high = 110;
+
+  float rtt_diff = 0;
+  uint8_t N = 1;
+  uint8_t M = 1;
+  uint8_t num_neg_gradients = 0;
+  uint8_t num_pos_gradients = 0;
 
   /* Default: fixed window size of 100 outstanding datagrams */
-  float the_window_size = 100;
+  float the_window_size = 20;
+  int num_samples = 0;
+  float delay_sum = 0;
+  float first_delay = 0;
+  bool filled = false;
+
+  float samples[NUM_SAMPLES];
 
 public:
   /* Public interface for the congestion controller */
