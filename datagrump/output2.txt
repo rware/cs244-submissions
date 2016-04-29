@@ -1,0 +1,132 @@
+Now running scale 0.72
+Listening on :::9090
+Sending to 100.64.0.1:9090
+Now running scale 0.73
+Listening on :::9090
+Sending to 100.64.0.1:9090
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.81 Mbits/s (75.7% utilization)
+95th percentile per-packet queueing delay: 76 ms
+95th percentile signal delay: 118 ms
+
+Uploading data to server... done.
+
+Upload successful (2072790 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?EACC-1461901017-saepaexu
+
+Now running scale 0.74
+Listening on :::9090
+Sending to 100.64.0.1:9090
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.82 Mbits/s (75.8% utilization)
+95th percentile per-packet queueing delay: 75 ms
+95th percentile signal delay: 121 ms
+
+Uploading data to server... done.
+
+Upload successful (2075463 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?EACC-1461901160-theemeex
+
+Now running scale 0.75
+Listening on :::9090
+Sending to 100.64.0.1:9090
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.85 Mbits/s (76.3% utilization)
+95th percentile per-packet queueing delay: 74 ms
+95th percentile signal delay: 121 ms
+
+Uploading data to server... done.
+
+Upload successful (2084329 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?EACC-1461901302-toopiete
+
+Now running scale 0.72
+Listening on :::9090
+Died on std::runtime_error: mm-delay: Please run "sudo sysctl -w net.ipv4.ip_forward=1" to enable IP forwarding
+
+Can't open /tmp/contest_uplink_log: No such file or directory at /usr/local/bin/mm-throughput-graph line 41.
+Must have at least one event at /usr/local/bin/mm-throughput-graph line 143.
+mm-throughput-graph exited with error. NOT uploading at ./run-contest line 52.
+Now running scale 0.74
+Listening on :::9090
+Died on std::runtime_error: mm-delay: Please run "sudo sysctl -w net.ipv4.ip_forward=1" to enable IP forwarding
+
+Can't open /tmp/contest_uplink_log: No such file or directory at /usr/local/bin/mm-throughput-graph line 41.
+Must have at least one event at /usr/local/bin/mm-throughput-graph line 143.
+mm-throughput-graph exited with error. NOT uploading at ./run-contest line 52.
+Now running scale 0.76
+Listening on :::9090
+Died on std::runtime_error: mm-delay: Please run "sudo sysctl -w net.ipv4.ip_forward=1" to enable IP forwarding
+
+Can't open /tmp/contest_uplink_log: No such file or directory at /usr/local/bin/mm-throughput-graph line 41.
+Must have at least one event at /usr/local/bin/mm-throughput-graph line 143.
+mm-throughput-graph exited with error. NOT uploading at ./run-contest line 52.
+Now running scale 0.72
+Listening on :::9090
+Sending to 100.64.0.1:9090
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.78 Mbits/s (75.1% utilization)
+95th percentile per-packet queueing delay: 72 ms
+95th percentile signal delay: 121 ms
+
+Uploading data to server... done.
+
+Upload successful (2062257 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?EACC-1461910997-ahwoenai
+
+Now running scale 0.74
+Listening on :::9090
+Sending to 100.64.0.1:9090
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.81 Mbits/s (75.5% utilization)
+95th percentile per-packet queueing delay: 74 ms
+95th percentile signal delay: 121 ms
+
+Uploading data to server... done.
+
+Upload successful (2069602 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?EACC-1461911140-shaevaif
+
+Now running scale 0.76
+Listening on :::9090
+Sending to 100.64.0.1:9090
+terminate called after throwing an instance of 'unix_error'
+  what():  send: Invalid argument
+
+Average capacity: 5.04 Mbits/s
+Average throughput: 3.85 Mbits/s (76.4% utilization)
+95th percentile per-packet queueing delay: 78 ms
+95th percentile signal delay: 120 ms
+
+Uploading data to server... done.
+
+Upload successful (2086603 bytes).
+For analysis, please visit:
+
+   http://cs344g.keithw.org/report?EACC-1461911282-eerohfoh
+

@@ -5,14 +5,15 @@
 
 using namespace std;
 
-#define WINDOW_DROP 0.72
+#define WINDOW_DROP 0.74
 #define SMALLEST_WINDOW_SIZE 5
 #define SSTHRESH_SCALE 1.1
+#define TIMEOUT 60
 
 /* Default constructor */
 Controller::Controller( const bool debug)
 : debug_( debug ), windowSize( 15 ), windowGrowing(0), ssthresh(1 << 15), outgoingPackets(deque<pair<uint64_t, uint64_t>>()),
-receivedAckno(0), ackCount(0), timeout ( 70 ), arrivalTimes(deque<uint64_t>()) {}
+receivedAckno(0), ackCount(0), timeout ( TIMEOUT ), arrivalTimes(deque<uint64_t>()) {}
 
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
