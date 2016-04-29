@@ -362,3 +362,15 @@ For analysis, please visit:
 
    http://cs344g.keithw.org/report?test22-1461035011-teijajol
 
+Now running window size 0.72
+Listening on :::9090
+Sending to 100.64.0.1:9090
+Now running window size 0.72
+Listening on :::9090
+Sending to 100.64.0.1:9090
+Now running window size 0.72
+Listening on :::9090
+Sending to 100.64.0.1:9090
+Now running scale 0.72
+Listening on :::9090
+Sending to 100.64.0.1:9090

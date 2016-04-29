@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#define WINDOW_DROP 0.8
+#define WINDOW_DROP 0.72
 #define SMALLEST_WINDOW_SIZE 5
 #define SSTHRESH_SCALE 1.1
 

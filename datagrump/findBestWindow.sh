@@ -1,9 +1,9 @@
 #!/bin/bash
 
-for i in {1..30..2}
+for i in 0.72 0.73 0.74 0.75
   do
-    sed "s/INSERTWINDOWSIZE/$i/g" controllerTemplate.cc > controller.cc;
+    sed "s/BLOOP/$i/g" controllerTemplate.cc > controller.cc;
     make;
-    echo "Now running window size $i" | tee -a output.txt;
-    ./run-contest test22 2>&1 | tee -a output.txt;
+    echo "Now running scale $i" | tee -a output.txt;
+    ./run-contest EACC 2>&1 | tee -a output.txt;
   done
