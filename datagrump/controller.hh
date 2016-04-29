@@ -10,6 +10,7 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
 
+  int cwnd_;
   /* Add member variables here */
 
 public:
@@ -32,6 +33,9 @@ public:
 		     const uint64_t send_timestamp_acked,
 		     const uint64_t recv_timestamp_acked,
 		     const uint64_t timestamp_ack_received );
+	
+	/* A timeout occurred */
+	void timeout_occurred();
 
   /* How long to wait (in milliseconds) if there are no acks
      before sending one more datagram */
