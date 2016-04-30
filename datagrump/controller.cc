@@ -8,8 +8,8 @@
 #define CWND_MIN 1
 #define TIMEOUT 60
 #define RTT_THRESH 110
-#define SLOW_ST_THRESH 13
-#define RTT_WEIGHT 1.25
+#define SLOW_ST_THRESH 10
+#define RTT_WEIGHT 0.2
 #define RTT_GAIN_FACTOR 0.005
 #define MULT_DECREASE_FACTOR 2.25
 #define TIME_SLICE 10
@@ -64,11 +64,10 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   unsigned int curr_rtt = (timestamp_ack_received - recv_timestamp_acked) +
       (recv_timestamp_acked - send_timestamp_acked);
   float old_avg = rtt_avg;
-  float curr_weight = RTT_WEIGHT/cwnd;
+  float curr_weight = RTT_WEIGHT;//cwnd;
   rtt_avg = curr_weight * curr_rtt + (1 - curr_weight) * rtt_avg;
   if (num_packets_in_timeslice != 0 && curr_timeslice < timestamp_ack_received/TIME_SLICE) {
     if (rtt_gain < 0) {
-      //cerr << "cwnd RTT Gain Factor" << (1.0 + (rtt_gain/num_packets_in_timeslice) * RTT_GAIN_FACTOR) << endl;
       cwnd *= (1.0 + (rtt_gain/num_packets_in_timeslice) * RTT_GAIN_FACTOR);
     } 
     rtt_gain = 0;
@@ -81,7 +80,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   } else if (rtt_avg <= old_avg) {
     rtt_gain++;
   }
-  //cwnd *= (1.0 + (rtt_gain/cwnd) * RTT_GAIN_FACTOR);
 
   if (rtt_avg > RTT_THRESH && cwnd <= SLOW_ST_THRESH) {
       cwnd = CWND_MIN;
@@ -89,9 +87,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       if (rtt_avg > RTT_THRESH) {
           cwnd /= MULT_DECREASE_FACTOR;
       }
-  }/* else if (cwnd < SLOW_ST_THRESH) {
-    cwnd += 1;
-  }*/ else {
+  } else {
     cwnd += 1/cwnd;
   }
    
