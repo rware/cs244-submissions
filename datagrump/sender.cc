@@ -56,7 +56,7 @@ int main( int argc, char *argv[] )
   } else if ( argc == 3 ) {
     /* do nothing */
   } else if (argc == 8) {
-      cout << "Got train args" << endl;
+      cout << "Using specified training arguments" << endl;
       rtt_timeout = atoi(argv[3]);
       timeout_reset = atoi(argv[4]);
       rand_linear = atoi(argv[5]);

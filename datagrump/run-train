@@ -1,4 +1,7 @@
 #!/usr/bin/perl -w
+#
+# Perl script with hooks into accepting args 
+# and passing those parameters to sender.cc 
 
 use strict;
 use LWP::UserAgent;
