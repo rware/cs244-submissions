@@ -25,7 +25,6 @@ Controller::Controller( const bool debug )
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
-  /* Default: fixed window size of 100 outstanding datagrams */
 
   if ( debug_ ) {
     cerr << "At time " << timestamp_ms()
@@ -64,8 +63,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   unsigned int curr_rtt = (timestamp_ack_received - recv_timestamp_acked) +
       (recv_timestamp_acked - send_timestamp_acked);
   float old_avg = rtt_avg;
-  float curr_weight = RTT_WEIGHT;//cwnd;
-  rtt_avg = curr_weight * curr_rtt + (1 - curr_weight) * rtt_avg;
+  rtt_avg = RTT_WEIGHT * curr_rtt + (1 - RTT_WEIGHT) * rtt_avg;
   if (num_packets_in_timeslice != 0 && curr_timeslice < timestamp_ack_received/TIME_SLICE) {
     if (rtt_gain < 0) {
       cwnd *= (1.0 + (rtt_gain/num_packets_in_timeslice) * RTT_GAIN_FACTOR);
