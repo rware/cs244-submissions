@@ -7,13 +7,6 @@
 #include "timestamp.hh"
 
 #define AVG_MULT 0.85
-#define TRACKED_PKTS 200
-
-uint64_t ctr = 0;
-
-uint64_t lastPackets[TRACKED_PKTS];
-double lastSlope = 0;
-
 
 using namespace std;
 
@@ -21,10 +14,9 @@ using namespace std;
 
 /* Default constructor */
 Controller::Controller( const bool debug )
-  : debug_( debug ), packetsUntilIncrease(0), curWinSize(10),
-    lastSendTimestamp(0), packetsUntilDecrease(0),
-    slowStartThreshold(5), minRTT(~0u), avgRTT(0),
-    targetRTT(100), linkRateStartTime(0), curLinkRate(0),
+  : debug_( debug ), curWinSize(10),
+    lastSendTimestamp(0), avgRTT(0),
+    linkRateStartTime(0), curLinkRate(0),
     linkRateNumPackets(0), prevLinkRate(0)
 {
 }
@@ -32,13 +24,6 @@ Controller::Controller( const bool debug )
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
-  /* Default: fixed window size of 100 outstanding datagrams */
-
-  if ( debug_ ) {
-    cerr << "At time " << timestamp_ms()
-	 << " window size is " << curWinSize << endl;
-  }
-
   return curWinSize;
 }
 
@@ -50,12 +35,8 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 				    const uint64_t send_timestamp )
                                     /* in milliseconds */
 {
-  /* Default: take no action */
-
-  if ( debug_ ) {
-    cerr << "At time " << send_timestamp
-	 << " sent datagram " << sequence_number << endl;
-  }
+  (void)sequence_number;
+  (void)send_timestamp;
 }
 
 /* An ack was received */
@@ -68,25 +49,16 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
+  (void)recv_timestamp_acked;
+  (void)sequence_number_acked;
 
-  if (ackedRTT < minRTT) {
-    minRTT = ackedRTT;
-    targetRTT = 2 * minRTT;
-  }
+  uint64_t ackedRTT = timestamp_ack_received - send_timestamp_acked;
 
   if (avgRTT == 0) {
     avgRTT = ackedRTT;
   } else {
     avgRTT = AVG_MULT * avgRTT + (1 - AVG_MULT) * ackedRTT;
   }
-
-  double currSlope = ackedRTT - avgRTT;
-  double slopeDiff = currSlope - lastSlope;
-  slopeDiff = slopeDiff;
-  lastSlope = currSlope;
-
-  
 
   // update statistics for link rate info
   if (linkRateStartTime == 0) {
@@ -118,18 +90,6 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       double numPacketsCanBeSent = 50 * curLinkRate;
       curWinSize = max(numPacketsCanBeSent, 1.0);
     }
-  }
-  
-  uint64_t packetIndex = ctr % TRACKED_PKTS;
-  ctr++;
-  lastPackets[packetIndex] = ackedRTT;
-  
-  if ( debug_ ) {
-    cerr << "At time " << timestamp_ack_received
-	 << " received ack for datagram " << sequence_number_acked
-	 << " (send @ time " << send_timestamp_acked
-	 << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
-	 << endl;
   }
 }
 

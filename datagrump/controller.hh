@@ -11,14 +11,9 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
-  uint64_t packetsUntilIncrease;
   double curWinSize;
   uint64_t lastSendTimestamp;
-  uint64_t packetsUntilDecrease;
-  uint64_t slowStartThreshold;
-  uint64_t minRTT;
   double avgRTT;
-  uint64_t targetRTT;
 
   uint64_t linkRateStartTime;
   double curLinkRate;
