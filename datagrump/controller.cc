@@ -84,7 +84,7 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
     rtt_estimate = newRoundTripTime;
   } else {
     if (last_queue_occ < newBufferOcc - 1) {
-      the_window_size -= 4.0/window_size();
+      the_window_size -= 3.0/window_size();
     } else {
       the_window_size += 2.0/window_size();
     }
@@ -106,7 +106,7 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
       // cerr << burst_count << " packets with recv_timestamp_acked of " << recv_timestamp_acked << " with estimated rtt of " << rtt_estimate << endl;
       // cerr << sequence_number_acked << ": " << (burst_count * 1424 * 8)/ (130 * 1000) << endl;
       // int difference = (int)(burst_count) > newBufferOcc - 1 ? (burst_count - newBufferOcc + 1) : 0;
-      double new_window_size = 0.475 * the_window_size + 0.475 * burst_count;
+      double new_window_size = 0.45 * the_window_size + 0.45 * burst_count;
       // if (new_window_size < the_window_size) {
       //   increase_rate *= 0.9;
       // } else {
