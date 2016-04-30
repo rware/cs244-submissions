@@ -2,6 +2,7 @@
 #define CONTROLLER_HH
 
 #include <cstdint>
+#include <deque>
 
 /* Congestion controller interface */
 
@@ -11,6 +12,8 @@ private:
   bool debug_; /* Enables debugging output */
 
   int cwnd_;
+  
+  std::deque<int> q;
   /* Add member variables here */
 
 public:
