@@ -14,19 +14,35 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 15 ), // Start window size higher than 1, avoid very slow start
-    timeout_( 51 ),
-    min_rtt_thresh_( 30 ),
-    max_rtt_thresh_( 70 ),
+    timeout_( 51 ),  // target RTT (outstanding packets timeout after this)
+
+    min_rtt_thresh_( 30 ), // These params used exclusively for
+    max_rtt_thresh_( 70 ), // exercise C's delay triggered scheme
     last_rtt_timestamp_(0),
-    mode_( AIMD_PROBABALISTIC ),
-    outstanding_packets_( ),
-    last_timeout_( 0 ),
-    timeout_reset_( 74 ),
-    rand_linear_( 5205 ),
-    timeout_multiplier_( 0.23 ),
-    minimum_rand_target_( 3428 )
+
+    mode_( AIMD_PROBABALISTIC ), // Specify mode for exercise A, B, C or contest.
+                                 // See controller.hh for other modes 
+
+    outstanding_packets_( ),     // Set of unACK'd packets
+
+    last_timeout_( 0 ),          // PAIMD: The last time that a packet timed out
+    
+    timeout_reset_( 74 ),        // PAIMD: Frequency (in  ms) that multiplicative 
+                                 // decrease can occur
+                                 
+    rand_linear_( 5205 ),        // PAIMD: affects aggressiveness of rapid recovery
+                                 // and cautious backoff
+
+    timeout_multiplier_( 0.23 ), // PAIMD: Multiplicative decrease multiplier
+
+    minimum_rand_target_( 3428 ) // PAIMD: Enforces a minimum fixed percentage 
+                                 // chance for increasing window size when a 
+                                 // packet is ACK'd
 {}
 
+/** 
+ * Used exclusively for training, this let sender.cc set param values
+ */
 void Controller::set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear, float timeout_multiplier, uint64_t min_rand_target) {
     if(rtt_timeout != 0) {
         timeout_ = rtt_timeout;
