@@ -36,6 +36,10 @@ public:
   int loop( void );
 };
 
+/* The following parameters are only used 
+ * when training (see run-train perl script,
+ * a modified version of run-contest)
+ */
 uint64_t rtt_timeout = 0;
 uint64_t timeout_reset = 0;
 uint64_t rand_linear = 0;
@@ -56,6 +60,7 @@ int main( int argc, char *argv[] )
   } else if ( argc == 3 ) {
     /* do nothing */
   } else if (argc == 8) {
+      // Get parameters from run-train script
       cout << "Using specified training arguments" << endl;
       rtt_timeout = atoi(argv[3]);
       timeout_reset = atoi(argv[4]);
@@ -81,7 +86,12 @@ DatagrumpSender::DatagrumpSender( const char * const host,
     sequence_number_( 0 ),
     next_ack_expected_( 0 )
 {
-  controller_.set_params(rtt_timeout, timeout_reset, rand_linear, timeout_multiplier, min_rand_target);
+   // Tell controller to use params from training,
+   // if the params weren't set, then controller will
+   // use its default values
+  controller_.set_params(rtt_timeout, timeout_reset,
+                         rand_linear, timeout_multiplier,
+                         min_rand_target);
 
   /* turn on timestamps when socket receives a datagram */
   socket_.set_timestamps();
