@@ -72,76 +72,32 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
              const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  /* Default: take no action */
+  // Reset retry counter for timeouts
+  retries = 0;
+
+  // Measure the RTT for the packet
   uint64_t delay = timestamp_ack_received - send_timestamp_acked;
 
   if (delay < min_rtt) min_rtt = delay;
 
+  // Update our average RTT measurment for use in the t_high and t_low i
+  // bounds calculations
+
   avg_rtt = (1 - alpha) * avg_rtt + alpha * delay;
-
-  //if (abs(delay - t_low) < abs(delay - t_high)) {
-  //  t_low = (1 - gamma) * t_low + gamma * delay;
-  //  std::cerr << "t_low: " << t_low << endl;
-  //} else {
-  //  t_high = (1 - gamma) * t_high + gamma * delay;
-  //  std::cerr << "t_high: " << t_high << endl;
-  //}
-  
-
-  //if (delay < t_low)
-  //  t_low -= 10 * gamma;
-  //else
-  //  t_low += gamma;
-
-  //if (delay > t_high)
-  //  t_high += 10 * gamma;
-  //else
-  //  t_high -= gamma;
-
-  //float avg_delay;
-
-  //if (!filled) {
-  //  samples[num_samples] = delay;
-  //  delay_sum += delay;
-  //  num_samples++;
-  //  avg_delay = delay_sum / num_samples;
-  //  if (num_samples == NUM_SAMPLES) {
-  //    num_samples = 0;
-  //    filled = true;
-  //  }
-  //}
-  //else {
-  //  int prev_sample = samples[(num_samples + 1) % NUM_SAMPLES];
-
-  //  delay_sum -= prev_sample;
-  //  delay_sum += delay;
-  //  samples[num_samples] = delay;
-  //  avg_delay = delay_sum / NUM_SAMPLES;
-
-  //  num_samples = (num_samples + 1) % NUM_SAMPLES;
-  //}
 
   t_high = avg_rtt * 1.8;
   t_low = avg_rtt * 0.6;
+
+  // update the rtt_diff for the gradient calculation
 
   int64_t new_rtt_diff = delay - prev_rtt;
 
   rtt_diff = (1 - alpha) * rtt_diff + alpha * new_rtt_diff;
 
-  if ( debug_ ) 
-    cerr << "rtt_diff: "       << rtt_diff 
-         << ", min_rtt: "      << min_rtt 
-         << ", new_rtt_diff: " << new_rtt_diff 
-         << endl;
   float gradient = rtt_diff / min_rtt;
   prev_rtt = delay;
 
-  //std::cerr << "t_high: " << t_high 
-  //          << " t_low: " << t_low 
-  //          << " delay: " << delay 
-  //          << " gradient: " << gradient 
-  //          << " window: " << the_window_size 
-  //          << endl;
+  // Set our N scaling factor
 
   if ( gradient <= 0) {
     num_neg_gradients ++;
@@ -152,36 +108,24 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
     N = 1;
   }
 
-  //if ( gradient >= 0) {
-  //  num_pos_gradients ++;
-  //  if (num_pos_gradients <= 5)
-  //    M = num_pos_gradients;
-  //} else {
-  //  num_pos_gradients = 0;
-  //  M = 1;
-  //}
+  // Run the meat of the algorithm
 
-  //if (delay - avg_delay > avg_delay * 4) { 
-  //  the_window_size = 0;
-  //  cerr << "returning" << endl;
-  //  return;
-  //}
-
+  // Too Low!
   if (delay < t_low) {
     the_window_size += N * (float) min_rtt / delay;
   }
+  // Too High!
   else if (delay > t_high) {
     the_window_size = the_window_size * (1 - beta * (1 - t_high / delay));
   }
+  // Gradient-based window modification
   else if (gradient <= 0) {
-    if ( debug_ ) 
-      cerr << "neg gradient" << endl;
     the_window_size = the_window_size + N * (float) min_rtt / delay;
   } else {
-    if ( debug_ ) 
-      cerr << "pos gradient: " << gradient << endl;
     the_window_size = the_window_size * (1 - beta * gradient);
   }
+
+  // make sure the window size doesn't drop too low
 
   the_window_size = (the_window_size < 1) ? 1 : the_window_size;
 
@@ -190,15 +134,17 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
          << " received ack for datagram " << sequence_number_acked
          << " (send @ time "              << send_timestamp_acked
          << ", received @ time "          << recv_timestamp_acked 
-         << " by receiver's clock)"
+         << " by receiver's clock). "     << endl
+         << "rtt_diff: "                  << rtt_diff 
+         << ", min_rtt: "                 << min_rtt 
+         << ", new_rtt_diff: "            << new_rtt_diff 
          << endl;
   }
 }
 
 /* How long to wait (in milliseconds) if there are no acks
-   before sending one more datagram */
+   before sending one more window */
 unsigned int Controller::timeout_ms( void )
 {
-  return avg_rtt * 2;
-  //return 250; /* timeout of 0.5 seconds */
+  return avg_rtt * 2 * ( 1.0 + (float) retries / 10.0);
 }
