@@ -63,12 +63,12 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
                                /* when the ack was received (by sender) */
 {
   uint64_t now = timestamp_ms();
-  uint64_t new_rtt = timestamp_ack_received - send_timestamp_acked;
   if (now - timestamp_changed < 10) {
     return;
   }
   timestamp_changed = now;
 
+  uint64_t new_rtt = timestamp_ack_received - send_timestamp_acked;
   int64_t new_rtt_diff = new_rtt - prev_rtt;
   prev_rtt = new_rtt;
   rtt_diff = (1 - EWMA_WEIGHT)*rtt_diff + EWMA_WEIGHT*new_rtt_diff;
