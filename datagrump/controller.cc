@@ -5,7 +5,7 @@
 #include "controller.hh"
 #include "timestamp.hh"
 
-#define AVG_MULT 0.95
+#define AVG_MULT 0.85
 #define TRACKED_PKTS 200
 
 uint64_t ctr = 0;
@@ -80,7 +80,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
       linkRateStartTime = timestamp_ack_received;
       linkRateNumPackets = 0;
-      cout << "Link Rate: " << curLinkRate << "    Curwinsize: " << curWinSize << " RTT: " << avgRTT << endl;
+      //cout << "Link Rate: " << curLinkRate << "    Curwinsize: " << curWinSize << " RTT: " << avgRTT << endl;
     }
   }
 
@@ -90,19 +90,20 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   linkRateNumPackets++;
 
 
-  if (ackedRTT < 60) {
-    if (curLinkRate != 0 && prevLinkRate != 0) {
-      double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
-      double numPacketsCanBeSent = 70 * nextLinkRate / 12.0;
-      curWinSize = max(numPacketsCanBeSent, 1.0);
-    }
+  double winMultiplier;
+  if (avgRTT < 55) {
+    winMultiplier = 70;
+  } else if (avgRTT < 60) {
+    winMultiplier = 65;
   } else {
-    if (curLinkRate != 0 && prevLinkRate != 0) {
-      double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
-      double numPacketsCanBeSent = 50 * nextLinkRate / 12.0;
-      curWinSize = max(numPacketsCanBeSent, 1.0);
-    }
+    winMultiplier = 55;
   }
+
+  if (curLinkRate != 0 && prevLinkRate != 0) {
+      //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
+      double numPacketsCanBeSent = winMultiplier * curLinkRate / 12.0;
+      curWinSize = max(numPacketsCanBeSent, 4.0);
+    }
   
  
   uint64_t packetIndex = ctr % TRACKED_PKTS;
@@ -156,5 +157,5 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
    before sending one more datagram */
 unsigned int Controller::timeout_ms( void )
 {
-  return 40; /* timeout of one second */
+  return 30; /* timeout of one second */
 }
