@@ -9,7 +9,7 @@ using namespace std;
 /* Default constructor */
 Controller::Controller( const bool debug )
   : debug_(debug), rtt_estimate(0), the_window_size(1.0), num_packets_received(0), first_of_burst(0), 
-    curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map(), rtt_total(0), num_packets_sent(0), last_queue_occ(-1), increase_rate(3.0), num_increase(0.0), last_calculated_rate(-1)
+    curr_interarrival(0), burst_count(1), burst_timer(0), slow_start(true), capacity_estimate(0.0), send_map(), rtt_total(0), num_packets_sent(0), last_queue_occ(-1), num_increase(0.0), last_calculated_rate(-1)
 {
   debug_ = false;
 }
@@ -83,10 +83,10 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
     }
     rtt_estimate = newRoundTripTime;
   } else {
-    if (last_queue_occ < newBufferOcc - 1) {
+    if (last_queue_occ < newBufferOcc) {
       the_window_size -= 5.0/window_size();
     } else {
-      the_window_size += increase_rate/window_size();
+      the_window_size += 2.0/window_size();
     }
 
     // if (newRoundTripTime > 70) {
@@ -106,32 +106,32 @@ void Controller::delay_aiad_unsmoothedRTT(const uint64_t sequence_number_acked,
       // cerr << burst_count << " packets with recv_timestamp_acked of " << recv_timestamp_acked << " with estimated rtt of " << rtt_estimate << endl;
       // cerr << sequence_number_acked << ": " << (burst_count * 1424 * 8)/ (130 * 1000) << endl;
       // int difference = (int)(burst_count) > newBufferOcc - 1 ? (burst_count - newBufferOcc + 1) : 0;
-      double new_window_size = 0.5 * the_window_size + 0.4 * burst_count;
+      double new_window_size = 0.5 * the_window_size + 0.5 * burst_count;
       // if (new_window_size < the_window_size) {
       //   increase_rate *= 0.9;
       // } else {
       //   increase_rate *= 1.1;
       // }
-      if (last_calculated_rate == -1) {
-        last_calculated_rate = new_window_size;
-      } else {
-        if (new_window_size < last_calculated_rate) {
-          num_increase = num_increase >= 0 ? -1 : (num_increase - 1);
-          if (num_increase <= -2) {
-            increase_rate = 1.0;
-          } else {
-            increase_rate = 3.0;
-          }
-        } else {
-          num_increase = num_increase <= 0 ? 1 : (num_increase + 1);
-          if (num_increase >= 5) {
-            increase_rate = 8.0;
-          } else {
-            increase_rate = 3.0;
-          }
-        }
-        last_calculated_rate = new_window_size;
-      }
+      // if (last_calculated_rate == -1) {
+      //   last_calculated_rate = new_window_size;
+      // } else {
+      //   if (new_window_size < last_calculated_rate) {
+      //     num_increase = num_increase >= 0 ? -1 : (num_increase - 1);
+      //     if (num_increase <= -2) {
+      //       increase_rate = 1.0;
+      //     } else {
+      //       increase_rate = 3.0;
+      //     }
+      //   } else {
+      //     num_increase = num_increase <= 0 ? 1 : (num_increase + 1);
+      //     if (num_increase >= 5) {
+      //       increase_rate = 5.0;
+      //     } else {
+      //       increase_rate = 3.0;
+      //     }
+      //   }
+      //   last_calculated_rate = new_window_size;
+      // }
       
       the_window_size = new_window_size;
       // cerr << burst_count << " " << window_size() << endl;

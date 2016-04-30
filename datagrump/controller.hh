@@ -24,7 +24,6 @@ private:
 
   uint64_t num_packets_sent;
   int last_queue_occ;
-  double increase_rate;
   int num_increase;
   double last_calculated_rate;
 
