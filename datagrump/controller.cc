@@ -172,5 +172,5 @@ unsigned int Controller::timeout_ms( void )
     return DEFAULT_TIMEOUT;
   }
 
-  return bestDelay * 3;
+  return bestDelay;
 }
