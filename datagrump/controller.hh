@@ -15,6 +15,7 @@ private:
   /* Add member variables here */
   uint64_t min_rtt = 20; 
   uint64_t prev_rtt = 20;
+  uint64_t min_rtt_seen = 20; 
   float avg_rtt = 20;
   float t_low = 50;
   float t_high = 100;

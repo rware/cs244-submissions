@@ -121,8 +121,8 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   //  num_samples = (num_samples + 1) % NUM_SAMPLES;
   //}
 
-  //t_high = avg_rtt * 1.8;
-  //t_low = avg_rtt * 0.6;
+  t_high = avg_rtt * 1.8;
+  t_low = avg_rtt * 0.6;
 
   int64_t new_rtt_diff = delay - prev_rtt;
 
@@ -143,14 +143,14 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   //          << " window: " << the_window_size 
   //          << endl;
 
-  //if ( gradient <= 0) {
-  //  num_neg_gradients ++;
-  //  if (num_neg_gradients <= 20)
-  //    N = num_neg_gradients / 4;
-  //} else {
-  //  num_neg_gradients = 0;
-  //  N = 1;
-  //}
+  if ( gradient <= 0) {
+    num_neg_gradients ++;
+    if (num_neg_gradients == 5)
+      N = num_neg_gradients / 2;
+  } else {
+    num_neg_gradients = 0;
+    N = 1;
+  }
 
   //if ( gradient >= 0) {
   //  num_pos_gradients ++;
