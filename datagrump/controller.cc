@@ -64,7 +64,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 {
   uint64_t now = timestamp_ms();
   uint64_t new_rtt = timestamp_ack_received - send_timestamp_acked;
-  if (now - timestamp_changed < 10 /*&& new_rtt <= 1000*/) {
+  if (now - timestamp_changed < 10) {
     return;
   }
   timestamp_changed = now;
