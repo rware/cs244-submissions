@@ -48,9 +48,11 @@ sub gen_random_candidate() {
 
     $candidate->{'param1'} = int(40 + rand(70));
     $candidate->{'param2'} = int(40 + rand(70));
-    $candidate->{'param3'} = int(30*30+rand(80*80));
+    # $candidate->{'param3'} = int(30*30+rand(80*80));
+    $candidate->{'param3'} = int(5+rand(7));
     $candidate->{'param4'} = nearest(0.01, rand(66)/100.0 + 0.01);
-    $candidate->{'param5'} = int(30*30+rand(80*80));
+    # $candidate->{'param5'} = int(30*30+rand(80*80));
+    $candidate->{'param5'} = int(4+rand(7));
 
     return $candidate;
 }

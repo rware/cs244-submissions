@@ -14,17 +14,17 @@ using namespace std;
 Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 15 ), // Start window size higher than 1, avoid very slow start
-    timeout_( 100 ),
+    timeout_( 51 ),
     min_rtt_thresh_( 50 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
     mode_( AIMD_PROBABALISTIC ),
     outstanding_packets_( ),
     last_timeout_( 0 ),
-    timeout_reset_( 50 ),
-    rand_linear_( 7000 ),
-    timeout_multiplier_( 0.5 ),
-    minimum_rand_target_( 6800 )
+    timeout_reset_( 74 ),
+    rand_linear_( 5205 ),
+    timeout_multiplier_( 0.23 ),
+    minimum_rand_target_( 3428 )
 {}
 
 void Controller::set_params(uint64_t rtt_timeout, uint64_t timeout_reset, uint64_t rand_linear, float timeout_multiplier, uint64_t min_rand_target) {

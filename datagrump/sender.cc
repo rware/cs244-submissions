@@ -51,8 +51,6 @@ int main( int argc, char *argv[] )
 
   bool debug = false;
 
-  cout << "Received " << argc << " arguments" << endl;
-
   if ( argc == 4 and string( argv[ 3 ] ) == "debug" ) {
     debug = true;
   } else if ( argc == 3 ) {
