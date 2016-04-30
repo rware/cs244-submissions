@@ -14,6 +14,8 @@ private:
   double cur_window_size; //need a double for additive increase
   double avg_delay;
   double var_delay;
+  uint64_t min_delay;
+  unsigned int timeout;
 
 public:
   /* Public interface for the congestion controller */
