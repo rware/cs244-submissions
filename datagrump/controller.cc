@@ -97,7 +97,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
       curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
       linkRateStartTime = timestamp_ack_received;
       linkRateNumPackets = 0;
-      printf("Link rate: %6.2f   cwnd: %7.3f   avgRTT: %6.2f\n", curLinkRate, curWinSize, avgRTT);
+      //printf("Link rate: %6.2f   cwnd: %7.3f   avgRTT: %6.2f\n", curLinkRate, curWinSize, avgRTT);
     }
   }
 
