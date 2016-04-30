@@ -15,7 +15,7 @@ Controller::Controller( const bool debug )
   : debug_( debug ),
     win_size_( 15 ), // Start window size higher than 1, avoid very slow start
     timeout_( 51 ),
-    min_rtt_thresh_( 50 ),
+    min_rtt_thresh_( 30 ),
     max_rtt_thresh_( 70 ),
     last_rtt_timestamp_(0),
     mode_( AIMD_PROBABALISTIC ),
@@ -76,7 +76,9 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
     struct SentPacket sent = {sequence_number, send_timestamp};
     outstanding_packets_.insert(sent);
 
-    /* Check if a timeout should have triggered */
+    /* Check if a timeout should have triggered. Also, don't call timeout too often.
+     * We only call at most one timeout during TIMEOUT_RESET. This is because we can get
+     * a batch of timeout packets that may reduce our window too much. */
     if(is_timeout(send_timestamp) && send_timestamp - last_timeout_ > timeout_reset_) {
         timeout_received();
         last_timeout_ = send_timestamp;
@@ -134,7 +136,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 			       const uint64_t timestamp_ack_received )
                                /* when the ack was received (by sender) */
 {
-  if(mode_ == AIMD || mode_ == AIMD_INF || mode_ == AIMD_PROBABALISTIC) {
+  if(mode_ == AIMD || mode_ == AIMD_PROBABALISTIC) {
     // Remove ACK'd packet from outstanding_packets
     remove_outstanding_packet(sequence_number_acked);
   }
@@ -190,7 +192,7 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
 /* A timeout was received */
 void Controller::timeout_received( void )
 {
-  if ((mode_ == AIMD) || (mode_ == AIMD_INF) || (mode_ == AIMD_PROBABALISTIC)) {
+  if ((mode_ == AIMD) || (mode_ == AIMD_PROBABALISTIC)) {
     win_size_ = std::max(1, (int) (win_size_ * timeout_multiplier_) );
   }
   return;

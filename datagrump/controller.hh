@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <set>
 
-enum Controller_Mode { NA, AIMD, AIMD_INF, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
+enum Controller_Mode { NA, AIMD, AIMD_PROBABALISTIC, SIMPLE_DELAY, DOUBLE_THRESH };
 /* Congestion controller interface */
 
 struct SentPacket {
