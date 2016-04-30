@@ -94,10 +94,10 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   } else {
     if (linkRateStartTime + 100 < timestamp_ack_received) {
       prevLinkRate = curLinkRate;
-      curLinkRate = (linkRateNumPackets) * 12.0 / (timestamp_ack_received - linkRateStartTime);
+      curLinkRate = (linkRateNumPackets) * 1.0 / (timestamp_ack_received - linkRateStartTime);
       linkRateStartTime = timestamp_ack_received;
       linkRateNumPackets = 0;
-      //printf("Link rate: %6.2f   cwnd: %7.3f   avgRTT: %6.2f\n", curLinkRate, curWinSize, avgRTT);
+      //printf("Link rate: %6.2f   cwnd: %7.3f   avgRTT: %6.2f\n", curLinkRate * 12.0, curWinSize, avgRTT);
     }
   }
 
@@ -109,13 +109,13 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   if (avgRTT < 60) {
     if (curLinkRate != 0 && prevLinkRate != 0) {
       //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
-      double numPacketsCanBeSent = 70 * curLinkRate / 12.0;
+      double numPacketsCanBeSent = 70 * curLinkRate;
       curWinSize = max(numPacketsCanBeSent, 1.0);
     }
   } else {
     if (curLinkRate != 0 && prevLinkRate != 0) {
       //double nextLinkRate = curLinkRate + (curLinkRate - prevLinkRate) / 100.0 * 30;
-      double numPacketsCanBeSent = 50 * curLinkRate / 12.0;
+      double numPacketsCanBeSent = 50 * curLinkRate;
       curWinSize = max(numPacketsCanBeSent, 1.0);
     }
   }
