@@ -20,10 +20,10 @@ static const double MULTIPLICATIVE_DECREMENT = 0.4;
 Controller::Controller( const bool debug )
   : debug_( debug )
   , window_size_double(10)
-  , timeout_batch(0)
-  , prev_rtt(100) // TODO: initial value?
-  , rtt_diff(10) // TODO: initial value?
+  , prev_rtt(100)
+  , rtt_diff(10)
   , timestamp_changed(0)
+  , timeout_batch(0)
   , increment_count(0)
   , decrement_count(0)
 {}
@@ -31,10 +31,10 @@ Controller::Controller( const bool debug )
 /* Get current window size, in datagrams */
 unsigned int Controller::window_size( void )
 {
-  // if ( debug_ ) {
-  //   cerr << "At time " << timestamp_ms()
-  //  << " window size is " << window_size_int << endl;
-  // }
+  if ( debug_ ) {
+    cerr << "At time " << timestamp_ms()
+   << " window size is " << window_size_double << endl;
+  }
 
   return window_size_double;
 }
@@ -47,10 +47,10 @@ void Controller::datagram_was_sent( const uint64_t sequence_number,
 {
   /* Default: take no action */
 
-  // if ( debug_ ) {
-  //   cerr << "At time " << send_timestamp
-  //  << " sent datagram " << sequence_number << endl;
-  // }
+  if ( debug_ ) {
+    cerr << "At time " << send_timestamp
+   << " sent datagram " << sequence_number << endl;
+  }
 }
 
 /* An ack was received */
@@ -70,71 +70,70 @@ void Controller::ack_received( const uint64_t sequence_number_acked,
   }
   timestamp_changed = now;
 
-  cout << "*********************************************" << endl;
   int64_t new_rtt_diff = new_rtt - prev_rtt;
-  cout << "time: " << now << endl;
-  cout << "rtt diff is " << new_rtt_diff << endl;
-  cout << "new_rtt is " << new_rtt << endl;
   prev_rtt = new_rtt;
   rtt_diff = (1 - EWMA_WEIGHT)*rtt_diff + EWMA_WEIGHT*new_rtt_diff;
   double normalized_gradient = rtt_diff / MIN_RTT;
 
   if (new_rtt <= T_HIGH) timeout_batch = 0;
 
+  // Increase aggressively (additive) below T_LOW
   if (new_rtt < T_LOW) {
     decrement_count = 0;
     increment_count += 1.5;
     window_size_double += increment_count * ADDITIVE_INCREMENT / sqrt(window_size_double);
-    cout << "below T_LOW, increment_count is " << increment_count << ", increasing window size to " << window_size_double << endl;
-  } else if (new_rtt > T_HIGH) {
+  }
+
+  // Decrease aggressively (multiplicative) above T_HIGH
+  else if (new_rtt > T_HIGH) {
     increment_count = 0;
     if (new_rtt > 1000) {
+      // When the RTT is over a second, just drop the window to 1
       decrement_count += 1.5;
       timeout_batch = 0;
       window_size_double = 1;
-      cout << "rtt > 1000, decreasing window size to 1" << endl;
     } else {
+      // Decrease aggressively if we're above T_HIGH and not in a timeout batch
       if (timeout_batch) {
-        cout << "rtt > T_HIGH, but in timeout batch" << endl;
         timeout_batch--;
       } else {
-        // decrement_count = 0;
         decrement_count += 1.5;
         timeout_batch = sqrt(window_size_double);
         window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*(1 - T_HIGH/new_rtt));
         if (window_size_double < 1) {
           window_size_double = 1;
         }
-        cout << "rtt > T_HIGH, decrement_count is " << decrement_count << ", decreasing window size to " << window_size_double << endl;
       }
     }
-  } else if (normalized_gradient <= 0 && new_rtt < 100) {
+  }
+
+  // Gradient-based additive increase if the RTT isn't already pretty good
+  else if (normalized_gradient <= 0 && new_rtt < 100) {
     increment_count++;
     decrement_count = 0;
     int n = max(increment_count / 2, 1.0);
     window_size_double += n * ADDITIVE_INCREMENT / window_size_double;
-    cout << "gradient is " << normalized_gradient << ", increment_count is " << increment_count << ", increasing window size to " << window_size_double << endl;
-  } else if (normalized_gradient > 0) {
+  }
+
+  // Gradient-based additive decrease
+  else if (normalized_gradient > 0) {
     increment_count = 0;
     decrement_count++;
-    // int n = decrement_count;
     int n = max(decrement_count / 2, 1.0);
     window_size_double += n * ADDITIVE_DECREMENT / sqrt(window_size_double);
-    // window_size_double *= (1 - MULTIPLICATIVE_DECREMENT*normalized_gradient / sqrt(window_size_double));
     if (window_size_double < 1) {
       window_size_double = 1;
     }
-    cout << "gradient is " << normalized_gradient << ", decrement_count is " << decrement_count << ", decreasing window size to " << window_size_double << endl;
   }  
 
-  // if ( debug_ ) {
-  //   cerr << "At time " << timestamp_ack_received
-  //  << " received ack for datagram " << sequence_number_acked
-  //  << " original packet sent " << send_timestamp
-  //  << " (send @ time " << send_timestamp_acked
-  //  << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
-  //  << endl;
-  // }
+  if ( debug_ ) {
+    cerr << "At time " << timestamp_ack_received
+   << " received ack for datagram " << sequence_number_acked
+   << " original packet sent " << send_timestamp_acked
+   << " (send @ time " << send_timestamp_acked
+   << ", received @ time " << recv_timestamp_acked << " by receiver's clock)"
+   << endl;
+  }
 }
 
 /* How long to wait (in milliseconds) if there are no acks
