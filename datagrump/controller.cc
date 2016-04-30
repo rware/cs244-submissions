@@ -17,7 +17,7 @@ using namespace std;
 #define UPDATE_TIME 5000
 
 #define DEFAULT_CWIND 10
-#define DEFAULT_TIMEOUT 45
+#define DEFAULT_TIMEOUT 45000
 #define MIN_CWIND 2
 
 #define EPSILON 3
