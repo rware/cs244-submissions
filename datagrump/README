@@ -1,9 +1,0 @@
-Exercise 2
-
-We implemented an AIMD scheme that increased by the inverse of the window size
-every time an ack was received and decreased by a factor of 2 when the time
-between sending and receiving the datagram was more than 200ms. We chose 200ms
-because the average RTT appeared to be around 100ms. Timeouts posed an
-interesting problem because if you see one timeout you're likely to see a few in
-a row. We tried both decreasing whenever there was a timeout and only decreasing
-once per timeout batch. Ignoring batched timeouts led to better results.
