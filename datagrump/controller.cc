@@ -7,7 +7,6 @@
 
 using namespace std;
 
-// TODO
 static const double EWMA_WEIGHT = 0.4;
 static const uint64_t T_LOW = 50;
 static const uint64_t T_HIGH = 140;
