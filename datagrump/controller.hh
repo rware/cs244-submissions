@@ -11,6 +11,14 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
+  double cwnd_;
+  int64_t min_owdelay_;
+  int64_t new_qdelay_;
+  int64_t prev_qdelay_;
+  double qdelay_diff_ewma_;
+  int64_t ack_num_;
+  double timeout_;
+  double rtt_ewma_;
 
 public:
   /* Public interface for the congestion controller */
