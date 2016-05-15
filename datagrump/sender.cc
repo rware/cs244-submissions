@@ -31,7 +31,14 @@ private:
 
 public:
   DatagrumpSender( const char * const host, const char * const port,
-		   const bool debug );
+		   const bool debug,
+				  float gain,
+ 				  unsigned int queue_limit,
+				  unsigned int queue_delay_target,
+				  unsigned int update_freq,
+				  unsigned int noise_filter,
+				  unsigned int timeout_ms
+		  );
   int loop( void );
 };
 
@@ -54,15 +61,24 @@ int main( int argc, char *argv[] )
 
   /* create sender object to handle the accounting */
   /* all the interesting work is done by the Controller */
-  DatagrumpSender sender( argv[ 1 ], argv[ 2 ], debug );
+  DatagrumpSender sender( argv[ 1 ], argv[ 2 ], debug,
+	 0, 0, 0,
+	 0, 50, 25);
   return sender.loop();
 }
 
 DatagrumpSender::DatagrumpSender( const char * const host,
 				  const char * const port,
-				  const bool debug )
+				  const bool debug,
+				  float gain,
+ 				  unsigned int queue_limit,
+				  unsigned int queue_delay_target,
+				  unsigned int update_freq,
+				  unsigned int noise_filter,
+				  unsigned int timeout_ms
+				 )
   : socket_(),
-    controller_( debug ),
+    controller_( debug, gain, queue_limit, queue_delay_target, update_freq, noise_filter, timeout_ms ),
     sequence_number_( 0 ),
     next_ack_expected_( 0 )
 {
