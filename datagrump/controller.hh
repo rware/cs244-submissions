@@ -10,7 +10,17 @@ class Controller
 private:
   bool debug_; /* Enables debugging output */
 
-  /* Add member variables here */
+  unsigned int window_size_;
+
+  unsigned int num_ack_until_increment_;
+
+  uint64_t prev_rtt_;
+
+  uint64_t min_rtt_;
+
+  double rtt_diff_;
+
+  uint64_t md_interval_;
 
 public:
   /* Public interface for the congestion controller */
