@@ -11,6 +11,11 @@ private:
   bool debug_; /* Enables debugging output */
 
   /* Add member variables here */
+  double window_size_;
+  unsigned int last_acked_num_;
+  double rtt_estimate_;
+  unsigned int delay_thresh_;
+  unsigned int last_md_;
 
 public:
   /* Public interface for the congestion controller */
@@ -25,7 +30,8 @@ public:
 
   /* A datagram was sent */
   void datagram_was_sent( const uint64_t sequence_number,
-			  const uint64_t send_timestamp );
+			  const uint64_t send_timestamp,
+			  bool from_timeout );
 
   /* An ack was received */
   void ack_received( const uint64_t sequence_number_acked,
