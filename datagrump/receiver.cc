@@ -27,7 +27,7 @@ int main( int argc, char *argv[] )
   socket.set_timestamps();
 
   /* "bind" the socket to the user-specified local port number */
-  socket.bind( Address( "::0", argv[ 1 ] ) );
+  socket.bind( Address( "192.0.0.2", argv[ 1 ] ) );
 
   cerr << "Listening on " << socket.local_address().to_string() << endl;
 
